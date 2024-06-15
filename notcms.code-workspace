@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "path": "packages/notcms"
+    },
+    {
+      "path": "packages/notcms-kit"
+    },
+    {
+      "name": "root",
+      "path": "."
+    }
+  ],
+  "settings": {}
+}
