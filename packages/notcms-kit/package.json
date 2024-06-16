@@ -3,6 +3,7 @@
   "version": "0.0.0-development",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "main": "./lib/index.js",
+  "bin": "./lib/index.js",
   "files": [
     "lib/**/*"
   ],
