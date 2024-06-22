@@ -1,5 +1,5 @@
 import { routes } from './routes';
-import { pageProperties } from './schema';
+import { PageProperties, pageProperties } from './schema';
 
 interface Page {
   id: string;
@@ -33,9 +33,9 @@ class DatabaseHandler<
 
 interface ClientOptions {
   secretKey?: string;
-  pageProperties: Record<string, Record<string, string>>;
+  pageProperties: PageProperties;
 }
-export class Client<TSchema extends Record<string, Record<string, unknown>>> {
+export class Client<TSchema extends PageProperties> {
   private secretKey: string;
 
   query: {

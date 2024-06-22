@@ -1,10 +1,20 @@
+export type PageProperties = Record<
+  string,
+  { id: string; properties: Record<string, string> }
+>;
 export const pageProperties = {
-  blog: {
-    slug: 'string',
-    publishedAt: 'date',
+  '2abc': {
+    id: '2abc',
+    properties: {
+      slug: 'string',
+      publishedAt: 'date',
+    },
   },
-  story: {
-    slug: 'string',
-    category: 'string',
+  '1def': {
+    id: '1def',
+    properties: {
+      slug: 'string',
+      category: 'string',
+    },
   },
-};
+} satisfies PageProperties;
