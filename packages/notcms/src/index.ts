@@ -1,5 +1,5 @@
 import { routes } from './routes';
-import { PageProperties, pageProperties } from './schema';
+import { PageProperties } from './schema';
 
 interface Page {
   id: string;
@@ -56,5 +56,3 @@ export class Client<TSchema extends PageProperties> {
     }
   }
 }
-
-new Client({ pageProperties });

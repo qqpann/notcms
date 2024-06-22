@@ -1,13 +1,16 @@
-import { myPackage } from '../src';
+import { Client } from '../src';
+import { pageProperties } from '../src/schema';
 
 describe('index', () => {
-  describe('myPackage', () => {
-    it('should return a string containing the message', () => {
+  describe('notcms', () => {
+    it('should successfully list page ids', async () => {
       const message = 'Hello';
 
-      const result = myPackage(message);
+      const nc = new Client({ pageProperties });
+      const res = await nc.query.abc.listPageIds();
+      const data = await res.json();
 
-      expect(result).toMatch(message);
+      expect(data).toMatch(message);
     });
   });
 });

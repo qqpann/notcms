@@ -3,8 +3,8 @@ export type PageProperties = Record<
   { id: string; properties: Record<string, string> }
 >;
 export const pageProperties = {
-  '2abc': {
-    id: '2abc',
+  abc: {
+    id: 'abc',
     properties: {
       slug: 'string',
       publishedAt: 'date',
