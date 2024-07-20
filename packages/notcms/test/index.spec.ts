@@ -7,8 +7,16 @@ describe('index', () => {
       const message = 'Hello';
 
       const nc = new Client({ pageProperties });
-      const res = await nc.query.abc.listPageIds();
-      const data = await res.json();
+      const data = await nc.query.abc.listPageIds();
+
+      expect(data).toMatch(message);
+    });
+
+    it('should successfully get a page', async () => {
+      const message = 'Hello';
+
+      const nc = new Client({ pageProperties });
+      const data = await nc.query.abc.getPage('123');
 
       expect(data).toMatch(message);
     });
