@@ -3,12 +3,12 @@ import { InferProperties, PageProperties, Properties } from './types';
 
 interface Page {
   id: string;
-  properties: Record<string, any>;
+  properties: Record<string, string | number | boolean | Date>;
   content: string;
 }
 
-class DatabaseHandler<TProperties extends Properties> {
-  constructor(private secretKey: string, private pageProperties: TProperties) {}
+class DatabaseHandler<TData> {
+  constructor(private secretKey: string) {}
 
   async listPageIds() {
     const res = await fetch(routes.pages, {
@@ -29,7 +29,11 @@ class DatabaseHandler<TProperties extends Properties> {
       },
     });
     const data = await res.json();
-    return data as InferProperties<TProperties>;
+    return data as {
+      id: string;
+      properties: TData;
+      content: string;
+    };
   }
 }
 
@@ -37,20 +41,20 @@ export class Client<TSchema extends PageProperties> {
   private secretKey: string;
 
   query: {
-    [K in keyof TSchema]: DatabaseHandler<TSchema[K]['properties']>;
+    [K in keyof TSchema]: DatabaseHandler<
+      InferProperties<TSchema[K]['properties']>
+    >;
   };
 
   constructor(options?: { secretKey?: string; pageProperties: TSchema }) {
     this.secretKey = options?.secretKey || 'default_key';
     this.query = {} as {
-      [K in keyof TSchema]: DatabaseHandler<TSchema[K]['properties']>;
+      [K in keyof TSchema]: DatabaseHandler<
+        InferProperties<TSchema[K]['properties']>
+      >;
     };
-    for (const [key, value] of Object.entries(options?.pageProperties || {})) {
-      const _key = key as keyof TSchema;
-      this.query[_key] = new DatabaseHandler(
-        this.secretKey,
-        (value as TSchema[keyof TSchema])['properties']
-      );
+    for (const key in options?.pageProperties) {
+      this.query[key as keyof TSchema] = new DatabaseHandler(this.secretKey);
     }
   }
 }
