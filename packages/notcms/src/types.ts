@@ -8,24 +8,15 @@ export type PageProperties = Record<
   { id: string; properties: Properties }
 >;
 
-// Infer the page property types from the pageProperties object
-// e.g. { properties: { slug: 'string', publishedAt: 'date' } } => { slug: string, publishedAt: Date }
-export type InferProperties<TProperties extends Properties> = {
-  [Key in keyof TProperties]: TProperties[Key] extends 'string'
-    ? string
-    : TProperties[Key] extends 'number'
-    ? number
-    : TProperties[Key] extends 'date'
-    ? Date
-    : TProperties[Key] extends 'boolean'
-    ? boolean
-    : TProperties[Key] extends 'string[]'
-    ? string[]
-    : TProperties[Key] extends 'number[]'
-    ? number[]
-    : TProperties[Key] extends 'date[]'
-    ? Date[]
-    : TProperties[Key] extends 'boolean[]'
-    ? boolean[]
+/** Utility type to map property string to their corresponding types */
+export type InferProperties<T extends Properties> = {
+  [K in keyof T]: T[K] extends keyof PropertyTypeMap
+    ? PropertyTypeMap[T[K]]
     : never;
+};
+type PropertyTypeMap = {
+  string: string;
+  number: number;
+  date: Date;
+  boolean: boolean;
 };

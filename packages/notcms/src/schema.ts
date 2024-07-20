@@ -20,5 +20,3 @@ export const pageProperties = {
 const tmp = pageProperties['abc']['properties'];
 type _A = typeof tmp;
 type A = InferProperties<typeof tmp>;
-
-let b: InferProperties<(typeof pageProperties)['1def']['properties']>;
