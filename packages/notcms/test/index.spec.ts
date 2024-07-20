@@ -6,7 +6,7 @@ describe('index', () => {
     it('should successfully list page ids', async () => {
       const message = 'Hello';
 
-      const nc = new Client({ pageProperties });
+      const nc = new Client<typeof pageProperties>({ pageProperties });
       const data = await nc.query.abc.listPageIds();
 
       expect(data).toMatch(message);

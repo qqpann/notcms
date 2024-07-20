@@ -33,10 +33,6 @@ class DatabaseHandler<TProperties extends Properties> {
   }
 }
 
-interface ClientOptions {
-  secretKey?: string;
-  pageProperties: PageProperties;
-}
 export class Client<TSchema extends PageProperties> {
   private secretKey: string;
 
@@ -44,7 +40,7 @@ export class Client<TSchema extends PageProperties> {
     [K in keyof TSchema]: DatabaseHandler<TSchema[K]['properties']>;
   };
 
-  constructor(options?: ClientOptions) {
+  constructor(options?: { secretKey?: string; pageProperties: TSchema }) {
     this.secretKey = options?.secretKey || 'default_key';
     this.query = {} as {
       [K in keyof TSchema]: DatabaseHandler<TSchema[K]['properties']>;
