@@ -11,29 +11,29 @@ class DatabaseHandler<TData> {
   constructor(private secretKey: string) {}
 
   async listPageIds() {
-    const res = await fetch(routes.pages, {
+    const response = await fetch(routes.pages, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${this.secretKey}`,
       },
     });
-    const data = await res.json();
-    return data as string[];
+    const data = (await response.json()) as string[];
+    return { data, response };
   }
 
   async getPage(pageId: string) {
-    const res = await fetch(routes.page(pageId), {
+    const response = await fetch(routes.page(pageId), {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${this.secretKey}`,
       },
     });
-    const data = await res.json();
-    return data as {
+    const data = (await response.json()) as {
       id: string;
       properties: TData;
       content: string;
     };
+    return { data, response };
   }
 }
 

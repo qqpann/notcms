@@ -7,7 +7,7 @@ describe('index', () => {
       const message = 'Hello';
 
       const nc = new Client<typeof pageProperties>({ pageProperties });
-      const data = await nc.query.abc.listPageIds();
+      const { data } = await nc.query.abc.listPageIds();
 
       expect(data).toMatch(message);
     });
@@ -16,7 +16,7 @@ describe('index', () => {
       const message = 'Hello';
 
       const nc = new Client({ pageProperties });
-      const data = await nc.query.abc.getPage('123');
+      const { data } = await nc.query.abc.getPage('123');
 
       expect(data).toMatch(message);
     });
