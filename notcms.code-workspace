@@ -5,14 +5,7 @@
       "path": "packages/notcms/src"
     },
     {
-      "name": "notcms-kit/src",
-      "path": "packages/notcms-kit/src"
-    },
-    {
       "path": "packages/notcms"
-    },
-    {
-      "path": "packages/notcms-kit"
     },
     {
       "path": "samples"
