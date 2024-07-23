@@ -2,9 +2,11 @@ import { host } from './variables';
 
 export const routes = {
   // cli
-  schema: host + '/schema',
+  schema: (wsId: string): string => host + `/ws/${wsId}/schema`,
 
   // client
-  pages: host + '/pages',
-  page: (pageId: string): string => host + `/pages/${pageId}`,
+  pages: (wsId: string, dbId: string): string =>
+    host + `/ws/${wsId}/db/${dbId}/pages`,
+  page: (wsId: string, dbId: string, pageId: string): string =>
+    host + `/ws/${wsId}/db/${dbId}/pages/${pageId}`,
 };

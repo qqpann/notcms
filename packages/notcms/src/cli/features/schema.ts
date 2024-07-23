@@ -1,11 +1,14 @@
 import { routes } from '../../routes';
 
 export async function fetchSchema(): Promise<string> {
-  const NOTCMS_SECRET_KEY = process.env.NOTCMS_SECRET_KEY;
+  const { NOTCMS_SECRET_KEY, NOTCMS_WORKSPACE_ID } = process.env;
   if (!NOTCMS_SECRET_KEY) {
     throw new Error('NOTCMS_SECRET_KEY is not set');
   }
-  const res = await fetch(routes.schema, {
+  if (!NOTCMS_WORKSPACE_ID) {
+    throw new Error('NOTCMS_WORKSPACE_ID is not set');
+  }
+  const res = await fetch(routes.schema(NOTCMS_WORKSPACE_ID), {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
