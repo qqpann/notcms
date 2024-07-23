@@ -8,6 +8,12 @@ export type PageProperties = Record<
   { id: string; properties: Properties }
 >;
 
+export type Page<T> = Prettify<{
+  id: string;
+  properties: T;
+  content: string;
+}>;
+
 /** Utility type to map property string to their corresponding types */
 export type InferProperties<T extends Properties> = Prettify<MapProperties<T>>;
 type MapProperties<T extends Properties> = {

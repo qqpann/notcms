@@ -1,11 +1,5 @@
 import { routes } from './routes';
-import { InferProperties, PageProperties, Properties } from './types';
-
-interface Page {
-  id: string;
-  properties: Record<string, string | number | boolean | Date>;
-  content: string;
-}
+import { InferProperties, Page, PageProperties } from './types';
 
 class DatabaseHandler<TData> {
   constructor(private secretKey: string) {}
@@ -28,11 +22,7 @@ class DatabaseHandler<TData> {
         Authorization: `Bearer ${this.secretKey}`,
       },
     });
-    const data = (await response.json()) as {
-      id: string;
-      properties: TData;
-      content: string;
-    };
+    const data = (await response.json()) as Page<TData>;
     return { data, response };
   }
 }
