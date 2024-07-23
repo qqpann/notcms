@@ -1,22 +1,22 @@
 import { promises as fs } from 'fs';
-import * as path from 'path';
+import { loadConfig, dumpConfig } from './config';
 
+/**
+ * Initialize NotCMS
+ * - Create notcms.config.json
+ */
 async function init() {
-  const config = {
-    schema: 'src/notcms/schema.ts',
-  };
-
-  await fs.writeFile('notcms.config.json', JSON.stringify(config, null, 2));
+  await dumpConfig('notcms.config.json');
   console.log('notcms.config.json created');
 }
 
+/**
+ * Pull schema from NotCMS
+ */
 async function pull() {
-  const configPath = path.resolve('notcms.config.json');
-  const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+  const config = await loadConfig('notcms.config.json');
+  const schemaPath = config.schema;
 
-  // FIXME: read actual schema path from config
-  // const schemaPath = path.resolve(config.schema);
-  const schemaPath = path.resolve('src/notcms/schema.ts');
   const schemaContent = `
 // src/notcms/schema.ts
 // for each db, the kit pulls their schema.
