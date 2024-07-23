@@ -1,4 +1,4 @@
-import { InferProperties, PageProperties, Properties } from './types';
+import { PageProperties } from './types';
 
 export const pageProperties = {
   abc: {
@@ -16,7 +16,3 @@ export const pageProperties = {
     },
   },
 } satisfies PageProperties;
-
-const tmp = pageProperties['abc']['properties'];
-type _A = typeof tmp;
-type A = InferProperties<typeof tmp>;

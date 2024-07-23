@@ -1,5 +1,5 @@
 import { Client } from '../src';
-import { pageProperties } from '../src/schema';
+import { pageProperties } from '../src/sample-schema';
 
 describe('index', () => {
   describe('notcms', () => {

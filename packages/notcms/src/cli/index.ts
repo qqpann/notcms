@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import { loadConfig, dumpConfig } from './config';
+import { routes } from '../routes';
 
 /**
  * Initialize NotCMS
@@ -17,21 +18,16 @@ async function pull() {
   const config = await loadConfig('notcms.config.json');
   const schemaPath = config.schema;
 
-  const schemaContent = `
-// src/notcms/schema.ts
-// for each db, the kit pulls their schema.
-// below are examples of schema for dbs: Blog db, and Story db
-export type BlogPageProps = {
-  slug?: string;
-  publishedAt?: Date;
-}
+  const res = await fetch(routes.schema, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  // TODO: validate response type
+  const data = (await res.json()) as { schema: string };
 
-export type StoryPageProps = {
-  slug?: string;
-  category?: string;
-}
-`;
-  await fs.writeFile(schemaPath, schemaContent);
+  await fs.writeFile(schemaPath, data.schema);
   console.log(`${schemaPath} updated`);
 }
 
