@@ -18,10 +18,15 @@ async function pull() {
   const config = await loadConfig('notcms.config.json');
   const schemaPath = config.schema;
 
+  const NOTCMS_SECRET_KEY = process.env.NOTCMS_SECRET_KEY;
+  if (!NOTCMS_SECRET_KEY) {
+    throw new Error('NOTCMS_SECRET_KEY is not set');
+  }
   const res = await fetch(routes.schema, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${NOTCMS_SECRET_KEY}`,
     },
   });
   // TODO: validate response type
