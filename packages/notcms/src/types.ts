@@ -1,6 +1,6 @@
 export type Properties = Record<
   string,
-  'string' | 'number' | 'date' | 'boolean'
+  'string' | 'number' | 'date' | 'boolean' | 'string[]'
 >;
 
 export type Schema = Record<string, { id: string; properties: Properties }>;
