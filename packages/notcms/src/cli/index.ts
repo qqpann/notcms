@@ -1,13 +1,21 @@
 import { promises as fs } from 'fs';
 import { loadConfig, dumpConfig } from './features/config';
 import { fetchSchema } from './features/schema';
+import { input } from '@inquirer/prompts';
+import type { Config } from './types';
 
 /**
  * Initialize NotCMS
  * - Create notcms.config.json
  */
 async function init() {
-  await dumpConfig('notcms.config.json');
+  const config: Config = {
+    schema: await input({
+      message: 'Enter the path to save the schema',
+      default: 'src/notcms/schema.ts',
+    }),
+  };
+  await dumpConfig('notcms.config.json', config);
   console.log('notcms.config.json created');
 }
 

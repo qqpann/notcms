@@ -113,5 +113,8 @@
       "@semantic-release/npm",
       "@semantic-release/github"
     ]
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^5.3.6"
   }
 }
