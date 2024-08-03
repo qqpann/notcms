@@ -1,4 +1,4 @@
-import { PageProperties } from './types';
+import type { PageProperties } from './types';
 
 export const pageProperties = {
   abc: {

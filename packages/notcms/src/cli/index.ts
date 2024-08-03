@@ -17,10 +17,22 @@ async function init() {
 async function pull() {
   const config = await loadConfig('notcms.config.json');
   const schemaPath = config.schema;
+  // schemaPath: 'src/notcms/schema.ts'
+  // make directory if it doesn't exist
+  await fs.mkdir(schemaPath.split('/').slice(0, -1).join('/'), {
+    recursive: true,
+  });
 
   const schema = await fetchSchema();
 
-  await fs.writeFile(schemaPath, schema);
+  await fs.writeFile(
+    schemaPath,
+    `
+import type { PageProperties } from 'notcms';
+
+export const pageProperties = ${schema} satisfies PageProperties;
+`
+  );
   console.log(`${schemaPath} updated`);
 }
 
