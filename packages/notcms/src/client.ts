@@ -1,5 +1,5 @@
 import { routes } from './routes';
-import { InferProperties, Page, PageProperties } from './types';
+import { InferProperties, Page, Schema } from './types';
 
 class DatabaseHandler<TData> {
   constructor(
@@ -37,7 +37,7 @@ class DatabaseHandler<TData> {
   }
 }
 
-export class Client<TSchema extends PageProperties> {
+export class Client<TSchema extends Schema> {
   private secretKey: string;
   private workspaceId: string;
 
@@ -50,7 +50,7 @@ export class Client<TSchema extends PageProperties> {
   constructor(options?: {
     secretKey?: string;
     workspaceId?: string;
-    pageProperties: TSchema;
+    schema: TSchema;
   }) {
     const secretKey = options?.secretKey || process.env.NOTCMS_SECRET_KEY;
     const workspaceId = options?.workspaceId || process.env.NOTCMS_WORKSPACE_ID;
@@ -71,15 +71,15 @@ export class Client<TSchema extends PageProperties> {
         InferProperties<TSchema[K]['properties']>
       >;
     };
-    const pageProperties = options?.pageProperties;
-    if (!pageProperties) {
-      throw new Error('pageProperties is required.');
+    const schema = options?.schema;
+    if (!schema) {
+      throw new Error('schema is required.');
     }
-    for (const key in pageProperties) {
+    for (const key in schema) {
       this.query[key as keyof TSchema] = new DatabaseHandler(
         this.secretKey,
         this.workspaceId,
-        pageProperties[key].id
+        schema[key].id
       );
     }
   }

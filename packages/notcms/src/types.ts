@@ -3,10 +3,7 @@ export type Properties = Record<
   'string' | 'number' | 'date' | 'boolean'
 >;
 
-export type PageProperties = Record<
-  string,
-  { id: string; properties: Properties }
->;
+export type Schema = Record<string, { id: string; properties: Properties }>;
 
 export type Page<T> = Prettify<{
   id: string;

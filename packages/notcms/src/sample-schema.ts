@@ -1,6 +1,6 @@
-import type { PageProperties } from './types';
+import type { Schema } from './types';
 
-export const pageProperties = {
+export const schema = {
   abc: {
     id: 'abc',
     properties: {
@@ -15,4 +15,4 @@ export const pageProperties = {
       category: 'number',
     },
   },
-} satisfies PageProperties;
+} satisfies Schema;

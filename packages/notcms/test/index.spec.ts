@@ -1,12 +1,12 @@
-import { Client } from '../src';
-import { pageProperties } from '../src/sample-schema';
+import { Client } from '../src/client';
+import { schema } from '../src/sample-schema';
 
 describe('index', () => {
   describe('notcms', () => {
     it('should successfully list page ids', async () => {
       const message = 'Hello';
 
-      const nc = new Client<typeof pageProperties>({ pageProperties });
+      const nc = new Client<typeof schema>({ schema: schema });
       const { data } = await nc.query.abc.listPageIds();
 
       expect(data).toMatch(message);
@@ -15,7 +15,7 @@ describe('index', () => {
     it('should successfully get a page', async () => {
       const message = 'Hello';
 
-      const nc = new Client({ pageProperties });
+      const nc = new Client({ schema: schema });
       const { data } = await nc.query.abc.getPage('123');
 
       expect(data).toMatch(message);

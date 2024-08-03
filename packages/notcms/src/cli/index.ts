@@ -36,9 +36,9 @@ async function pull() {
   await fs.writeFile(
     schemaPath,
     `
-import type { PageProperties } from 'notcms';
+import type { Schema } from 'notcms';
 
-export const pageProperties = ${schema} satisfies PageProperties;
+export const schema = ${schema} satisfies Schema;
 `
   );
   console.log(`${schemaPath} updated`);
