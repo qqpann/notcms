@@ -18,7 +18,7 @@ class DatabaseHandler<TData> {
         },
       }
     );
-    const data = (await response.json()) as string[];
+    const data = (await response.json()) as { pageIds: string[] };
     return { data, response };
   }
 
