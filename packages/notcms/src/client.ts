@@ -18,8 +18,8 @@ class DatabaseHandler<TData> {
         },
       }
     );
-    const data = (await response.json()) as { pageIds: string[] };
-    return { data, response };
+    const { pageIds } = (await response.json()) as { pageIds: string[] };
+    return { data: pageIds, response };
   }
 
   async getPage(pageId: string) {
@@ -32,8 +32,8 @@ class DatabaseHandler<TData> {
         },
       }
     );
-    const data = (await response.json()) as Page<TData>;
-    return { data, response };
+    const page = (await response.json()) as Page<TData>;
+    return { data: page, response };
   }
 }
 
