@@ -42,11 +42,7 @@ export const Blog = (): JSX.Element => {
                 </div>
               </div>
             </div>
-            <img
-              className="relative flex-1 grow h-px"
-              alt="Line"
-              src="/img/line-1.svg"
-            />
+            <span className="relative flex-1 grow h-px w-full block bg-white opacity-25" />
           </div>
           <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
             <div className="flex items-start gap-8 relative self-stretch w-full flex-[0_0_auto]">
