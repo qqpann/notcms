@@ -1,6 +1,30 @@
 import React from "react";
 import { Header } from "../components/Header";
 
+const CONTENT = `
+The minimum viable product, as many founders know it, doesn't reflect the reality of how products get built today.
+
+Building something valuable is no longer about validating a novel idea as fast as possible. Instead, the modern MVP exercise is about building a version of an idea that is different from and better than what exists today. Most of us aren’t building for a net-new market. Rather, we’re finding opportunities to improve existing categories. We need an MVP concept that helps founders and product leaders iterate on their early ideas to compete in an existing market.
+
+When we started to build our MVP for Linear, we spent a lot of time talking to users, narrowed our audience, and tested what we were building. And it taught us some important lessons about our product (and building great products in general).
+
+Below, I’ll discuss why building in today’s market requires an updated concept of the MVP, the importance of narrowing who you’re building for, the power of strategically using your waitlist, and some indicators you’ll see when you’ve found early product market fit.
+
+## Small heading to start a new topic
+
+When we started to build our MVP for Linear, we spent a lot of time talking to users, narrowed our audience, and tested what we were building. And it taught us some important lessons about our product (and building great products in general).
+
+Below, I’ll discuss why building in today’s market requires an updated concept of the MVP, the importance of narrowing who you’re building for, the power of strategically using your waitlist, and some indicators you’ll see when you’ve found early product market fit.
+
+The minimum viable product, as many founders know it, doesn't reflect the reality of how products get built today.
+
+Building something valuable is no longer about validating a novel idea as fast as possible. Instead, the modern MVP exercise is about building a version of an idea that is different from and better than what exists today. Most of us aren’t building for a net-new market. Rather, we’re finding opportunities to improve existing categories. We need an MVP concept that helps founders and product leaders iterate on their early ideas to compete in an existing market.
+
+When we started to build our MVP for Linear, we spent a lot of time talking to users, narrowed our audience, and tested what we were building. And it taught us some important lessons about our product (and building great products in general).
+
+Below, I’ll discuss why building in today’s market requires an updated concept of the MVP, the importance of narrowing who you’re building for, the power of strategically using your waitlist, and some indicators you’ll see when you’ve found early product market fit. 
+`;
+
 export const BlogDetail = (): JSX.Element => {
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(10.82,10.81,11.21)_0%,rgb(0,0,0)_100%)]">
