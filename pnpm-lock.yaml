@@ -78,6 +78,9 @@ importers:
 
   samples/blog-demo:
     dependencies:
+      marked:
+        specifier: ^14.0.0
+        version: 14.0.0
       next:
         specifier: 14.2.5
         version: 14.2.5(react-dom@18.3.1)(react@18.3.1)
@@ -5308,6 +5311,12 @@ packages:
     engines: {node: '>= 18'}
     hasBin: true
     dev: true
+
+  /marked@14.0.0:
+    resolution: {integrity: sha512-uIj4+faQ+MgHgwUW1l2PsPglZLOLOT1uErt06dAPtx2kjteLAkbsd/0FiYg/MGS+i7ZKLb7w2WClxHkzOOuryQ==}
+    engines: {node: '>= 18'}
+    hasBin: true
+    dev: false
 
   /meow@13.2.0:
     resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
