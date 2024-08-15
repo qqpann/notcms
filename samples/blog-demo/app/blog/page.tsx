@@ -1,5 +1,5 @@
 import React from "react";
-import { Header } from "../components/Header";
+import { Header } from "~/components/Header";
 import { Category, Post } from "~/types";
 
 const posts: Post[] = [];
@@ -23,7 +23,7 @@ const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
     }) satisfies Category
 );
 
-export const Blog = (): JSX.Element => {
+export default function Blog() {
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(11,11,11)_0%,rgb(0,0,0)_100%)]">
       <Header />
@@ -91,7 +91,7 @@ export const Blog = (): JSX.Element => {
       </div>
     </div>
   );
-};
+}
 
 interface Props {
   className?: string;
