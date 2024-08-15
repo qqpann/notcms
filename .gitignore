@@ -121,3 +121,4 @@ lib/
 
 # samples
 samples/*
+!samples/blog-demo
