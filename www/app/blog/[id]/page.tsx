@@ -56,20 +56,20 @@ const renderer: Partial<Renderer> = {
 } as Renderer;
 marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
 
-export default function Page() {
-  const post: PostDetail = {
-    id: "1",
-    title: "Building a Modern MVP",
-    description:
-      "Building something valuable is no longer about validating a novel idea as fast as possible. Instead, the modern MVP exercise is about building a version of an idea that is different from and better than what exists today.",
-    category: "Product",
-    tags: ["Product", "MVP"],
-    writer: "John Doe",
-    writerImage: "/img/writer.png",
-    date: "2021-07-01",
-    content: CONTENT,
-    keyVisualImage: "/img/key-visual.png",
-  };
+const post: PostDetail = {
+  id: "1",
+  title: "Building a Modern MVP",
+  description:
+    "Building something valuable is no longer about validating a novel idea as fast as possible. Instead, the modern MVP exercise is about building a version of an idea that is different from and better than what exists today.",
+  category: "Product",
+  tags: ["Product", "MVP"],
+  writer: "John Doe",
+  writerImage: "/img/writer.png",
+  date: "2021-07-01",
+  content: CONTENT,
+  keyVisualImage: "/img/key-visual.png",
+};
+export default async function Page({ params }: { params: { id: string } }) {
   return <BlogDetail post={post} />;
 }
 function BlogDetail({ post }: { post: PostDetail }) {
