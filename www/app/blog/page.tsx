@@ -27,7 +27,7 @@ const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
     }) satisfies Category
 );
 
-export default function Blog() {
+export default async function Blog() {
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(11,11,11)_0%,rgb(0,0,0)_100%)]">
       <Header />
