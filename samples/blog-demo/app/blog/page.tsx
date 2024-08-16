@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { Header } from "~/components/Header";
 import { Category, Post } from "~/types";
@@ -99,7 +100,10 @@ interface Props {
 }
 function HeroBlogPostCard({ className, post }: Props) {
   return (
-    <div className="flex items-start gap-8 relative self-stretch w-full flex-[0_0_auto]">
+    <Link
+      href={`/blog/${post.id}`}
+      className="flex items-start gap-8 relative self-stretch w-full flex-[0_0_auto]"
+    >
       <div className="w-[785px] h-[422px] ml-[-0.50px] bg-black border-[#ffffff1f] relative mt-[-0.50px] mb-[-0.50px] rounded-[10px] border-[0.5px] border-solid shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]" />
       <div className="flex flex-col items-start gap-4 px-0 py-5 relative flex-1 self-stretch grow">
         <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
@@ -130,12 +134,13 @@ function HeroBlogPostCard({ className, post }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 function BlogPostCard1({ className, post }: Props) {
   return (
-    <div
+    <Link
+      href={`/blog/${post.id}`}
       className={`flex flex-col items-start justify-center gap-4 pt-1.5 pb-3.5 px-1.5 relative w-96 rounded-[10px] overflow-hidden border-[0.5px] border-solid border-[#ffffff14] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] [background:linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.04)_100%)] ${className}`}
     >
       <div className="relative w-[373px] h-[201px] mt-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded border-[0.5px] border-solid border-[#ffffff14]" />
@@ -160,12 +165,15 @@ function BlogPostCard1({ className, post }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 function BlogPostCard2({ className, post }: Props) {
   return (
-    <div className="flex flex-col items-start justify-center gap-4 pt-1.5 pb-3.5 px-1.5 flex-1 grow rounded-[10px] overflow-hidden shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] [background:linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.04)_100%)] relative self-stretch border-[0.5px] border-solid border-[#ffffff14]">
+    <Link
+      href={`/blog/${post.id}`}
+      className="flex flex-col items-start justify-center gap-4 pt-1.5 pb-3.5 px-1.5 flex-1 grow rounded-[10px] overflow-hidden shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] [background:linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.04)_100%)] relative self-stretch border-[0.5px] border-solid border-[#ffffff14]"
+    >
       <div className="relative w-[373px] h-[201px] mt-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded border-[0.5px] border-solid border-[#ffffff14]" />
       <div className="px-2.5 py-0 flex-1 grow flex flex-col items-start gap-3 relative self-stretch w-full">
         <p className="flex-1 text-[17px] tracking-[0.17px] relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white leading-[normal]">
@@ -192,12 +200,13 @@ function BlogPostCard2({ className, post }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 function BlogPostCard3({ className, post }: Props) {
   return (
-    <div
+    <Link
+      href={`/blog/${post.id}`}
       className={`flex flex-col items-start justify-center gap-4 pt-0 pb-3.5 px-0 relative w-[385px] rounded-[10px] overflow-hidden border-[0.5px] border-solid border-[#ffffff29] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] [background:linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.04)_100%)] ${className}`}
     >
       <div className="relative self-stretch w-full h-[201px] mt-[-0.50px] ml-[-0.50px] bg-black border-[0.5px] border-solid border-[#ffffff14]" />
@@ -221,6 +230,6 @@ function BlogPostCard3({ className, post }: Props) {
           </p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
