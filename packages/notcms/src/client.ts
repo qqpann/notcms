@@ -1,6 +1,8 @@
 import { routes } from './routes';
 import { InferProperties, Page, Schema } from './types';
 
+type PropertiesSimple = Record<string, string | number | boolean | string[]>;
+
 class DatabaseHandler<TData> {
   constructor(
     private secretKey: string,
@@ -20,6 +22,20 @@ class DatabaseHandler<TData> {
     );
     const { pageIds } = (await response.json()) as { pageIds: string[] };
     return { data: pageIds, response };
+  }
+
+  async listPages() {
+    const response = await fetch(
+      routes.pages(this.workspaceId, this.databaseId),
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.secretKey}`,
+        },
+      }
+    );
+    const { pages } = (await response.json()) as { pages: PropertiesSimple[] };
+    return { data: pages, response };
   }
 
   async getPage(pageId: string) {
