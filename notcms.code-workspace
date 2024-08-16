@@ -8,6 +8,9 @@
       "path": "packages/notcms"
     },
     {
+      "path": "www"
+    },
+    {
       "path": "samples"
     },
     {
