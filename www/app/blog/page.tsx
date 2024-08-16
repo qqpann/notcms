@@ -3,6 +3,8 @@ import React from "react";
 import { Header } from "~/components/Header";
 import { Category, Post } from "~/src/types";
 
+export const revalidate = 10;
+
 const posts: Post[] = [];
 for (let i = 1; i <= 7; i++) {
   posts.push({

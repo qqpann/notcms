@@ -3,6 +3,8 @@ import { Header } from "~/components/Header";
 import { marked, type Renderer } from "marked";
 import { PostDetail } from "~/src/types";
 
+export const revalidate = 10;
+
 const CONTENT = `
 The minimum viable product, as many founders know it, doesn't reflect the reality of how products get built today.
 
