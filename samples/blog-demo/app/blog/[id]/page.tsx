@@ -1,7 +1,9 @@
 import React from "react";
 import { Header } from "~/components/Header";
 import { marked, type Renderer } from "marked";
-import { PostDetail } from "~/types";
+import { PostDetail } from "~/src/types";
+
+export const revalidate = 10;
 
 const CONTENT = `
 The minimum viable product, as many founders know it, doesn't reflect the reality of how products get built today.
@@ -49,25 +51,25 @@ const renderer: Partial<Renderer> = {
   },
   image({ href, title, text }) {
     // return `<img src="${href}" alt="${text}" title="${title}" class="w-full h-auto mb-[2rem]">`;
-    return `<img src="${href}" alt="${text}" title="${title}" class="relative w-[601px] h-[221px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]">`;
+    return `<img src="${href}" alt="${text}" title="${title}" class="relative w-[601px] h-auto bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]">`;
   },
 } as Renderer;
 marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
 
-export default function Page() {
-  const post: PostDetail = {
-    id: "1",
-    title: "Building a Modern MVP",
-    description:
-      "Building something valuable is no longer about validating a novel idea as fast as possible. Instead, the modern MVP exercise is about building a version of an idea that is different from and better than what exists today.",
-    category: "Product",
-    tags: ["Product", "MVP"],
-    writer: "John Doe",
-    writerImage: "/img/writer.png",
-    date: "2021-07-01",
-    content: CONTENT,
-    keyVisualImage: "/img/key-visual.png",
-  };
+const post: PostDetail = {
+  id: "1",
+  title: "Building a Modern MVP",
+  description:
+    "Building something valuable is no longer about validating a novel idea as fast as possible. Instead, the modern MVP exercise is about building a version of an idea that is different from and better than what exists today.",
+  category: "Product",
+  tags: ["Product", "MVP"],
+  writer: "John Doe",
+  writerImage: "/img/writer.png",
+  date: "2021-07-01",
+  content: CONTENT,
+  keyVisualImage: "/img/key-visual.png",
+};
+export default async function Page({ params }: { params: { id: string } }) {
   return <BlogDetail post={post} />;
 }
 function BlogDetail({ post }: { post: PostDetail }) {
@@ -103,7 +105,7 @@ function BlogDetail({ post }: { post: PostDetail }) {
         <main
           className="relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
           dangerouslySetInnerHTML={{
-            __html: marked(post.content),
+            __html: marked(post.content ?? ""),
           }}
         />
       </div>

@@ -7,10 +7,10 @@ export type Post = {
   writer: string;
   writerImage: string;
   date: string;
+  keyVisualImage: string;
 };
 export type PostDetail = {
   content: string;
-  keyVisualImage: string;
 } & Post;
 export type Category = {
   id: string;
