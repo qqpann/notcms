@@ -9,6 +9,12 @@ describe('index', () => {
       console.log(data);
     });
 
+    it.skip('should successfully list pages', async () => {
+      const nc = new Client({ schema: schema });
+      const { data } = await nc.query.abc.listPages();
+      console.log(data);
+    });
+
     it.skip('should successfully get a page', async () => {
       const nc = new Client({ schema: schema });
       const { data } = await nc.query.abc.getPage('123');

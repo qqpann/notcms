@@ -1,8 +1,6 @@
 import { routes } from './routes';
 import { InferProperties, Page, Schema } from './types';
 
-type PropertiesSimple = Record<string, string | number | boolean | string[]>;
-
 class DatabaseHandler<TData> {
   constructor(
     private secretKey: string,
@@ -34,7 +32,14 @@ class DatabaseHandler<TData> {
         },
       }
     );
-    const { pages } = (await response.json()) as { pages: PropertiesSimple[] };
+    const { pages } = (await response.json()) as {
+      pages: {
+        id: string;
+        title: string | null;
+        properties: TData | null;
+        version: string | null;
+      }[];
+    };
     return { data: pages, response };
   }
 
