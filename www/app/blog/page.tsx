@@ -31,7 +31,7 @@ export default function Blog() {
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(11,11,11)_0%,rgb(0,0,0)_100%)]">
       <Header />
-      <div className="flex flex-col items-start gap-12 px-32 py-16 relative self-stretch w-full flex-[0_0_auto]">
+      <div className="flex flex-col items-start gap-12 px-32 py-16 relative self-stretch w-[1440px] flex-[0_0_auto]">
         <div className="flex flex-col w-[947px] items-start gap-5 relative flex-[0_0_auto]">
           <div className="relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
             Recent updates
