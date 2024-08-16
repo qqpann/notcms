@@ -23,6 +23,7 @@ type PropertyTypeMap = {
   number: number;
   date: Date;
   boolean: boolean;
+  'string[]': string[];
 };
 /** Make the hover overlay more readable */
 type Prettify<T> = {
