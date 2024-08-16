@@ -105,7 +105,7 @@ function BlogDetail({ post }: { post: PostDetail }) {
         <main
           className="relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
           dangerouslySetInnerHTML={{
-            __html: marked(post.content),
+            __html: marked(post.content ?? ""),
           }}
         />
       </div>
