@@ -51,7 +51,7 @@ const renderer: Partial<Renderer> = {
   },
   image({ href, title, text }) {
     // return `<img src="${href}" alt="${text}" title="${title}" class="w-full h-auto mb-[2rem]">`;
-    return `<img src="${href}" alt="${text}" title="${title}" class="relative w-[601px] h-[221px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]">`;
+    return `<img src="${href}" alt="${text}" title="${title}" class="relative w-[601px] h-auto bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]">`;
   },
 } as Renderer;
 marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
