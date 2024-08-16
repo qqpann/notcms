@@ -64,10 +64,10 @@ const post: PostDetail = {
   category: "Product",
   tags: ["Product", "MVP"],
   writer: "John Doe",
-  writerImage: "/img/writer.png",
+  writerImage: "/img/sample-profile-icon.png",
   date: "2021-07-01",
   content: CONTENT,
-  keyVisualImage: "/img/key-visual.png",
+  keyVisualImage: "/img/404.png",
 };
 export default async function Page({ params }: { params: { id: string } }) {
   return <BlogDetail post={post} />;
