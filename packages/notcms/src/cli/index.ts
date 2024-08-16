@@ -36,9 +36,12 @@ async function pull() {
   await fs.writeFile(
     schemaPath,
     `
+import { Client } from "notcms";
 import type { Schema } from 'notcms';
 
 export const schema = ${schema} satisfies Schema;
+
+export const nc = new Client({ schema });
 `
   );
   console.log(`${schemaPath} updated`);
