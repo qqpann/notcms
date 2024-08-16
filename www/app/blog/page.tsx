@@ -16,7 +16,7 @@ for (let i = 1; i <= 7; i++) {
     writer: "Qiushi Pan",
     writerImage: "/img/sample-profile-icon.png",
     date: "Aug 14, 2024",
-    keyVisualImage: "/img/sample-image.png",
+    keyVisualImage: "/img/404.png",
   } satisfies Post);
 }
 const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(

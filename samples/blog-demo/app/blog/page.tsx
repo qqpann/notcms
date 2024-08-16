@@ -9,14 +9,14 @@ const posts: Post[] = [];
 for (let i = 1; i <= 7; i++) {
   posts.push({
     id: i.toString(),
-    title: "NotCMS’ very first blog post",
+    title: "Sample blog post title",
     description:
       "Learn more about how NotCMS uses Notion to allow writers to create content worry-free.",
     category: "Blog",
     writer: "Qiushi Pan",
     writerImage: "/img/sample-profile-icon.png",
     date: "Aug 14, 2024",
-    keyVisualImage: "/img/sample-image.png",
+    keyVisualImage: "/img/404.png",
   } satisfies Post);
 }
 const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
