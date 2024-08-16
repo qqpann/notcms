@@ -1,6 +1,6 @@
 {
   "name": "notcms",
-  "version": "0.0.3-development",
+  "version": "0.0.4-development",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
