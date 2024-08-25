@@ -11,6 +11,7 @@
   "dependencies": {
     "marked": "^14.0.0",
     "next": "14.2.5",
+    "notcms": "workspace:0.0.6-development",
     "react": "^18",
     "react-dom": "^18"
   },

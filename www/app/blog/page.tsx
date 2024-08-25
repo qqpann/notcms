@@ -1,24 +1,11 @@
 import Link from "next/link";
 import React from "react";
 import { Header } from "~/components/Header";
+import { nc } from "~/src/notcms/schema";
 import { Category, Post } from "~/src/types";
 
 export const revalidate = 10;
 
-const posts: Post[] = [];
-for (let i = 1; i <= 7; i++) {
-  posts.push({
-    id: i.toString(),
-    title: "NotCMS’ very first blog post",
-    description:
-      "Learn more about how NotCMS uses Notion to allow writers to create content worry-free.",
-    category: "Blog",
-    writer: "Qiushi Pan",
-    writerImage: "/img/sample-profile-icon.png",
-    date: "Aug 14, 2024",
-    keyVisualImage: "/img/404.png",
-  } satisfies Post);
-}
 const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
   (name, i) =>
     ({
@@ -28,6 +15,28 @@ const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
 );
 
 export default async function Blog() {
+  const { data: pages } = await nc.query.blog.listPages();
+
+  const posts: Post[] = pages.reverse().map(
+    (page) =>
+      ({
+        id: page.id,
+        title: page.title ?? "",
+        description: page.properties?.description ?? "",
+        writer: page.properties?.writer ?? "",
+        writerImage: "/img/sample-profile-icon.png",
+        keyVisualImage: page.properties?.thumbnail[0] ?? "",
+        category: page.properties?.category ?? "",
+        date: new Date(
+          page.properties?.created_at ?? Date.now()
+        ).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+      }) satisfies Post
+  );
+
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(11,11,11)_0%,rgb(0,0,0)_100%)]">
       <Header />
