@@ -8,13 +8,15 @@ import React from "react";
 export const Header = (): JSX.Element => {
   return (
     <div className="flex w-[1440px] h-16 items-center gap-10 px-32 py-0 relative">
-      <div className="flex items-center gap-2 relative flex-1 grow">
-        <img
-          className="relative w-[30.36px] h-[28.41px] mt-[-2.85px] mb-[-7.57px] ml-[-6.72px]"
-          alt="Frame"
-          src="/img/notcms-icon.svg"
-        />
-        <div className="relative w-fit [text-shadow:0px_1px_2px_#0000000f] [font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-white text-xl tracking-[0.40px] leading-[normal] whitespace-nowrap">
+      <div className="flex items-center gap-1.5 relative flex-1 grow">
+        <div className="relative w-4 h-3.5 opacity-70">
+          <img
+            className="absolute w-[17px] h-[17px] -top-px left-0"
+            alt="Rectangle"
+            src="/img/notcms-icon.png"
+          />
+        </div>
+        <div className="relative w-fit mt-[-1.00px] [text-shadow:0px_1px_2px_#0000000f] [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-white text-xl tracking-[0.60px] leading-[normal] whitespace-nowrap">
           NotCMS
         </div>
       </div>
