@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Header } from "~/components/Header";
 
 export default function Home() {
   return <Landing />;
@@ -36,37 +37,9 @@ export const Landing = (): JSX.Element => {
         alt="Ellipse"
         src="https://c.animaapp.com/PNtvr1Xl/img/ellipse-1911.svg"
       />
-      <div className="flex w-[1440px] h-16 items-center gap-10 px-32 py-0 relative">
-        <div className="flex items-center gap-1.5 relative flex-1 grow">
-          <img
-            className="relative w-[16.51px] h-[16.51px] mt-[-0.95px] mb-[-1.56px] ml-[-0.18px]"
-            alt="Frame"
-            src="https://c.animaapp.com/PNtvr1Xl/img/frame-2147223770.svg"
-          />
-          <div className="relative w-fit mt-[-1.00px] [text-shadow:0px_1px_2px_#0000000f] [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-white text-xl tracking-[0.60px] leading-[normal] whitespace-nowrap">
-            NotCMS
-          </div>
-        </div>
-        <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#aaafb5] text-sm text-center tracking-[0.14px] leading-[normal] whitespace-nowrap">
-          Pricing
-        </div>
-        <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#aaafb5] text-sm text-center tracking-[0.14px] leading-[normal] whitespace-nowrap">
-          Templates
-        </div>
-        <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#aaafb5] text-sm text-center tracking-[0.14px] leading-[normal] whitespace-nowrap">
-          Blog
-        </div>
-        <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#aaafb5] text-sm text-center tracking-[0.14px] leading-[normal] whitespace-nowrap">
-          Docs
-        </div>
-        <div className="flex flex-col items-end justify-center gap-2 relative flex-1 grow">
-          <div className="inline-flex h-7 items-center justify-center gap-2 px-3 py-[9.5px] relative bg-[#e6e6e61a] rounded-[10px]">
-            <div className="mt-[-1.00px] [font-family:'Selecta_VF_Trial-Medium',Helvetica] text-sm tracking-[0.14px] leading-[normal] relative w-fit font-medium text-white text-center whitespace-nowrap">
-              Get started
-            </div>
-          </div>
-        </div>
-      </div>
+
+      <Header />
+
       <div className="flex flex-col items-center gap-12 px-32 py-16 relative self-stretch w-full flex-[0_0_auto]">
         <p className="relative self-stretch mt-[-1.00px] [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-white text-[64px] text-center tracking-[0.64px] leading-[72px]">
           Instantly create &amp; publish
