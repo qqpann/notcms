@@ -29,7 +29,7 @@ const FeatureCard = ({
   );
 };
 
-export const Landing = (): JSX.Element => {
+function Landing() {
   return (
     <div className="flex flex-col w-[1440px] items-start relative bg-white [background:linear-gradient(180deg,rgb(15,15,17)_0%,rgb(0,0,0)_100%)]">
       <img
@@ -794,7 +794,7 @@ export const Landing = (): JSX.Element => {
       </div>
     </div>
   );
-};
+}
 
 const TextLinkList = ({
   hasTitle = true,
