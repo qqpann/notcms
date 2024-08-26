@@ -23,7 +23,7 @@ export default async function Blog() {
         id: page.id,
         title: page.title ?? "",
         description: page.properties?.description ?? "",
-        writer: page.properties?.writer ?? "",
+        writer: page.properties?.writer.slice(0, 10) ?? "",
         writerImage: "/img/sample-profile-icon.png",
         keyVisualImage: page.properties?.thumbnail[0] ?? "",
         category: page.properties?.category ?? "",
@@ -74,30 +74,35 @@ export default async function Blog() {
           </div>
           <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
             <HeroBlogPostCard post={posts[0]} />
-            <div className="flex items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-              <BlogPostCard1
-                post={posts[1]}
-                className="!flex-1 !grow !w-[unset]"
-              />
-              <BlogPostCard1
-                post={posts[2]}
-                className="!flex-1 !grow !w-[unset]"
-              />
-              <BlogPostCard2 post={posts[3]} />
-            </div>
-            <div className="flex items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-              <BlogPostCard2
-                post={posts[4]}
-                className="!mt-[-0.50px] !mb-[-0.50px] !ml-[-0.50px] !grow !flex-1 !w-[unset]"
-              />
-              <BlogPostCard3
-                post={posts[5]}
-                className="!mt-[-0.50px] !mb-[-0.50px] !flex-1 !grow !w-[unset]"
-              />
-              <BlogPostCard3
-                post={posts[6]}
-                className="!mt-[-0.50px] !mb-[-0.50px] !mr-[-0.50px] !grow !flex-1 !w-[unset]"
-              />
+            <div className="grid grid-cols-3 items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
+              {posts.slice(1).map((post, i) => {
+                switch (i % 3) {
+                  case 0:
+                    return (
+                      <BlogPostCard1
+                        key={post.id}
+                        post={post}
+                        className="!flex-1 !grow !w-[unset]"
+                      />
+                    );
+                  case 1:
+                    return (
+                      <BlogPostCard2
+                        key={post.id}
+                        post={post}
+                        className="flex items-start gap-4 relative self-stretch w-full flex-[0_0_auto]"
+                      />
+                    );
+                  default:
+                    return (
+                      <BlogPostCard3
+                        key={post.id}
+                        post={post}
+                        className="!mt-[-0.50px] !mb-[-0.50px] !flex-1 !grow !w-[unset]"
+                      />
+                    );
+                }
+              })}
             </div>
           </div>
         </div>
