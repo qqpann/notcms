@@ -15,7 +15,7 @@ const renderer: Partial<Renderer> = {
     const text = this.parser.parseInline(tokens);
     const escapedText = text.toLowerCase().replace(/[^\w]+/g, "-");
 
-    return `<h${depth} class="[font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-[#f8f7f7] text-2xl tracking-[0.06px] leading-8 mb-[1.5rem]">
+    return `<h${depth} class="[font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-[#f8f7f7] tracking-[0.06px] leading-8 mb-[1.5rem]">
               <a name="${escapedText}" class="anchor" href="#${escapedText}">
                 <span class="header-link"></span>
               </a>
@@ -81,7 +81,7 @@ function BlogDetail({ post }: { post: PostDetail }) {
           />
         </div>
         <main
-          className="relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
+          className="prose prose-base dark:prose-invert prose-h2:text-2xl text-white relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
           dangerouslySetInnerHTML={{
             __html: marked(post.content ?? ""),
           }}
