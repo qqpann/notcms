@@ -36,8 +36,8 @@ export default async function Page({ params }: { params: { id: string } }) {
     title: data.properties.title,
     description: data.properties.description ?? "",
     writer: data.properties.writer ?? "",
-    writerImage: "/images/sample-profile-image.png",
-    keyVisualImage: data.properties.thumbnail[0] ?? "/images/404.png",
+    writerImage: "/img/sample-profile-icon.png",
+    keyVisualImage: data.properties.thumbnail[0] ?? "/img/404.png",
     category: data.properties.category,
     date: new Date(
       data.properties?.created_at ?? Date.now()
