@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { siteConfig } from "~/src/site-config";
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
 
       <a
         // waitlist google form
-        href="https://forms.gle/MoDUsLCrNJZVmR8M6"
+        href={siteConfig.waitlist}
         className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
         target="_blank"
         rel="noopener noreferrer"
