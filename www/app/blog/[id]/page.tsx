@@ -1,7 +1,8 @@
 import React from "react";
-import { Header } from "~/components/Header";
 import { marked, type Renderer } from "marked";
-import { PostDetail } from "~/src/types";
+
+import { Header } from "~/components/Header";
+import type { PostDetail } from "~/src/types";
 import { nc } from "~/src/notcms/schema";
 
 export const revalidate = 10;
@@ -40,7 +41,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     keyVisualImage: data.properties.thumbnail[0] ?? "/img/404.png",
     category: data.properties.category,
     date: new Date(
-      data.properties?.created_at ?? Date.now(),
+      data.properties?.created_at ?? Date.now()
     ).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -66,7 +67,7 @@ function BlogDetail({ post }: { post: PostDetail }) {
             <div className="flex w-[115px] items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
               <img
                 className="relative w-[18px] h-[18px] object-cover"
-                alt="Image"
+                alt="Writer Profile"
                 src={post.writerImage}
               />
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
@@ -76,12 +77,13 @@ function BlogDetail({ post }: { post: PostDetail }) {
           </div>
           <img
             className="relative self-stretch w-full h-[422px] mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]"
-            alt="Key Visual Image"
+            alt="Key Visual"
             src={post.keyVisualImage}
           />
         </div>
         <main
           className="prose prose-base dark:prose-invert prose-h2:text-2xl text-white relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: This is a markdown renderer
           dangerouslySetInnerHTML={{
             __html: marked(post.content ?? ""),
           }}
