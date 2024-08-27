@@ -1,9 +1,8 @@
+import { type Renderer, marked } from "marked";
 import React from "react";
-import { marked, type Renderer } from "marked";
-
 import { Header } from "~/components/Header";
-import type { PostDetail } from "~/src/types";
 import { nc } from "~/src/notcms/schema";
+import type { PostDetail } from "~/src/types";
 
 export const revalidate = 10;
 
@@ -41,7 +40,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     keyVisualImage: data.properties.thumbnail[0] ?? "/img/404.png",
     category: data.properties.category,
     date: new Date(
-      data.properties?.created_at ?? Date.now()
+      data.properties?.created_at ?? Date.now(),
     ).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
