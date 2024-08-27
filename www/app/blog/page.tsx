@@ -17,25 +17,28 @@ const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
 export default async function Blog() {
   const { data: pages } = await nc.query.blog.listPages();
 
-  const posts: Post[] = pages.reverse().map(
-    (page) =>
-      ({
-        id: page.id,
-        title: page.title ?? "",
-        description: page.properties?.description ?? "",
-        writer: page.properties?.writer.slice(0, 10) ?? "",
-        writerImage: "/img/sample-profile-icon.png",
-        keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
-        category: page.properties?.category ?? "",
-        date: new Date(
-          page.properties?.created_at ?? Date.now()
-        ).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
-      }) satisfies Post
-  );
+  const posts: Post[] = pages
+    .reverse()
+    .filter((p) => p.properties?.published)
+    .map(
+      (page) =>
+        ({
+          id: page.id,
+          title: page.title ?? "",
+          description: page.properties?.description ?? "",
+          writer: page.properties?.writer.slice(0, 10) ?? "",
+          writerImage: "/img/sample-profile-icon.png",
+          keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
+          category: page.properties?.category ?? "",
+          date: new Date(
+            page.properties?.created_at ?? Date.now()
+          ).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+        }) satisfies Post
+    );
 
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(11,11,11)_0%,rgb(0,0,0)_100%)]">

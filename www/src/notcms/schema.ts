@@ -11,6 +11,7 @@ export const schema = {
       categories: "string[]",
       tags: "string[]",
       created_at: "date",
+      published: "boolean",
       description: "string",
       title: "string",
     },
