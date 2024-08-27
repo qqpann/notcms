@@ -16,6 +16,14 @@ export const schema = {
       title: "string",
     },
   },
+  service: {
+    id: "01J6A6NTZZNEVGCTYMYWG4P5XW",
+    properties: {
+      slug: "string",
+      lang: "string",
+      title: "string",
+    },
+  },
 } satisfies Schema;
 
 export const nc = new Client({ schema });
