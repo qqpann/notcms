@@ -12,7 +12,7 @@ const FeatureCard = ({
 }: {
   desc: string;
   title: string;
-  className: any;
+  className: string;
 }): JSX.Element => {
   return (
     <div
@@ -85,12 +85,12 @@ function Landing() {
                 <div className="relative w-[473px] h-[269px] top-6 left-6">
                   <img
                     className="absolute w-[271px] h-[269px] top-0 left-0"
-                    alt="Image"
+                    alt=""
                     src="https://c.animaapp.com/PNtvr1Xl/img/image@2x.png"
                   />
                   <img
                     className="absolute w-3 h-3 top-9 left-8 object-cover"
-                    alt="Image"
+                    alt=""
                     src="https://c.animaapp.com/PNtvr1Xl/img/image-2168@2x.png"
                   />
                   <div className="absolute w-10 h-2 top-3 left-3">
@@ -819,22 +819,22 @@ const TextLinkList = ({
 }: {
   hasTitle: boolean;
   density: "tight" | "default";
-  className: any;
-  textStrongDivClassName: any;
+  className: string;
+  textStrongDivClassName: string;
   textStrongText: string;
-  textLinkListItemDivClassName: any;
+  textLinkListItemDivClassName: string;
   textLinkListItemText: string;
-  textLinkListItemDivClassNameOverride: any;
+  textLinkListItemDivClassNameOverride: string;
   textLinkListItemText1: string;
-  textLinkListItemDivClassName1: any;
+  textLinkListItemDivClassName1: string;
   textLinkListItemText2: string;
-  textLinkListItemDivClassName2: any;
+  textLinkListItemDivClassName2: string;
   textLinkListItemText3: string;
-  textLinkListItemDivClassName3: any;
+  textLinkListItemDivClassName3: string;
   textLinkListItemText4: string;
-  textLinkListItemDivClassName4: any;
+  textLinkListItemDivClassName4: string;
   textLinkListItemText5: string;
-  textLinkListItemDivClassName5: any;
+  textLinkListItemDivClassName5: string;
   textLinkListItemText6: string;
 }): JSX.Element => {
   return (
@@ -892,7 +892,7 @@ const TextLinkListItem = ({
   divClassName,
 }: {
   text: string;
-  divClassName: any;
+  divClassName: string;
 }): JSX.Element => {
   return (
     <div className="relative w-[89px] h-[22px]">
@@ -910,8 +910,8 @@ const TextStrong = ({
   divClassName,
 }: {
   text: string;
-  className: any;
-  divClassName: any;
+  className: string;
+  divClassName: string;
 }): JSX.Element => {
   return (
     <div className={`inline-flex items-start relative ${className}`}>
