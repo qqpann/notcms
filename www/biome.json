@@ -22,7 +22,7 @@
       "jsxQuoteStyle": "double",
       "quoteProperties": "asNeeded",
       "semicolons": "always",
-      "trailingCommas": "all"
+      "trailingCommas": "es5"
     }
   },
   "json": {

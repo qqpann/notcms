@@ -11,7 +11,7 @@ const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
     ({
       id: i.toString(),
       name,
-    }) satisfies Category,
+    }) satisfies Category
 );
 
 export default async function Blog() {
@@ -31,13 +31,13 @@ export default async function Blog() {
           keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
           category: page.properties?.category ?? "",
           date: new Date(
-            page.properties?.created_at ?? Date.now(),
+            page.properties?.created_at ?? Date.now()
           ).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
           }),
-        }) satisfies Post,
+        }) satisfies Post
     );
 
   return (
