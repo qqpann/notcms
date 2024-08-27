@@ -40,7 +40,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     keyVisualImage: data.properties.thumbnail[0] ?? "/img/404.png",
     category: data.properties.category,
     date: new Date(
-      data.properties?.created_at ?? Date.now()
+      data.properties?.created_at ?? Date.now(),
     ).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
