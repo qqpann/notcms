@@ -117,7 +117,7 @@ dist
 .pnp.*
 
 # Compiled code
-lib/
+dist/
 
 # samples
 samples/*
