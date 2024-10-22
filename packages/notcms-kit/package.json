@@ -3,7 +3,7 @@
   "version": "0.0.8-development",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "bin": {
-    "notcms": "./dist/index.js"
+    "notcms-kit": "./dist/index.js"
   },
   "files": ["dist/**/*"],
   "scripts": {
