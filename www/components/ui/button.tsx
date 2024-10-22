@@ -54,4 +54,26 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
+export const CandyButton = ({ children, ...props }: ButtonProps) => {
+  return (
+    <button
+      {...props}
+      className="relative rounded-[40px] bg-gradient-to-r from-[#FF7E58] to-[#FF0093]"
+    >
+      <span className="relative z-10">{children}</span>
+      <span className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 rounded-full" />
+      <span className="absolute inset-0 opacity-75 group-hover:opacity-100 transition-opacity duration-300">
+        <span className="absolute -left-4 -top-4 w-12 h-12 bg-orange-300 rounded-full blur-md" />
+        <span className="absolute -right-4 -bottom-4 w-12 h-12 bg-purple-400 rounded-full blur-md" />
+      </span>
+      <span
+        className="absolute inset-0 rounded-full opacity-50"
+        style={{
+          boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.5)",
+        }}
+      />
+    </button>
+  );
+};
+
 export { Button, buttonVariants };
