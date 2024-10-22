@@ -28,5 +28,4 @@ type PropertyTypeMap = {
 /** Make the hover overlay more readable */
 type Prettify<T> = {
   [K in keyof T]: T[K];
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 } & unknown;

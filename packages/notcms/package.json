@@ -13,6 +13,9 @@
     "clean": "rm -rf ./lib/",
     "cm": "cz",
     "lint": "eslint ./src/ --fix",
+    "format": "biome format --write .",
+    "lint-biome": "biome lint --write .",
+    "check": "biome check --write .",
     "semantic-release": "semantic-release",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
@@ -65,7 +68,7 @@
     }
   },
   "lint-staged": {
-    "*.ts": "eslint --cache --cache-location .eslintcache --fix"
+    "*.ts": "biome ci ."
   },
   "release": {
     "branches": ["main"],
