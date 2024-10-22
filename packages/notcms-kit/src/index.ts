@@ -3,6 +3,7 @@ import { input } from "@inquirer/prompts";
 import boxen from "boxen";
 import chalk from "chalk";
 import { Command } from "commander";
+import dedent from "dedent";
 import { dumpConfig, loadConfig } from "./features/config.js";
 import { fetchSchema } from "./features/schema.js";
 import type { Config } from "./types.js";
@@ -38,14 +39,13 @@ async function pull() {
 
   await fs.writeFile(
     schemaPath,
+    dedent`
+    import { Client } from "notcms";
+    import type { Schema } from "notcms";
+
+    export const schema = ${schema} satisfies Schema;
+    export const nc = new Client({ schema });
     `
-import { Client } from "notcms";
-import type { Schema } from "notcms";
-
-export const schema = ${schema} satisfies Schema;
-
-export const nc = new Client({ schema });
-`
   );
   console.log(`${schemaPath} updated`);
 }
