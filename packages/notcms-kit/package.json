@@ -1,6 +1,6 @@
 {
   "name": "notcms-kit",
-  "version": "0.0.7-development",
+  "version": "0.0.8-development",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "bin": {
     "notcms": "./dist/index.js"
@@ -8,6 +8,7 @@
   "files": ["dist/**/*"],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
+    "postbuild": "ts-node add-shebang.ts",
     "clean": "rm -rf ./dist/",
     "cm": "cz",
     "lint": "eslint ./src/ --fix",
