@@ -20,7 +20,20 @@ async function init() {
     }),
   };
   await dumpConfig("notcms.config.json", config);
-  console.log("notcms.config.json created");
+
+  console.log(
+    boxen(
+      dedent`
+      NotCMS Config is initialized and saved to ${chalk.blue("notcms.config.json")}.
+      `,
+      {
+        padding: 1,
+        title: "[ Success ]",
+        borderColor: "green",
+        borderStyle: "round",
+      }
+    )
+  );
 }
 
 /**
@@ -47,7 +60,20 @@ async function pull() {
     export const nc = new Client({ schema });
     `
   );
-  console.log(`${schemaPath} updated`);
+
+  console.log(
+    boxen(
+      dedent`
+      Schema pulled successfully and saved to ${chalk.blue(schemaPath)}.
+      `,
+      {
+        padding: 1,
+        title: "[ Success ]",
+        borderColor: "green",
+        borderStyle: "round",
+      }
+    )
+  );
 }
 
 async function main() {
