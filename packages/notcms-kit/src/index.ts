@@ -56,8 +56,7 @@ async function main() {
   program.command("pull").description("Pull schema from NotCMS").action(pull);
   program.showHelpAfterError();
   program.configureOutput({
-    // TODO: Add colors
-    // https://github.com/tj/commander.js/?tab=readme-ov-file#override-exit-and-output-handling
+    outputError: (str, write) => write(chalk.red(str)),
   });
 
   await program.parseAsync(process.argv);
