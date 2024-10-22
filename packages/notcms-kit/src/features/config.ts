@@ -1,6 +1,6 @@
-import { promises as fs } from "fs";
-import * as path from "path";
-import { Config, isConfig } from "../types";
+import { promises as fs } from "node:fs";
+import * as path from "node:path";
+import { Config, isConfig } from "../types.js";
 
 const DEFAULT_CONFIG: Config = {
   schema: "src/notcms/schema.ts",

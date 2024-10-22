@@ -1,9 +1,11 @@
-import { promises as fs } from "fs";
+import { promises as fs } from "node:fs";
 import { input } from "@inquirer/prompts";
+import boxen from "boxen";
+import chalk from "chalk";
 import { Command } from "commander";
-import { dumpConfig, loadConfig } from "./features/config";
-import { fetchSchema } from "./features/schema";
-import type { Config } from "./types";
+import { dumpConfig, loadConfig } from "./features/config.js";
+import { fetchSchema } from "./features/schema.js";
+import type { Config } from "./types.js";
 
 /**
  * Initialize NotCMS
@@ -65,6 +67,6 @@ main().catch(async (err) => {
   console.error(err);
   // const { default: boxen } = await import("boxen");
   // const { default: chalk } = await import("chalk");
-  // console.log(boxen(chalk.red(err.message), { padding: 1 }));
+  console.log(boxen(chalk.red(err.message), { padding: 1 }));
   // throw err;
 });

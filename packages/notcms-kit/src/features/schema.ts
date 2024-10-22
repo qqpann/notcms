@@ -1,4 +1,4 @@
-import { routes } from "../routes";
+import { routes } from "../routes.js";
 
 export async function fetchSchema(): Promise<string> {
   const { NOTCMS_SECRET_KEY, NOTCMS_WORKSPACE_ID } = process.env;
