@@ -1,11 +1,9 @@
 {
-  "name": "notcms",
+  "name": "notcms-kit",
   "version": "0.0.7-development",
   "description": "NotCMS makes it easy to build a CMS for your website.",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "bin": {
-    "notcms": "./dist/cli/index.js"
+    "notcms": "./dist/index.js"
   },
   "files": ["dist/**/*"],
   "scripts": {

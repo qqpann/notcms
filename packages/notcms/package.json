@@ -4,9 +4,6 @@
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "notcms": "./dist/cli/index.js"
-  },
   "files": ["dist/**/*"],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
@@ -68,7 +65,7 @@
     }
   },
   "lint-staged": {
-    "*.ts": "biome ci . --changed"
+    "*.ts": "biome ci ."
   },
   "release": {
     "branches": ["main"],

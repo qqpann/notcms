@@ -4,6 +4,9 @@
       "path": "packages/notcms"
     },
     {
+      "path": "packages/notcms-kit"
+    },
+    {
       "path": "www"
     },
     {
