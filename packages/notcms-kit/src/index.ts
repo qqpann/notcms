@@ -63,10 +63,13 @@ async function main() {
   await program.parseAsync(process.argv);
 }
 
-main().catch(async (err) => {
-  console.error(err);
-  // const { default: boxen } = await import("boxen");
-  // const { default: chalk } = await import("chalk");
-  console.log(boxen(chalk.red(err.message), { padding: 1 }));
-  // throw err;
+main().catch(async (err: Error) => {
+  console.log(
+    boxen(err.message, {
+      padding: 1,
+      title: `[ ${chalk.bold(err.name ?? "Error")} ]`,
+      borderColor: "red",
+      borderStyle: "double",
+    })
+  );
 });
