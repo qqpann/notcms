@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "postbuild": "ts-node add-shebang.ts",
+    "watch": "tsc --project tsconfig.build.json --watch",
     "clean": "rm -rf ./dist/",
     "cm": "cz",
     "lint": "eslint ./src/ --fix",
