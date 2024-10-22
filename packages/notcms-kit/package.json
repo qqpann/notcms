@@ -47,7 +47,10 @@
   },
   "homepage": "https://github.com/qqpann/notcms#readme",
   "dependencies": {
-    "@inquirer/prompts": "^5.3.6"
+    "@inquirer/prompts": "^5.3.6",
+    "boxen": "^8.0.1",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0"
   },
   "devDependencies": {
     "@ryansonshine/commitizen": "^4.2.8",
