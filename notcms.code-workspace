@@ -1,10 +1,6 @@
 {
   "folders": [
     {
-      "name": "notcms/src",
-      "path": "packages/notcms/src"
-    },
-    {
       "path": "packages/notcms"
     },
     {
