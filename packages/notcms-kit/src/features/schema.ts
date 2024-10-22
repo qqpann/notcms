@@ -9,11 +9,11 @@ export async function fetchSchema(): Promise<string> {
   if (!NOTCMS_SECRET_KEY || !NOTCMS_WORKSPACE_ID) {
     throw new Error(
       dedent`
-      Both ${chalk.yellow.bold("NOTCMS_SECRET_KEY")} and ${chalk.yellow.bold("NOTCMS_WORKSPACE_ID")} must be set.
+      Both ${chalk.yellow("NOTCMS_SECRET_KEY")} and ${chalk.yellow("NOTCMS_WORKSPACE_ID")} must be set.
 
       ${chalk.bold("Got:")}
-        NOTCMS_SECRET_KEY: ${NOTCMS_SECRET_KEY ? "(set)" : undefined}
-        NOTCMS_WORKSPACE_ID: ${NOTCMS_WORKSPACE_ID}
+        NOTCMS_WORKSPACE_ID: ${NOTCMS_WORKSPACE_ID ? chalk.green(NOTCMS_WORKSPACE_ID) : chalk.red(NOTCMS_WORKSPACE_ID)}
+        NOTCMS_SECRET_KEY:   ${NOTCMS_SECRET_KEY ? chalk.green("(set)") : chalk.red(NOTCMS_SECRET_KEY)}
 
       ${chalk.bold("Suggested action:")}
         1. Get your key and id from the dashboard.
