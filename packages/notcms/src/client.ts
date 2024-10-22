@@ -1,5 +1,5 @@
-import { routes } from './routes';
-import { InferProperties, Page, Schema } from './types';
+import { routes } from "./routes";
+import { InferProperties, Page, Schema } from "./types";
 
 class DatabaseHandler<TData> {
   constructor(
@@ -12,7 +12,7 @@ class DatabaseHandler<TData> {
     const response = await fetch(
       routes.pages(this.workspaceId, this.databaseId),
       {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
         },
@@ -26,7 +26,7 @@ class DatabaseHandler<TData> {
     const response = await fetch(
       routes.pages(this.workspaceId, this.databaseId),
       {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
         },
@@ -47,7 +47,7 @@ class DatabaseHandler<TData> {
     const response = await fetch(
       routes.page(this.workspaceId, this.databaseId, pageId),
       {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
         },
@@ -64,7 +64,7 @@ export class Client<TSchema extends Schema> {
 
   query: {
     [K in keyof TSchema]: DatabaseHandler<
-      InferProperties<TSchema[K]['properties']>
+      InferProperties<TSchema[K]["properties"]>
     >;
   };
 
@@ -77,24 +77,24 @@ export class Client<TSchema extends Schema> {
     const workspaceId = options?.workspaceId || process.env.NOTCMS_WORKSPACE_ID;
     if (!secretKey) {
       throw new Error(
-        'secretKey is required. Pass it as an option or set it as an environment variable.'
+        "secretKey is required. Pass it as an option or set it as an environment variable."
       );
     }
     if (!workspaceId) {
       throw new Error(
-        'workspaceId is required. Pass it as an option or set it as an environment variable.'
+        "workspaceId is required. Pass it as an option or set it as an environment variable."
       );
     }
     this.secretKey = secretKey;
     this.workspaceId = workspaceId;
     this.query = {} as {
       [K in keyof TSchema]: DatabaseHandler<
-        InferProperties<TSchema[K]['properties']>
+        InferProperties<TSchema[K]["properties"]>
       >;
     };
     const schema = options?.schema;
     if (!schema) {
-      throw new Error('schema is required.');
+      throw new Error("schema is required.");
     }
     for (const key in schema) {
       this.query[key as keyof TSchema] = new DatabaseHandler(

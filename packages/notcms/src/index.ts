@@ -1,2 +1,2 @@
-export { Client } from './client';
-export * from './types';
+export { Client } from "./client";
+export * from "./types";

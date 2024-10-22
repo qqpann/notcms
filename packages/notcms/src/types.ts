@@ -1,6 +1,6 @@
 export type Properties = Record<
   string,
-  'string' | 'number' | 'date' | 'boolean' | 'string[]'
+  "string" | "number" | "date" | "boolean" | "string[]"
 >;
 
 export type Schema = Record<string, { id: string; properties: Properties }>;
@@ -23,7 +23,7 @@ type PropertyTypeMap = {
   number: number;
   date: Date;
   boolean: boolean;
-  'string[]': string[];
+  "string[]": string[];
 };
 /** Make the hover overlay more readable */
 type Prettify<T> = {

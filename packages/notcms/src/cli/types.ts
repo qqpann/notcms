@@ -3,5 +3,5 @@ export type Config = {
 };
 
 export function isConfig(obj: Record<string, unknown>): obj is Config {
-  return typeof obj.schema === 'string';
+  return typeof obj.schema === "string";
 }

@@ -1,37 +1,34 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
-	"vcs": {
-		"clientKind": "git",
-		"enabled": true,
-		"useIgnoreFile": true,
-		"defaultBranch": "main"
-	},
-	"formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },
-	"organizeImports": { "enabled": true },
-	"linter": { "enabled": true, "rules": { "recommended": false } },
-	"javascript": {
-		"formatter": {
-			"jsxQuoteStyle": "double",
-			"quoteProperties": "asNeeded",
-			"trailingCommas": "es5",
-			"semicolons": "always",
-			"arrowParentheses": "always",
-			"bracketSpacing": true,
-			"bracketSameLine": false
-		}
-	},
-	"json": { "formatter": { "trailingCommas": "none" } },
-	"overrides": [
-		{
-			"include": [
-				"*.stories.@(ts|tsx|js|jsx|mjs|cjs)",
-				"*.story.@(ts|tsx|js|jsx|mjs|cjs)"
-			],
-			"linter": { "rules": { "correctness": { "useHookAtTopLevel": "off" } } }
-		},
-		{
-			"include": [".storybook/main.@(js|cjs|mjs|ts)"],
-			"linter": { "rules": {} }
-		}
-	]
+  "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+  "vcs": {
+    "clientKind": "git",
+    "enabled": true,
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2 },
+  "organizeImports": { "enabled": true },
+  "linter": { "enabled": true, "rules": { "recommended": false } },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false
+    }
+  },
+  "json": { "formatter": { "trailingCommas": "none" } },
+  "overrides": [
+    {
+      "include": ["*.stories.@(ts|tsx)", "*.story.@(ts|tsx)"],
+      "linter": { "rules": { "correctness": { "useHookAtTopLevel": "off" } } }
+    },
+    {
+      "include": [".storybook/main.@(js|cjs|mjs|ts)"],
+      "linter": { "rules": {} }
+    }
+  ]
 }

@@ -1,9 +1,9 @@
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { Config, isConfig } from '../types';
+import { promises as fs } from "fs";
+import * as path from "path";
+import { Config, isConfig } from "../types";
 
 const DEFAULT_CONFIG: Config = {
-  schema: 'src/notcms/schema.ts',
+  schema: "src/notcms/schema.ts",
 };
 
 export function dumpConfig(
@@ -19,10 +19,10 @@ export function dumpConfig(
 export async function loadConfig(configPath: string): Promise<Config> {
   try {
     const config = JSON.parse(
-      await fs.readFile(path.resolve(configPath), 'utf-8')
+      await fs.readFile(path.resolve(configPath), "utf-8")
     );
     if (!isConfig(config)) {
-      throw new Error('Invalid config');
+      throw new Error("Invalid config");
     }
     return config;
   } catch (error) {

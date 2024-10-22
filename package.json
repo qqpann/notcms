@@ -1,8 +1,9 @@
 {
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
+    "format": "biome format --write .",
+    "lint-biome": "biome lint --write .",
+    "check": "biome check --write .",
     "prepare": "husky"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
+import { type Renderer, marked } from "marked";
 import React from "react";
 import { Header } from "~/components/Header";
-import { marked, type Renderer } from "marked";
 import { PostDetail } from "~/src/types";
 
 export const revalidate = 10;
