@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import { input } from "@inquirer/prompts";
+import { Command } from "commander";
 import { dumpConfig, loadConfig } from "./features/config";
 import { fetchSchema } from "./features/schema";
 import type { Config } from "./types";
@@ -48,23 +49,22 @@ export const nc = new Client({ schema });
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  const command = args[0];
+  const program = new Command("notcms-kit");
+  program.command("init").description("Initialize NotCMS").action(init);
+  program.command("pull").description("Pull schema from NotCMS").action(pull);
+  program.showHelpAfterError();
+  program.configureOutput({
+    // TODO: Add colors
+    // https://github.com/tj/commander.js/?tab=readme-ov-file#override-exit-and-output-handling
+  });
 
-  switch (command) {
-    case "init":
-      await init();
-      break;
-    case "pull":
-      await pull();
-      break;
-    default:
-      console.log(`Unknown command: ${command}`);
-      break;
-  }
+  await program.parseAsync(process.argv);
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   console.error(err);
-  throw err;
+  // const { default: boxen } = await import("boxen");
+  // const { default: chalk } = await import("chalk");
+  // console.log(boxen(chalk.red(err.message), { padding: 1 }));
+  // throw err;
 });
