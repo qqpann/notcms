@@ -68,7 +68,7 @@
     }
   },
   "lint-staged": {
-    "*.ts": "biome ci ."
+    "*.ts": "biome ci . --changed"
   },
   "release": {
     "branches": ["main"],
