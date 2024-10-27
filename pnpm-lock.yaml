@@ -193,8 +193,8 @@ importers:
         specifier: 14.2.5
         version: 14.2.5(@babel/core@7.24.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       notcms:
-        specifier: 0.0.6-development
-        version: 0.0.6-development
+        specifier: workspace:*
+        version: link:../packages/notcms
       react:
         specifier: ^18
         version: 18.3.1
@@ -4595,11 +4595,6 @@ packages:
   normalize-url@8.0.1:
     resolution: {integrity: sha512-IO9QvjUMWxPQQhs60oOu10CRkWCiZzSUkzbXGGV9pviYl1fXYcvkzQ5jV9z8Y6un8ARoVRl4EtC6v6jNqbaJ/w==}
     engines: {node: '>=14.16'}
-
-  notcms@0.0.6-development:
-    resolution: {integrity: sha512-/W4YYCiA+rMJxbzzzgi1uoYXkPvCPAEHNbiUNCsK7pc14U3HfwHb7CCY2D64Z6PoKhff5tP3XJV5H7x86oPuWQ==}
-    engines: {node: '>=12.0'}
-    hasBin: true
 
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
@@ -11525,10 +11520,6 @@ snapshots:
   normalize-path@3.0.0: {}
 
   normalize-url@8.0.1: {}
-
-  notcms@0.0.6-development:
-    dependencies:
-      '@inquirer/prompts': 5.3.6
 
   npm-run-path@4.0.1:
     dependencies:

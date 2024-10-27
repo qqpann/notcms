@@ -35,6 +35,7 @@ class DatabaseHandler<TData> {
     const { pages } = (await response.json()) as {
       pages: {
         id: string;
+        notionPageId: string;
         title: string | null;
         properties: TData | null;
         version: string | null;

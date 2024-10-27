@@ -26,7 +26,7 @@ export default async function Blog() {
     .map(
       (page) =>
         ({
-          id: page.id,
+          id: page.notionPageId,
           title: page.title ?? "",
           description: page.properties?.description ?? "",
           writer: page.properties?.writer.slice(0, 10) ?? "",
