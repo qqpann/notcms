@@ -3,25 +3,25 @@ import type { Schema } from "notcms";
 
 export const schema = {
   blog: {
-    id: "01J64GZCM04773JK58TNTR9XNH",
+    id: "01J8XTSD2SCRXRQ0XWTMB5NB2B",
     properties: {
       writer: "string",
       thumbnail: "string[]",
       category: "string",
+      writers: "string[]",
       categories: "string[]",
-      tags: "string[]",
       created_at: "date",
       published: "boolean",
+      tags: "string[]",
       description: "string",
       title: "string",
     },
   },
-  service: {
-    id: "01J6A6NTZZNEVGCTYMYWG4P5XW",
+  writers: {
+    id: "01J8XTSRH2C5PDE0H0XKFZZKXN",
     properties: {
-      slug: "string",
-      lang: "string",
-      title: "string",
+      image: "string[]",
+      名前: "string",
     },
   },
 } satisfies Schema;

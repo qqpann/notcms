@@ -1,6 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Header } from "~/components/Header";
+import { Button } from "~/components/ui/button";
+import { Separator } from "~/components/ui/separator";
 import { nc } from "~/src/notcms/schema";
 import type { Category, Post } from "~/src/types";
 
@@ -28,7 +31,8 @@ export default async function Blog() {
           description: page.properties?.description ?? "",
           writer: page.properties?.writer.slice(0, 10) ?? "",
           writerImage: "/img/sample-profile-icon.png",
-          keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
+          // keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
+          keyVisualImage: "/img/404.png",
           category: page.properties?.category ?? "",
           date: new Date(
             page.properties?.created_at ?? Date.now()
@@ -41,75 +45,61 @@ export default async function Blog() {
     );
 
   return (
-    <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(11,11,11)_0%,rgb(0,0,0)_100%)]">
+    <div className="min-h-screen bg-black text-white">
       <Header />
-      <div className="flex flex-col items-start gap-12 px-32 py-16 relative self-stretch w-[1440px] flex-[0_0_auto]">
-        <div className="flex flex-col w-[947px] items-start gap-5 relative flex-[0_0_auto]">
-          <div className="relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
+
+      <main className="container max-w-[1440px] px-32 mx-auto py-8">
+        <div className="flex flex-col w-full items-start gap-5 flex-[0_0_auto]">
+          <h2 className="self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
             Recent updates
-          </div>
-          <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-[15px] tracking-[0.15px] leading-[normal]">
+          </h2>
+          <p className="self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa4] text-[15px] tracking-[0.15px] leading-[normal]">
             This blog is maintained using NotCMS itself!
           </p>
         </div>
-        <div className="flex flex-col items-start gap-8 relative self-stretch w-full flex-[0_0_auto]">
-          <div className="flex items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
-            <div className="inline-flex items-center gap-3 relative flex-[0_0_auto]">
-              <div className="flex w-[71px] h-6 items-center gap-12 px-0 py-3 relative rounded-[24.5px] border-[0.5px] border-solid border-[#ffffff1a] [background:linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.1)_100%)]">
-                <div className="inline-flex items-center justify-center gap-2 px-3 py-2 relative flex-[0_0_auto] mt-[-12.00px] mb-[-12.00px] rounded-[30px]">
-                  <div className="relative w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-                    All posts
-                  </div>
-                </div>
-              </div>
-              {categories.map((category) => (
-                <div
-                  className="inline-flex items-center justify-center gap-2 px-3 py-0 relative flex-[0_0_auto]"
-                  key={category.id}
-                >
-                  <div className="relative w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-                    {category.name}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <span className="relative flex-1 grow h-px w-full block bg-white opacity-25" />
+
+        <div className="flex items-center gap-12 self-stretch w-full flex-[0_0_auto]">
+          <div className="inline-flex items-center gap-3 flex-[0_0_auto]">
+            <button className="flex w-[71px] h-6 items-center gap-12 px-0 py-3 rounded-[24.5px] border-[0.5px] border-solid border-[#ffffff1a] [background:linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.1)_100%)]">
+              <span className="inline-flex items-center justify-center gap-2 px-3 py-2 flex-[0_0_auto] mt-[-12.00px] mb-[-12.00px] rounded-[30px]">
+                <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+                  All posts
+                </span>
+              </span>
+            </button>
+
+            <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
+              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+                Blogs
+              </span>
+            </button>
+
+            <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
+              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+                Customer stories
+              </span>
+            </button>
+
+            <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
+              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+                Changelog
+              </span>
+            </button>
           </div>
-          <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-            <HeroBlogPostCard post={posts[0]} />
-            <div className="grid grid-cols-3 items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-              {posts.slice(1).map((post, i) => {
-                switch (i % 3) {
-                  case 0:
-                    return (
-                      <BlogPostCard1
-                        key={post.id}
-                        post={post}
-                        className="!flex-1 !grow !w-[unset]"
-                      />
-                    );
-                  case 1:
-                    return (
-                      <BlogPostCard2
-                        key={post.id}
-                        post={post}
-                        className="flex items-start gap-4 relative self-stretch w-full flex-[0_0_auto]"
-                      />
-                    );
-                  default:
-                    return (
-                      <BlogPostCard3
-                        key={post.id}
-                        post={post}
-                        className="!mt-[-0.50px] !mb-[-0.50px] !flex-1 !grow !w-[unset]"
-                      />
-                    );
-                }
-              })}
-            </div>
+
+          <Separator className="flex-1 grow h-px" />
+        </div>
+
+        <div className="grid grid-cols-1 gap-8">
+          <HeroBlogPostCard post={posts[0]} />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {posts.map((post) => (
+              <BlogPostCard key={post.id} post={post} />
+            ))}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
@@ -124,11 +114,19 @@ function HeroBlogPostCard({ className, post }: Props) {
       href={`/blog/${post.id}`}
       className="flex items-start gap-8 relative self-stretch w-full flex-[0_0_auto]"
     >
-      <img
+      {/* <img
         className="w-[785px] h-[422px] ml-[-0.50px] bg-black border-[#ffffff1f] relative mt-[-0.50px] mb-[-0.50px] rounded-[10px] border-[0.5px] border-solid shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]"
         alt="Key Visual"
         src={post.keyVisualImage}
+      /> */}
+      <Image
+        src={post.keyVisualImage}
+        alt="Key Visual"
+        width={785}
+        height={422}
+        className="rounded"
       />
+
       <div className="flex flex-col items-start gap-4 px-0 py-5 relative flex-1 self-stretch grow">
         <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
@@ -146,10 +144,17 @@ function HeroBlogPostCard({ className, post }: Props) {
               </div>
             </div>
             <div className="inline-flex items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
-              <img
+              {/* <img
                 className="w-[18px] h-[18px] relative object-cover"
                 alt="Writer Profile"
                 src={post.writerImage}
+              /> */}
+              <Image
+                src={post.writerImage}
+                alt="Writer Profile"
+                width={18}
+                height={18}
+                className="rounded"
               />
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
                 {post.writer}
@@ -161,109 +166,57 @@ function HeroBlogPostCard({ className, post }: Props) {
     </Link>
   );
 }
-function BlogPostCard1({ className, post }: Props) {
+function BlogPostCard({ className, post }: Props) {
   return (
+    // TODO: border?
     <Link
       href={`/blog/${post.id}`}
-      className={`flex flex-col items-start justify-center gap-4 pt-1.5 pb-3.5 px-1.5 relative w-96 rounded-[10px] overflow-hidden border-[0.5px] border-solid border-[#ffffff14] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] [background:linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.04)_100%)] ${className}`}
+      className={
+        "flex flex-col items-start gap-5 pt-4 pb-5 px-4 bg-[#ffffff03] rounded-3xl overflow-hidden border-[0.5px] border-solid border-transparent shadow-[inset_0px_-80px_96px_#ffffff14]"
+      }
     >
-      <img
-        className="relative w-[373px] h-[201px] mt-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded border-[0.5px] border-solid border-[#ffffff14]"
-        alt="Key Visual"
+      <Image
         src={post.keyVisualImage}
+        alt="Key Visual"
+        width={373}
+        height={201}
+        className="rounded"
       />
-      <div className="flex flex-col items-start gap-3 px-2.5 py-0 relative self-stretch w-full flex-[0_0_auto]">
-        <div className="relative self-stretch mt-[-1.00px] [font-family:'Space_Mono',Helvetica] font-normal text-[#f44b99] text-xs tracking-[0.12px] leading-[normal]">
-          {post.category.toUpperCase()}
-        </div>
-        <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-[17px] tracking-[0.17px] leading-[normal]">
+
+      <div className="flex flex-col items-start gap-4 px-1.5 py-0 self-stretch w-full flex-[0_0_auto]">
+        <p className="self-stretch mt-[-1px] font-h-6 font-[number:var(--h-6-font-weight)] text-white text-[length:var(--h-6-font-size)] tracking-[var(--h-6-letter-spacing)] leading-[var(--h-6-line-height)] [font-style:var(--h-6-font-style)]">
           {post.title}
         </p>
-        <div className="flex items-center gap-1.5 relative self-stretch w-full flex-[0_0_auto]">
-          <img
-            className="relative w-4 h-4 object-cover"
-            alt="Writer Profile"
-            src={post.writerImage}
-          />
-          <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-            {post.writer}
-          </div>
-          <div className="relative flex-1 [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-xs text-right tracking-[0.12px] leading-[normal]">
-            {post.date}
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-}
-function BlogPostCard2({ className, post }: Props) {
-  return (
-    <Link
-      href={`/blog/${post.id}`}
-      className="flex flex-col items-start justify-center gap-4 pt-1.5 pb-3.5 px-1.5 flex-1 grow rounded-[10px] overflow-hidden shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] [background:linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.04)_100%)] relative self-stretch border-[0.5px] border-solid border-[#ffffff14]"
-    >
-      <img
-        className="relative w-[373px] h-[201px] mt-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded border-[0.5px] border-solid border-[#ffffff14]"
-        alt="Key Visual"
-        src={post.keyVisualImage}
-      />
-      <div className="px-2.5 py-0 flex-1 grow flex flex-col items-start gap-3 relative self-stretch w-full">
-        <p className="flex-1 text-[17px] tracking-[0.17px] relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white leading-[normal]">
-          {post.title}
-        </p>
-        <div className="flex items-center gap-1.5 relative self-stretch w-full flex-[0_0_auto]">
-          <div className="inline-flex h-5 items-center gap-1.5 px-2 py-0.5 relative flex-[0_0_auto] bg-[#ffffff29] rounded-[40px]">
-            <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-              {post.category}
-            </div>
-          </div>
-          <div className="inline-flex items-center gap-1.5 pl-0.5 pr-2 py-0.5 relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
-            <img
-              className="w-4 h-4 relative object-cover"
-              alt="Writer Profile"
+
+        <div className="flex items-center gap-1.5 self-stretch w-full relative flex-[0_0_auto]">
+          <div className="inline-flex h-5 items-center justify-center gap-1 pl-0.5 pr-2 py-[9.5px] rounded-[66.5px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_100%)] relative flex-[0_0_auto]">
+            {/* <img
+              className="relative w-4 h-4 mt-[-7.50px] mb-[-7.50px] object-cover"
+              alt="Image"
               src={post.writerImage}
+            /> */}
+            <Image
+              src={post.writerImage}
+              alt="Writer Profile"
+              width={16}
+              height={16}
+              className="rounded"
             />
-            <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+
+            <div className="relative w-fit mt-[-5.00px] mb-[-3.00px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
               {post.writer}
             </div>
           </div>
-          <div className="relative flex-1 [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-xs text-right tracking-[0.12px] leading-[normal]">
+
+          <div className="inline-flex h-5 items-center justify-center gap-2 pt-[9.5px] pb-[10.5px] px-2 rounded-[66.5px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_100%)] relative flex-[0_0_auto]">
+            <div className="relative w-fit mt-[-5.50px] mb-[-3.50px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
+              {post.category}
+            </div>
+          </div>
+
+          <div className="relative flex-1 font-caption font-[number:var(--caption-font-weight)] text-[#9f9fa5] text-[length:var(--caption-font-size)] text-right tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] [font-style:var(--caption-font-style)]">
             {post.date}
           </div>
-        </div>
-      </div>
-    </Link>
-  );
-}
-function BlogPostCard3({ className, post }: Props) {
-  return (
-    <Link
-      href={`/blog/${post.id}`}
-      className={`flex flex-col items-start justify-center gap-4 pt-0 pb-3.5 px-0 relative w-[385px] rounded-[10px] overflow-hidden border-[0.5px] border-solid border-[#ffffff29] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] [background:linear-gradient(180deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.04)_100%)] ${className}`}
-    >
-      <img
-        className="relative self-stretch w-full h-[201px] mt-[-0.50px] ml-[-0.50px] bg-black border-[0.5px] border-solid border-[#ffffff14]"
-        alt="Key Visual"
-        src={post.keyVisualImage}
-      />
-      <div className="flex flex-col items-start gap-3 px-4 py-0 relative self-stretch w-full flex-[0_0_auto]">
-        <div className="relative w-[25px] h-2">
-          <div className="absolute -top-px left-0 [background:linear-gradient(180deg,rgb(142,43.65,89.04)_0%,rgb(244,75,153)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-transparent text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-            {post.category}
-          </div>
-        </div>
-        <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-[17px] tracking-[0.17px] leading-[normal]">
-          {post.title}
-        </p>
-        <div className="flex items-center gap-1.5 relative self-stretch w-full flex-[0_0_auto]">
-          <img
-            className="relative w-4 h-4 object-cover"
-            alt="Writer Profile"
-            src={post.writerImage}
-          />
-          <p className="relative flex-1 [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-zinc-400 text-xs tracking-[0.12px] leading-[normal]">
-            {post.writer} on {post.date}
-          </p>
         </div>
       </div>
     </Link>
