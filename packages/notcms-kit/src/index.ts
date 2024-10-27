@@ -1,4 +1,5 @@
-import { promises as fs } from "node:fs";
+import { promises as fs, existsSync } from "node:fs";
+import path from "node:path";
 import { input } from "@inquirer/prompts";
 import boxen from "boxen";
 import chalk from "chalk";
@@ -33,6 +34,51 @@ async function init() {
         borderStyle: "round",
       }
     )
+  );
+
+  if (isNextProject()) {
+    console.log(
+      boxen(
+        dedent`
+        Next.js project detected.
+
+        In order to use next/image with NotCMS,
+        add the following to your next.config.(js|ts):
+
+        ${boxen(
+          dedent`
+          module.exports = {
+            images: {
+              remotePatterns: [
+                {
+                  protocol: 'https',
+                  hostname: 'api.notcms.com',
+                  port: '',
+                  pathname: '/v1/**',
+                },
+              ],
+            },
+          }
+          `,
+          { padding: 1, borderColor: "gray", borderStyle: "round" }
+        )}
+        `,
+        {
+          padding: 1,
+          title: "[ Info ]",
+          borderColor: "blue",
+          borderStyle: "round",
+        }
+      )
+    );
+  }
+}
+function isNextProject() {
+  // js, ts, mjs, cjs
+  const ext = [".js", ".ts", ".mjs", ".cjs"];
+  return true;
+  return ext.some((e) =>
+    existsSync(path.resolve(process.cwd(), `next.config${e}`))
   );
 }
 
