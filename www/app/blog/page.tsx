@@ -31,8 +31,7 @@ export default async function Blog() {
           description: page.properties?.description ?? "",
           writer: page.properties?.writer.slice(0, 10) ?? "",
           writerImage: "/img/sample-profile-icon.png",
-          // keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
-          keyVisualImage: "/img/404.png",
+          keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
           category: page.properties?.category ?? "",
           date: new Date(
             page.properties?.created_at ?? Date.now()
