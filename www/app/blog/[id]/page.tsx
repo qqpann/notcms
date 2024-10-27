@@ -1,8 +1,9 @@
 import { type Renderer, marked } from "marked";
+import Image from "next/image";
 import React from "react";
 import { Header } from "~/components/Header";
 import { nc } from "~/src/notcms/schema";
-import type { PostDetail } from "~/src/types";
+import type { PostDetail, Writer } from "~/src/types";
 
 export const revalidate = 10;
 
@@ -30,27 +31,40 @@ const renderer: Partial<Renderer> = {
 marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const { data } = await nc.query.blog.getPage(params.id);
+  const { data: _page } = await nc.query.blog.getPage(params.id);
+  console.log("data.properties", _page);
   const post = {
     id: params.id,
-    title: data.properties.title,
-    description: data.properties.description ?? "",
-    writer: data.properties.writer ?? "",
+    title: _page.properties.title,
+    description: _page.properties.description ?? "",
+    writer: _page.properties.writer ?? "",
     writerImage: "/img/sample-profile-icon.png",
-    keyVisualImage: data.properties.thumbnail[0] ?? "/img/404.png",
-    category: data.properties.category,
+    keyVisualImage: _page.properties.thumbnail[0] ?? "/img/404.png",
+    category: _page.properties.category,
     date: new Date(
-      data.properties?.created_at ?? Date.now()
+      _page.properties?.created_at ?? Date.now()
     ).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     }),
-    content: data.content,
+    content: _page.content,
   } satisfies PostDetail;
-  return <BlogDetail post={post} />;
+  console.log("get writer id", _page.properties.writers[0]);
+  const { data: _writer } = await nc.query.writers.getPage(
+    _page.properties.writers[0]
+  );
+  const writer = _writer
+    ? {
+        name: _writer.properties?.名前,
+        description: _writer.content,
+        image: _writer.properties?.image[0],
+      }
+    : undefined;
+  console.log(writer);
+  return <BlogDetail post={post} writer={writer} />;
 }
-function BlogDetail({ post }: { post: PostDetail }) {
+function BlogDetail({ post, writer }: { post: PostDetail; writer?: Writer }) {
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(10.82,10.81,11.21)_0%,rgb(0,0,0)_100%)]">
       <div className="flex flex-col items-center gap-12 pt-16 pb-32 px-32 relative self-stretch w-full flex-[0_0_auto]">
@@ -86,6 +100,31 @@ function BlogDetail({ post }: { post: PostDetail }) {
             __html: marked(post.content ?? ""),
           }}
         />
+
+        {writer && <WriterProfileCard writer={writer} />}
+      </div>
+    </div>
+  );
+}
+function WriterProfileCard({ writer }: { writer: Writer }) {
+  return (
+    <div className="flex w-[600px] items-start gap-6 p-6  bg-[#ffffff03] rounded-[20px] overflow-hidden border-[0.5px] border-solid">
+      <Image
+        width={56}
+        height={56}
+        className="rounded-full w-14 h-14 object-cover"
+        alt={`${writer.name}'s Profile`}
+        src={writer.image}
+      />
+
+      <div className="flex flex-col items-start gap-4  flex-1 grow">
+        <div className=" self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-white text-lg tracking-[0.18px] leading-[18px]">
+          {writer.name}
+        </div>
+
+        <p className=" self-stretch opacity-70 [font-family:'Inter-Regular',Helvetica] font-normal text-white text-base tracking-[0.16px] leading-[22px]">
+          {writer.description}
+        </p>
       </div>
     </div>
   );

@@ -16,3 +16,8 @@ export type Category = {
   id: string;
   name: string;
 };
+export type Writer = {
+  name: string;
+  description: string;
+  image: string;
+};
