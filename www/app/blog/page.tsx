@@ -45,62 +45,58 @@ export default async function Blog() {
     );
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Header />
+    <main className="container max-w-[1440px] mx-auto py-8">
+      <div className="flex flex-col w-full items-start gap-5 flex-[0_0_auto]">
+        <h2 className="self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
+          Recent updates
+        </h2>
+        <p className="self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa4] text-[15px] tracking-[0.15px] leading-[normal]">
+          This blog is maintained using NotCMS itself!
+        </p>
+      </div>
 
-      <main className="container max-w-[1440px] px-32 mx-auto py-8">
-        <div className="flex flex-col w-full items-start gap-5 flex-[0_0_auto]">
-          <h2 className="self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
-            Recent updates
-          </h2>
-          <p className="self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa4] text-[15px] tracking-[0.15px] leading-[normal]">
-            This blog is maintained using NotCMS itself!
-          </p>
+      <div className="flex items-center gap-12 self-stretch w-full flex-[0_0_auto]">
+        <div className="inline-flex items-center gap-3 flex-[0_0_auto]">
+          <button className="flex w-[71px] h-6 items-center gap-12 px-0 py-3 rounded-[24.5px] border-[0.5px] border-solid border-[#ffffff1a] [background:linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.1)_100%)]">
+            <span className="inline-flex items-center justify-center gap-2 px-3 py-2 flex-[0_0_auto] mt-[-12.00px] mb-[-12.00px] rounded-[30px]">
+              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+                All posts
+              </span>
+            </span>
+          </button>
+
+          <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
+            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+              Blogs
+            </span>
+          </button>
+
+          <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
+            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+              Customer stories
+            </span>
+          </button>
+
+          <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
+            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+              Changelog
+            </span>
+          </button>
         </div>
 
-        <div className="flex items-center gap-12 self-stretch w-full flex-[0_0_auto]">
-          <div className="inline-flex items-center gap-3 flex-[0_0_auto]">
-            <button className="flex w-[71px] h-6 items-center gap-12 px-0 py-3 rounded-[24.5px] border-[0.5px] border-solid border-[#ffffff1a] [background:linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.1)_100%)]">
-              <span className="inline-flex items-center justify-center gap-2 px-3 py-2 flex-[0_0_auto] mt-[-12.00px] mb-[-12.00px] rounded-[30px]">
-                <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-                  All posts
-                </span>
-              </span>
-            </button>
+        <Separator className="flex-1 grow h-px" />
+      </div>
 
-            <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
-              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-                Blogs
-              </span>
-            </button>
+      <div className="grid grid-cols-1 gap-8">
+        <HeroBlogPostCard post={posts[0]} />
 
-            <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
-              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-                Customer stories
-              </span>
-            </button>
-
-            <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
-              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
-                Changelog
-              </span>
-            </button>
-          </div>
-
-          <Separator className="flex-1 grow h-px" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {posts.map((post) => (
+            <BlogPostCard key={post.id} post={post} />
+          ))}
         </div>
-
-        <div className="grid grid-cols-1 gap-8">
-          <HeroBlogPostCard post={posts[0]} />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {posts.map((post) => (
-              <BlogPostCard key={post.id} post={post} />
-            ))}
-          </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
 

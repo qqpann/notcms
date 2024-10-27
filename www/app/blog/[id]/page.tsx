@@ -53,7 +53,6 @@ export default async function Page({ params }: { params: { id: string } }) {
 function BlogDetail({ post }: { post: PostDetail }) {
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(10.82,10.81,11.21)_0%,rgb(0,0,0)_100%)]">
-      <Header />
       <div className="flex flex-col items-center gap-12 pt-16 pb-32 px-32 relative self-stretch w-full flex-[0_0_auto]">
         <div className="flex flex-col w-[784px] items-center gap-12 relative flex-[0_0_auto]">
           <div className="flex flex-col items-center gap-8 relative self-stretch w-full flex-[0_0_auto]">
