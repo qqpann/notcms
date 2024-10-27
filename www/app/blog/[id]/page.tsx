@@ -108,23 +108,21 @@ function BlogDetail({ post, writer }: { post: PostDetail; writer?: Writer }) {
 }
 function WriterProfileCard({ writer }: { writer: Writer }) {
   return (
-    <div className="flex w-[600px] items-start gap-6 p-6  bg-[#ffffff03] rounded-[20px] overflow-hidden border-[0.5px] border-solid">
+    <div className="w-[600px] p-6 bg-white/0 rounded-[20px] shadow-inner border border-white justify-start items-start gap-6 inline-flex">
       <Image
         width={56}
         height={56}
-        className="rounded-full w-14 h-14 object-cover"
+        className="Image w-14 h-14 rounded-full border border-black/10"
         alt={`${writer.name}'s Profile`}
         src={writer.image}
       />
-
-      <div className="flex flex-col items-start gap-4  flex-1 grow">
-        <div className=" self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-white text-lg tracking-[0.18px] leading-[18px]">
+      <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 inline-flex">
+        <div className="self-stretch text-white text-lg font-medium font-['Inter'] leading-[18px] tracking-tight">
           {writer.name}
         </div>
-
-        <p className=" self-stretch opacity-70 [font-family:'Inter-Regular',Helvetica] font-normal text-white text-base tracking-[0.16px] leading-[22px]">
+        <div className="self-stretch opacity-70 text-white text-base font-normal font-['Inter'] leading-snug tracking-tight">
           {writer.description}
-        </p>
+        </div>
       </div>
     </div>
   );
