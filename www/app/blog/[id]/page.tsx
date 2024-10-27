@@ -10,7 +10,7 @@ export const revalidate = 10;
 const renderer: Partial<Renderer> = {
   paragraph({ tokens }) {
     const text = this.parser.parseInline(tokens);
-    return `<p class="font-light text-zinc-300 tracking-[0.02px] leading-[25px] mb-[2rem]">${text}</p>`;
+    return `<p class="font-light text-zinc-300 tracking-[0.02px] leading-[25px]">${text}</p>`;
   },
   heading({ tokens, depth }) {
     const text = this.parser.parseInline(tokens);
@@ -94,7 +94,7 @@ function BlogDetail({ post, writer }: { post: PostDetail; writer?: Writer }) {
           />
         </div>
         <main
-          className="prose prose-base dark:prose-invert prose-h2:text-2xl text-white relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
+          className="prose prose-base dark:prose-invert w-[600px] text-justify prose-headings:text-[#f8f7f7] prose-headings:font-medium prose-headings:text-2xl font-['Inter'] leading-tight text-zinc-300 text-sm font-normal"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: This is a markdown renderer
           dangerouslySetInnerHTML={{
             __html: marked(post.content ?? ""),
