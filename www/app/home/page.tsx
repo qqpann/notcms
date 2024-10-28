@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Header } from "~/components/Header";
 
 export default function Home() {
   return <Landing />;
@@ -37,8 +36,6 @@ function Landing() {
         alt="Ellipse"
         src="https://c.animaapp.com/PNtvr1Xl/img/ellipse-1911.svg"
       />
-
-      <Header />
 
       <div className="flex flex-col items-center gap-12 px-32 py-16 relative self-stretch w-full flex-[0_0_auto]">
         <p className="relative self-stretch mt-[-1.00px] [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-white text-[64px] text-center tracking-[0.64px] leading-[72px]">
