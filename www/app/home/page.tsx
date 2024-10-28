@@ -10,7 +10,7 @@ export default function Home() {
 
 function Hero() {
   return (
-    <div className="flex flex-col items-center gap-24 pt-24 pb-0 relative">
+    <section className="container max-w-[1440px] px-32 mx-auto flex flex-col items-center gap-24 pt-24 pb-0 relative">
       <div className="absolute w-[1184px] h-[768px] top-[480px] left-32 [background:linear-gradient(180deg,rgb(115,115,115)_0%,rgba(217,217,217,0)_75%)] opacity-0" />
 
       <div className="flex flex-col items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
@@ -98,6 +98,6 @@ function Hero() {
       {/* <div className="absolute w-[1184px] h-px top-[484px] left-32 blur-sm [background:linear-gradient(180deg,rgba(129,129,129,0)_0%,rgb(129,129,129)_50%,rgba(129,129,129,0)_100%)] opacity-50" /> */}
 
       {/* <div className="absolute w-[1184px] h-px top-[484px] left-32 blur-[2px] [background:linear-gradient(180deg,rgba(129,129,129,0)_0%,rgb(129,129,129)_50%,rgba(129,129,129,0)_100%)] opacity-50" /> */}
-    </div>
+    </section>
   );
 }

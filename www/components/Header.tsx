@@ -23,7 +23,7 @@ const navItems: NavItem[] = [
 ];
 export function Header() {
   return (
-    <div className="flex max-w-[1440px] mx-auto h-16 items-center px-32 py-0">
+    <div className="container max-w-[1440px] px-32 py-0 h-16 mx-auto flex items-center">
       <Link href={routes.top} className="flex items-center gap-1.5 flex-1 grow">
         <Image
           width={17}

@@ -43,7 +43,7 @@ export default async function Blog() {
     );
 
   return (
-    <main className="container max-w-[1440px] mx-auto py-8">
+    <main className="container max-w-[1440px] px-32 mx-auto py-8">
       <div className="flex flex-col w-full items-start gap-5 flex-[0_0_auto]">
         <h2 className="self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
           Recent updates

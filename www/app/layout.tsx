@@ -22,9 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(inter.className, "min-h-screen bg-black text-white")}>
         <Header />
-        <div className="container max-w-[1440px] px-32 mx-auto py-8">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );
