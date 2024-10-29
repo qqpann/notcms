@@ -2,8 +2,15 @@ import { Client } from "notcms";
 import type { Schema } from "notcms";
 
 export const schema = {
+  writers: {
+    id: "1703046e27044db385b3087d02437cc8",
+    properties: {
+      image: "string[]",
+      名前: "string",
+    },
+  },
   blog: {
-    id: "01JB76DMRGW7X0ZQF9VY9FEVVE",
+    id: "cb962fce05b44e57b4ffdc0f1f93e96d",
     properties: {
       writer: "string",
       thumbnail: "string[]",
@@ -15,13 +22,6 @@ export const schema = {
       tags: "string[]",
       description: "string",
       title: "string",
-    },
-  },
-  writers: {
-    id: "01JB76Q6WM10DKQ2VQ9TPQNBJF",
-    properties: {
-      image: "string[]",
-      名前: "string",
     },
   },
 } satisfies Schema;
