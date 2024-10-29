@@ -4,6 +4,7 @@ export const siteConfig = {
   waitList: "https://forms.gle/MoDUsLCrNJZVmR8M6",
   author: {
     name: "Qiushi Pan",
+    handle: "qqpann",
     x: "https://x.com/qqpann",
   },
 } as const;

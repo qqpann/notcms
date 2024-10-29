@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { siteConfig } from "~/src/site-config";
 
 import "./globals.css";
+import { Footer } from "~/components/Footer";
 import { Header } from "~/components/Header";
 import { cn } from "~/lib/utils";
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className={cn(inter.className, "min-h-screen bg-black text-white")}>
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );

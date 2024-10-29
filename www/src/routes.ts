@@ -5,4 +5,4 @@ export const routes = {
   pricing: "/pricing",
   templates: "/templates",
   docs: "/docs",
-};
+} as const;
