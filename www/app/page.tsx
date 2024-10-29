@@ -4,5 +4,5 @@ import { siteConfig } from "~/src/site-config";
 
 export default function Home() {
   // TODO: Redirect to dashboard if user is logged in
-  return redirect(routes.landing);
+  return redirect(routes.home);
 }

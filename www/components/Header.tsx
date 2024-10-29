@@ -15,7 +15,7 @@ type NavItem = {
   href: string;
 };
 const navItems: NavItem[] = [
-  { title: "Home", href: routes.landing },
+  { title: "Home", href: routes.home },
   { title: "Pricing", href: routes.pricing },
   { title: "Templates", href: routes.templates },
   { title: "Blog", href: routes.blog },

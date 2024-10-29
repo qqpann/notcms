@@ -1,6 +1,6 @@
 export const routes = {
   top: "/",
-  landing: "/home",
+  home: "/home",
   blog: "/blog",
   pricing: "/pricing",
   templates: "/templates",
