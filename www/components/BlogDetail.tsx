@@ -1,27 +1,18 @@
 import { marked } from "marked";
-import React from "react";
-import { nc } from "~/src/notcms/schema";
 
-export const revalidate = 10;
+// const { data } = await nc.query.service.getPage("01J6A6NXVPFC65SM2GE6R88W2S");
+// const page = {
+//   id: params.id,
+//   title: data.properties.title,
+//   content: data.content,
+// } satisfies PostDetail;
 
 type PostDetail = {
   id: string;
   title: string;
   content: string;
 };
-
-export default async function Page({ params }: { params: { id: string } }) {
-  // const { data: pages } = await nc.query.service.listPages();
-  // console.log(pages);
-  const { data } = await nc.query.service.getPage("01J6A6NXVPFC65SM2GE6R88W2S");
-  const page = {
-    id: params.id,
-    title: data.properties.title,
-    content: data.content,
-  } satisfies PostDetail;
-  return <BlogDetail post={page} />;
-}
-function BlogDetail({ post }: { post: PostDetail }) {
+export function BlogDetail({ post }: { post: PostDetail }) {
   return (
     <div className="flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(10.82,10.81,11.21)_0%,rgb(0,0,0)_100%)]">
       <div className="flex flex-col items-center gap-12 pt-16 pb-32 px-32 relative self-stretch w-full flex-[0_0_auto]">
