@@ -45,7 +45,7 @@ export function Header() {
       <div className="flex items-center justify-end gap-2 flex-1 grow">
         <div className="inline-flex h-7 items-center justify-center gap-2 px-3 py-[9.5px] bg-[#e6e6e61a] rounded-[10px]">
           <Link
-            href={siteConfig.waitlist}
+            href={siteConfig.waitList}
             className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-white text-sm text-center tracking-[0.14px] leading-[normal] whitespace-nowrap"
           >
             {/* Get started */}

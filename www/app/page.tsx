@@ -2,9 +2,9 @@ import { siteConfig } from "~/src/site-config";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
+    <main className="flex flex-col items-center justify-between h-auto">
       <a
-        href={siteConfig.waitlist}
+        href={siteConfig.waitList}
         className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
         target="_blank"
         rel="noopener noreferrer"
