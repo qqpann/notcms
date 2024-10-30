@@ -9,53 +9,122 @@ class DatabaseHandler<TData> {
   ) {}
 
   async listPageIds() {
-    const response = await fetch(
-      routes.pages(this.workspaceId, this.databaseId),
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${this.secretKey}`,
-        },
+    try {
+      const response = await fetch(
+        routes.pages(this.workspaceId, this.databaseId),
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${this.secretKey}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to fetch page ids. [${response.status} ${response.statusText}]: ${errorText}`
+        );
       }
-    );
-    const { pageIds } = (await response.json()) as { pageIds: string[] };
-    return { data: pageIds, response };
+
+      const { pageIds } = (await response.json()) as { pageIds: string[] };
+
+      if (!Array.isArray(pageIds)) {
+        throw new Error(
+          "Invalid response format. Make sure the package is up to date."
+        );
+      }
+
+      return { data: pageIds, error: null, response: response };
+    } catch (error) {
+      console.error("Failed to fetch page ids:", error);
+      return {
+        data: undefined,
+        error: error instanceof Error ? error : "Unknown error",
+      };
+    }
   }
 
   async listPages() {
-    const response = await fetch(
-      routes.pages(this.workspaceId, this.databaseId),
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${this.secretKey}`,
-        },
+    try {
+      const response = await fetch(
+        routes.pages(this.workspaceId, this.databaseId),
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${this.secretKey}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to fetch pages. [${response.status} ${response.statusText}]: ${errorText}`
+        );
       }
-    );
-    const { pages } = (await response.json()) as {
-      pages: {
-        id: string;
-        notionPageId: string;
-        title: string | null;
-        properties: TData | null;
-        version: string | null;
-      }[];
-    };
-    return { data: pages, response };
+
+      const { pages } = (await response.json()) as {
+        pages: {
+          id: string;
+          notionPageId: string;
+          title: string | null;
+          properties: TData | null;
+          version: string | null;
+        }[];
+      };
+
+      if (!Array.isArray(pages)) {
+        throw new Error(
+          "Invalid response format. Make sure the package is up to date."
+        );
+      }
+
+      return { data: pages, error: null, response: response };
+    } catch (error) {
+      console.error("Failed to fetch pages:", error);
+      return {
+        data: undefined,
+        error: error instanceof Error ? error : "Unknown error",
+      };
+    }
   }
 
   async getPage(pageId: string) {
-    const response = await fetch(
-      routes.page(this.workspaceId, this.databaseId, pageId),
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${this.secretKey}`,
-        },
+    try {
+      const response = await fetch(
+        routes.page(this.workspaceId, this.databaseId, pageId),
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${this.secretKey}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to fetch page. [${response.status} ${response.statusText}]: ${errorText}`
+        );
       }
-    );
-    const page = (await response.json()) as Page<TData>;
-    return { data: page, response };
+
+      const page = (await response.json()) as Page<TData>;
+
+      if (typeof page !== "object" || page == null) {
+        throw new Error(
+          "Invalid response format. Make sure the package is up to date."
+        );
+      }
+
+      return { data: page, error: null, response: response };
+    } catch (error) {
+      console.error("Failed to fetch page:", error);
+      return {
+        data: undefined,
+        error: error instanceof Error ? error : "Unknown error",
+      };
+    }
   }
 }
 
