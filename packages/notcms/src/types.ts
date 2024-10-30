@@ -7,6 +7,7 @@ export type Schema = Record<string, { id: string; properties: Properties }>;
 
 export type Page<T> = Prettify<{
   id: string;
+  title: string;
   properties: T;
   content: string;
 }>;
