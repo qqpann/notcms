@@ -9,15 +9,3 @@ export type Post = {
   date: string;
   keyVisualImage: string;
 };
-export type PostDetail = {
-  content: string;
-} & Post;
-export type Category = {
-  id: string;
-  name: string;
-};
-export type Writer = {
-  name: string;
-  description: string;
-  image: string;
-};

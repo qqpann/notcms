@@ -2,7 +2,6 @@ import { type Renderer, marked } from "marked";
 import Image from "next/image";
 import React from "react";
 import { nc } from "~/src/notcms/schema";
-import type { PostDetail, Writer } from "~/src/types";
 
 export const revalidate = 10;
 
@@ -29,74 +28,55 @@ const renderer: Partial<Renderer> = {
 } as Renderer;
 marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
 
+type Page = typeof nc.query.blog.$inferPage;
+type Writer = typeof nc.query.writers.$inferPage;
 export default async function Page({ params }: { params: { id: string } }) {
-  const { data: _page } = await nc.query.blog.getPage(params.id);
-  console.log("data.properties", _page);
-  const post = {
-    id: params.id,
-    title: _page.properties.title,
-    description: _page.properties.description ?? "",
-    writer: _page.properties.writer ?? "",
-    writerImage: "/img/sample-profile-icon.png",
-    keyVisualImage: _page.properties.thumbnail[0] ?? "/img/404.png",
-    category: _page.properties.category,
-    date: new Date(
-      _page.properties?.created_at ?? Date.now()
-    ).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
-    content: _page.content,
-  } satisfies PostDetail;
-  console.log("get writer id", _page.properties.writers[0]);
-  const { data: _writer } = await nc.query.writers.getPage(
-    _page.properties.writers[0]
+  const { data: page, error } = await nc.query.blog.getPage(params.id);
+  if (error) {
+    return <div>{error.toString()}</div>;
+  }
+  if (!page) {
+    return <div>Page not found</div>;
+  }
+  const { data: writer } = await nc.query.writers.getPage(
+    page.properties.writers[0]
   );
-  const writer = _writer
-    ? {
-        name: _writer.properties?.名前,
-        description: _writer.content,
-        image: _writer.properties?.image[0],
-      }
-    : undefined;
-  console.log(writer);
-  return <BlogDetail post={post} writer={writer} />;
+  return <BlogDetail page={page} writer={writer} />;
 }
-function BlogDetail({ post, writer }: { post: PostDetail; writer?: Writer }) {
+function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
   return (
     <div className="container max-w-[1440px] px-32 mx-auto flex flex-col items-start relative bg-white [background:linear-gradient(180deg,rgb(10.82,10.81,11.21)_0%,rgb(0,0,0)_100%)]">
       <div className="flex flex-col items-center gap-12 pt-16 pb-32 px-32 relative self-stretch w-full flex-[0_0_auto]">
         <div className="flex flex-col w-[784px] items-center gap-12 relative flex-[0_0_auto]">
           <div className="flex flex-col items-center gap-8 relative self-stretch w-full flex-[0_0_auto]">
             <div className="relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-sm text-center tracking-[0.14px] leading-[normal]">
-              {post.date}
+              {new Date(page.properties.created_at).toLocaleDateString()}
             </div>
             <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl text-center tracking-[0.48px] leading-[normal]">
-              {post.title}
+              {page.title}
             </p>
             <div className="flex w-[115px] items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
               <img
                 className="relative w-[18px] h-[18px] object-cover"
                 alt="Writer Profile"
-                src={post.writerImage}
+                src={writer?.properties.image[0]}
               />
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
-                {post.writer}
+                {writer?.title ?? page.properties.writer}
               </div>
             </div>
           </div>
           <img
             className="relative self-stretch w-full h-[422px] mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]"
             alt="Key Visual"
-            src={post.keyVisualImage}
+            src={page.properties.thumbnail[0]}
           />
         </div>
         <main
           className="prose prose-base dark:prose-invert w-[600px] text-justify prose-headings:text-[#f8f7f7] prose-headings:font-medium prose-headings:text-2xl font-['Inter'] leading-tight text-zinc-300 text-sm font-normal"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: This is a markdown renderer
           dangerouslySetInnerHTML={{
-            __html: marked(post.content ?? ""),
+            __html: marked(page.content ?? ""),
           }}
         />
 
@@ -112,15 +92,15 @@ function WriterProfileCard({ writer }: { writer: Writer }) {
         width={56}
         height={56}
         className="Image w-14 h-14 rounded-full border border-black/10"
-        alt={`${writer.name}'s Profile`}
-        src={writer.image}
+        alt={`${writer.title}'s Profile`}
+        src={writer.properties.image[0]}
       />
       <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 inline-flex">
         <div className="self-stretch text-white text-lg font-medium font-['Inter'] leading-[18px] tracking-tight">
-          {writer.name}
+          {writer.title}
         </div>
         <div className="self-stretch opacity-70 text-white text-base font-normal font-['Inter'] leading-snug tracking-tight">
-          {writer.description}
+          {writer.content}
         </div>
       </div>
     </div>
