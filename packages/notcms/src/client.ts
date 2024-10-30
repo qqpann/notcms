@@ -8,6 +8,13 @@ class DatabaseHandler<TData> {
     private databaseId: string
   ) {}
 
+  /**
+   * The inferred page type for this database.
+   * Usage example:
+   *   type Page = typeof nc.query.blog.$inferPage;
+   */
+  declare readonly $inferPage: Page<TData>;
+
   async listPageIds() {
     try {
       const response = await fetch(
