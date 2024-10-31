@@ -1,5 +1,5 @@
 import { routes } from "./routes";
-import { InferProperties, Page, Schema } from "./types";
+import type { InferProperties, Page, Schema } from "./types";
 
 class DatabaseHandler<TData> {
   constructor(
