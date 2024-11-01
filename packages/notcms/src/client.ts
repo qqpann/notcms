@@ -42,6 +42,9 @@ class DatabaseHandler<TData> {
 
       const { data } = (await response.json()) as { data: T };
 
+      // TODO: check if data is of type T
+      // maybe in a test?
+
       return [data, null, response] as const;
     } catch (error) {
       console.error("Failed to fetch data:", error);
