@@ -47,12 +47,27 @@ class DatabaseHandler<TData> {
       console.error("Failed to fetch data:", error);
       return [
         undefined,
-        error instanceof Error ? error : "Unknown error",
+        error instanceof Error ? error : Error("Unknown error"),
         response,
       ] as const;
     }
   }
 
+  /**
+   * Retrieves a list of pages from the database.
+   *
+   * @template TData - The type of properties in the page.
+   * @returns {Promise<[Pages<TData>, null, Response] | [undefined, Error, Response | undefined]>}
+   * - A Promise that resolves to either:
+   *    - `[Pages<TData>, null, Response]` on success, where:
+   *      - `Pages<TData>`: The retrieved pages data.
+   *      - `null`: Indicates no error.
+   *      - `Response`: The HTTP response object.
+   *    - `[undefined, Error, Response | undefined]` on failure, where:
+   *      - `undefined`: No data is returned.
+   *      - `Error`: The error encountered.
+   *      - `Response | undefined`: The optional HTTP response object.
+   */
   listPages() {
     return this.fetch<Pages<TData>>(
       routes.pages(this.workspaceId, this.databaseId),
@@ -60,6 +75,22 @@ class DatabaseHandler<TData> {
     );
   }
 
+  /**
+   * Retrieves a page from the database.
+   *
+   * @template TData - The type of properties in the page.
+   * @param {string} pageId - The ID of the page to retrieve.
+   * @returns {Promise<[Page<TData>, null, Response] | [undefined, Error, Response | undefined]>}
+   * - A Promise that resolves to either:
+   *    - `[Page<TData>, null, Response]` on success, where:
+   *      - `Page<TData>`: The retrieved page data.
+   *      - `null`: Indicates no error.
+   *      - `Response`: The HTTP response object.
+   *    - `[undefined, Error, Response | undefined]` on failure, where:
+   *      - `undefined`: No data is returned.
+   *      - `Error`: The error encountered.
+   *      - `Response | undefined`: The optional HTTP response object.
+   */
   getPage(pageId: string) {
     return this.fetch<Page<TData>>(
       routes.page(this.workspaceId, this.databaseId, pageId),
