@@ -72,17 +72,11 @@ class DatabaseHandler<TData> {
         );
       }
 
-      const { pages } = (await response.json()) as {
-        pages: Pages<TData>;
+      const { data } = (await response.json()) as {
+        data: Pages<TData>;
       };
 
-      if (!Array.isArray(pages)) {
-        throw new Error(
-          "Invalid response format. Make sure the package is up to date."
-        );
-      }
-
-      return { data: pages, error: null, response: response };
+      return { data: data, error: null, response: response };
     } catch (error) {
       console.error("Failed to fetch pages:", error);
       return {
@@ -111,15 +105,9 @@ class DatabaseHandler<TData> {
         );
       }
 
-      const page = (await response.json()) as Page<TData>;
+      const { data } = (await response.json()) as { data: Page<TData> };
 
-      if (typeof page !== "object" || page == null) {
-        throw new Error(
-          "Invalid response format. Make sure the package is up to date."
-        );
-      }
-
-      return { data: page, error: null, response: response };
+      return { data: data, error: null, response: response };
     } catch (error) {
       console.error("Failed to fetch page:", error);
       return {
