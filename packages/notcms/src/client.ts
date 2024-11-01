@@ -16,43 +16,6 @@ class DatabaseHandler<TData> {
   declare readonly $inferPage: Page<TData>;
   declare readonly $inferPages: Pages<TData>;
 
-  async listPageIds() {
-    try {
-      const response = await fetch(
-        routes.pages(this.workspaceId, this.databaseId),
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${this.secretKey}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Failed to fetch page ids. [${response.status} ${response.statusText}]: ${errorText}`
-        );
-      }
-
-      const { pageIds } = (await response.json()) as { pageIds: string[] };
-
-      if (!Array.isArray(pageIds)) {
-        throw new Error(
-          "Invalid response format. Make sure the package is up to date."
-        );
-      }
-
-      return { data: pageIds, error: null, response: response };
-    } catch (error) {
-      console.error("Failed to fetch page ids:", error);
-      return {
-        data: undefined,
-        error: error instanceof Error ? error : "Unknown error",
-      };
-    }
-  }
-
   async listPages() {
     try {
       const response = await fetch(
