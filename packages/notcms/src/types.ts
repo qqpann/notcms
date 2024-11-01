@@ -11,6 +11,12 @@ export type Page<T> = Prettify<{
   properties: T;
   content: string;
 }>;
+export type Pages<T> = Prettify<{
+  id: string;
+  title: string;
+  properties: T;
+  // no content
+}>[];
 
 /** Utility type to map property string to their corresponding types */
 export type InferProperties<T extends Properties> = Prettify<MapProperties<T>>;

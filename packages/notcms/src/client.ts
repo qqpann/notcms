@@ -1,5 +1,5 @@
 import { routes } from "./routes";
-import type { InferProperties, Page, Schema } from "./types";
+import type { InferProperties, Page, Pages, Schema } from "./types";
 
 class DatabaseHandler<TData> {
   constructor(
@@ -14,6 +14,7 @@ class DatabaseHandler<TData> {
    *   type Page = typeof nc.query.blog.$inferPage;
    */
   declare readonly $inferPage: Page<TData>;
+  declare readonly $inferPages: Pages<TData>;
 
   async listPageIds() {
     try {
@@ -72,13 +73,7 @@ class DatabaseHandler<TData> {
       }
 
       const { pages } = (await response.json()) as {
-        pages: {
-          id: string;
-          notionPageId: string;
-          title: string | null;
-          properties: TData | null;
-          version: string | null;
-        }[];
+        pages: Pages<TData>;
       };
 
       if (!Array.isArray(pages)) {
