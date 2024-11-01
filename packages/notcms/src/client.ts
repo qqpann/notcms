@@ -22,8 +22,9 @@ class DatabaseHandler<TData> {
     method: string
     // body?: any
   ) {
+    let response: Response | undefined;
     try {
-      const response = await fetch(url, {
+      response = await fetch(url, {
         method,
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
@@ -41,13 +42,14 @@ class DatabaseHandler<TData> {
 
       const { data } = (await response.json()) as { data: T };
 
-      return { data: data, error: null, response: response };
+      return [data, null, response] as const;
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      return {
-        data: undefined,
-        error: error instanceof Error ? error : "Unknown error",
-      };
+      return [
+        undefined,
+        error instanceof Error ? error : "Unknown error",
+        response,
+      ] as const;
     }
   }
 
