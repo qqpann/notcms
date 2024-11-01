@@ -16,32 +16,34 @@ class DatabaseHandler<TData> {
   declare readonly $inferPage: Page<TData>;
   declare readonly $inferPages: Pages<TData>;
 
-  async listPages() {
+  // common function to fetch data
+  private async fetch<T>(
+    url: string | URL | globalThis.Request,
+    method: string
+    // body?: any
+  ) {
     try {
-      const response = await fetch(
-        routes.pages(this.workspaceId, this.databaseId),
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${this.secretKey}`,
-          },
-        }
-      );
+      const response = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${this.secretKey}`,
+          "Content-Type": "application/json",
+        },
+        // body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
-          `Failed to fetch pages. [${response.status} ${response.statusText}]: ${errorText}`
+          `Failed to fetch data. [${response.status} ${response.statusText}]: ${errorText}`
         );
       }
 
-      const { data } = (await response.json()) as {
-        data: Pages<TData>;
-      };
+      const { data } = (await response.json()) as { data: T };
 
       return { data: data, error: null, response: response };
     } catch (error) {
-      console.error("Failed to fetch pages:", error);
+      console.error("Failed to fetch data:", error);
       return {
         data: undefined,
         error: error instanceof Error ? error : "Unknown error",
@@ -49,35 +51,18 @@ class DatabaseHandler<TData> {
     }
   }
 
-  async getPage(pageId: string) {
-    try {
-      const response = await fetch(
-        routes.page(this.workspaceId, this.databaseId, pageId),
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${this.secretKey}`,
-          },
-        }
-      );
+  listPages() {
+    return this.fetch<Pages<TData>>(
+      routes.pages(this.workspaceId, this.databaseId),
+      "GET"
+    );
+  }
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Failed to fetch page. [${response.status} ${response.statusText}]: ${errorText}`
-        );
-      }
-
-      const { data } = (await response.json()) as { data: Page<TData> };
-
-      return { data: data, error: null, response: response };
-    } catch (error) {
-      console.error("Failed to fetch page:", error);
-      return {
-        data: undefined,
-        error: error instanceof Error ? error : "Unknown error",
-      };
-    }
+  getPage(pageId: string) {
+    return this.fetch<Page<TData>>(
+      routes.page(this.workspaceId, this.databaseId, pageId),
+      "GET"
+    );
   }
 }
 
