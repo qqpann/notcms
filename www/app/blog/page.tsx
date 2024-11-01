@@ -17,8 +17,10 @@ type Writer = typeof nc.query.writers.$inferPage;
 
 export default async function Blog() {
   let [pages] = await nc.query.blog.listPages();
+  let [writers] = await nc.query.writers.listPages();
 
   pages = pages ?? [];
+  writers = writers ?? [];
 
   return (
     <main className="container max-w-[1440px] px-32 mx-auto py-8">
@@ -64,12 +66,18 @@ export default async function Blog() {
       </div>
 
       <div className="grid grid-cols-1 gap-8">
-        <HeroBlogPostCard page={pages[0]} />
+        <HeroBlogPostCard
+          page={pages[0]}
+          writer={writers.find((w) => w.id === pages[0].properties.writers[0])}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {pages.map((page) => (
-            <BlogPostCard key={page.id} page={page} />
-          ))}
+          {pages.map((page) => {
+            const writer = writers.find(
+              (w) => w.id === page.properties.writers[0]
+            );
+            return <BlogPostCard key={page.id} page={page} writer={writer} />;
+          })}
         </div>
       </div>
     </main>
@@ -79,8 +87,9 @@ export default async function Blog() {
 interface Props {
   className?: string;
   page: Omit<Page, "content">;
+  writer?: Omit<Writer, "content">;
 }
-function HeroBlogPostCard({ className, page }: Props) {
+function HeroBlogPostCard({ className, page, writer }: Props) {
   return (
     <Link
       href={`/blog/${page.id}`}
@@ -122,14 +131,14 @@ function HeroBlogPostCard({ className, page }: Props) {
                 src={post.writerImage}
               /> */}
               <Image
-                src={page.writerImage}
+                src={writer?.properties.image[0] ?? ""}
                 alt="Writer Profile"
                 width={18}
                 height={18}
                 className="rounded"
               />
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
-                {page.properties.writer}
+                {writer?.title}
               </div>
             </div>
           </div>
@@ -138,17 +147,17 @@ function HeroBlogPostCard({ className, page }: Props) {
     </Link>
   );
 }
-function BlogPostCard({ className, page: post }: Props) {
+function BlogPostCard({ className, page, writer }: Props) {
   return (
     // TODO: border?
     <Link
-      href={`/blog/${post.id}`}
+      href={`/blog/${page.id}`}
       className={
         "flex flex-col items-start gap-5 pt-4 pb-5 px-4 bg-[#ffffff03] rounded-3xl overflow-hidden border-[0.5px] border-solid border-transparent shadow-[inset_0px_-80px_96px_#ffffff14]"
       }
     >
       <Image
-        src={post.properties.thumbnail[0]}
+        src={page.properties.thumbnail[0]}
         alt="Key Visual"
         width={373}
         height={201}
@@ -157,7 +166,7 @@ function BlogPostCard({ className, page: post }: Props) {
 
       <div className="flex flex-col items-start gap-4 px-1.5 py-0 self-stretch w-full flex-[0_0_auto]">
         <p className="self-stretch mt-[-1px] font-h-6 font-[number:var(--h-6-font-weight)] text-white text-[length:var(--h-6-font-size)] tracking-[var(--h-6-letter-spacing)] leading-[var(--h-6-line-height)] [font-style:var(--h-6-font-style)]">
-          {post.title}
+          {page.title}
         </p>
 
         <div className="flex items-center gap-1.5 self-stretch w-full relative flex-[0_0_auto]">
@@ -168,7 +177,7 @@ function BlogPostCard({ className, page: post }: Props) {
               src={post.writerImage}
             /> */}
             <Image
-              src={post.writerImage}
+              src={writer?.properties.image[0] ?? ""}
               alt="Writer Profile"
               width={16}
               height={16}
@@ -176,18 +185,18 @@ function BlogPostCard({ className, page: post }: Props) {
             />
 
             <div className="relative w-fit mt-[-5.00px] mb-[-3.00px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
-              {post.properties.writer}
+              {writer?.title}
             </div>
           </div>
 
           <div className="inline-flex h-5 items-center justify-center gap-2 pt-[9.5px] pb-[10.5px] px-2 rounded-[66.5px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_100%)] relative flex-[0_0_auto]">
             <div className="relative w-fit mt-[-5.50px] mb-[-3.50px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
-              {post.properties.category}
+              {page.properties.category}
             </div>
           </div>
 
           <div className="relative flex-1 font-caption font-[number:var(--caption-font-weight)] text-[#9f9fa5] text-[length:var(--caption-font-size)] text-right tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] [font-style:var(--caption-font-style)]">
-            {new Date(post.properties.created_at).toLocaleDateString()}
+            {new Date(page.properties.created_at).toLocaleDateString()}
           </div>
         </div>
       </div>
