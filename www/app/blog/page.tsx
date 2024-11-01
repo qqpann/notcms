@@ -4,43 +4,21 @@ import React from "react";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { nc } from "~/src/notcms/schema";
-import type { Category, Post } from "~/src/types";
 
 export const revalidate = 10;
 
-const categories: Category[] = ["Blog", "Customer stories", "Changelog"].map(
-  (name, i) =>
-    ({
-      id: i.toString(),
-      name,
-    }) satisfies Category
-);
+const categories = ["Blog", "Customer stories", "Changelog"].map((name, i) => ({
+  id: i.toString(),
+  name,
+}));
+
+type Page = typeof nc.query.blog.$inferPage;
+type Writer = typeof nc.query.writers.$inferPage;
 
 export default async function Blog() {
-  const { data: pages } = await nc.query.blog.listPages();
+  let [pages] = await nc.query.blog.listPages();
 
-  const posts: Post[] = pages
-    .reverse()
-    .filter((p) => p.properties?.published)
-    .map(
-      (page) =>
-        ({
-          id: page.notionPageId,
-          title: page.title ?? "",
-          description: page.properties?.description ?? "",
-          writer: page.properties?.writer.slice(0, 10) ?? "",
-          writerImage: "/img/sample-profile-icon.png",
-          keyVisualImage: page.properties?.thumbnail[0] ?? "/img/404.png",
-          category: page.properties?.category ?? "",
-          date: new Date(
-            page.properties?.created_at ?? Date.now()
-          ).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }),
-        }) satisfies Post
-    );
+  pages = pages ?? [];
 
   return (
     <main className="container max-w-[1440px] px-32 mx-auto py-8">
@@ -86,11 +64,11 @@ export default async function Blog() {
       </div>
 
       <div className="grid grid-cols-1 gap-8">
-        <HeroBlogPostCard post={posts[0]} />
+        <HeroBlogPostCard page={pages[0]} />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {posts.map((post) => (
-            <BlogPostCard key={post.id} post={post} />
+          {pages.map((page) => (
+            <BlogPostCard key={page.id} page={page} />
           ))}
         </div>
       </div>
@@ -100,12 +78,12 @@ export default async function Blog() {
 
 interface Props {
   className?: string;
-  post: Post;
+  page: Omit<Page, "content">;
 }
-function HeroBlogPostCard({ className, post }: Props) {
+function HeroBlogPostCard({ className, page }: Props) {
   return (
     <Link
-      href={`/blog/${post.id}`}
+      href={`/blog/${page.id}`}
       className="flex items-start gap-8 relative self-stretch w-full flex-[0_0_auto]"
     >
       {/* <img
@@ -114,7 +92,7 @@ function HeroBlogPostCard({ className, post }: Props) {
         src={post.keyVisualImage}
       /> */}
       <Image
-        src={post.keyVisualImage}
+        src={page.properties.thumbnail[0]}
         alt="Key Visual"
         width={785}
         height={422}
@@ -125,16 +103,16 @@ function HeroBlogPostCard({ className, post }: Props) {
         <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
             <p className="text-[25px] tracking-[0.25px] relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white leading-[normal]">
-              {post.title}
+              {page.title}
             </p>
             <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-[15px] tracking-[0.15px] leading-5">
-              {post.description}
+              {page.properties.description}
             </p>
           </div>
           <div className="inline-flex items-start gap-2 relative flex-[0_0_auto]">
             <div className="inline-flex h-6 items-center gap-1.5 px-3 py-0.5 relative flex-[0_0_auto] bg-[#ffffff29] rounded-[40px]">
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
-                {post.category}
+                {page.properties.category}
               </div>
             </div>
             <div className="inline-flex items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
@@ -144,14 +122,14 @@ function HeroBlogPostCard({ className, post }: Props) {
                 src={post.writerImage}
               /> */}
               <Image
-                src={post.writerImage}
+                src={page.writerImage}
                 alt="Writer Profile"
                 width={18}
                 height={18}
                 className="rounded"
               />
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
-                {post.writer}
+                {page.properties.writer}
               </div>
             </div>
           </div>
@@ -160,7 +138,7 @@ function HeroBlogPostCard({ className, post }: Props) {
     </Link>
   );
 }
-function BlogPostCard({ className, post }: Props) {
+function BlogPostCard({ className, page: post }: Props) {
   return (
     // TODO: border?
     <Link
@@ -170,7 +148,7 @@ function BlogPostCard({ className, post }: Props) {
       }
     >
       <Image
-        src={post.keyVisualImage}
+        src={post.properties.thumbnail[0]}
         alt="Key Visual"
         width={373}
         height={201}
@@ -198,18 +176,18 @@ function BlogPostCard({ className, post }: Props) {
             />
 
             <div className="relative w-fit mt-[-5.00px] mb-[-3.00px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
-              {post.writer}
+              {post.properties.writer}
             </div>
           </div>
 
           <div className="inline-flex h-5 items-center justify-center gap-2 pt-[9.5px] pb-[10.5px] px-2 rounded-[66.5px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_100%)] relative flex-[0_0_auto]">
             <div className="relative w-fit mt-[-5.50px] mb-[-3.50px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
-              {post.category}
+              {post.properties.category}
             </div>
           </div>
 
           <div className="relative flex-1 font-caption font-[number:var(--caption-font-weight)] text-[#9f9fa5] text-[length:var(--caption-font-size)] text-right tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] [font-style:var(--caption-font-style)]">
-            {post.date}
+            {new Date(post.properties.created_at).toLocaleDateString()}
           </div>
         </div>
       </div>

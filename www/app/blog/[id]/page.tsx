@@ -31,16 +31,14 @@ marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
 type Page = typeof nc.query.blog.$inferPage;
 type Writer = typeof nc.query.writers.$inferPage;
 export default async function Page({ params }: { params: { id: string } }) {
-  const { data: page, error } = await nc.query.blog.getPage(params.id);
+  const [page, error] = await nc.query.blog.getPage(params.id);
   if (error) {
     return <div>{error.toString()}</div>;
   }
   if (!page) {
     return <div>Page not found</div>;
   }
-  const { data: writer } = await nc.query.writers.getPage(
-    page.properties.writers[0]
-  );
+  const [writer] = await nc.query.writers.getPage(page.properties.writers[0]);
   return <BlogDetail page={page} writer={writer} />;
 }
 function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
