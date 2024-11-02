@@ -28,7 +28,6 @@ export function BlogDetail({ post }: { post: PostDetail }) {
         </div>
         <main
           className="prose prose-base dark:prose-invert prose-h2:text-2xl text-white relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: This is a markdown renderer
           dangerouslySetInnerHTML={{
             __html: marked(post.content ?? ""),
           }}

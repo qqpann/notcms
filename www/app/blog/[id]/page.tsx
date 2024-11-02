@@ -73,7 +73,6 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
         </div>
         <main
           className="prose prose-base dark:prose-invert w-[600px] text-justify prose-headings:text-[#f8f7f7] prose-headings:font-medium prose-headings:text-2xl font-['Inter'] leading-tight text-zinc-300 text-sm font-normal"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: This is a markdown renderer
           dangerouslySetInnerHTML={{
             __html: marked(page.content ?? ""),
           }}
