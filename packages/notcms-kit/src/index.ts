@@ -100,13 +100,14 @@ async function pull() {
 
   await fs.writeFile(
     schemaPath,
-    dedent`
-    import { Client } from "notcms";
-    import type { Schema } from "notcms";
-
-    export const schema = ${schema} satisfies Schema;
-    export const nc = new Client({ schema });
+    // NOTE: schema's indent level is different, so cannot use dedent
     `
+import { Client } from "notcms";
+import type { Schema } from "notcms";
+
+export const schema = ${schema} satisfies Schema;
+export const nc = new Client({ schema });
+    `.trim()
   );
 
   console.log(
