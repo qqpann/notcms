@@ -1,5 +1,6 @@
 import { promises as fs, existsSync } from "node:fs";
 import path from "node:path";
+import { config } from "@dotenvx/dotenvx";
 import { input } from "@inquirer/prompts";
 import boxen from "boxen";
 import chalk from "chalk";
@@ -124,12 +125,33 @@ async function pull() {
 
 async function main() {
   const program = new Command("notcms-kit");
-  program.command("init").description("Initialize NotCMS").action(init);
-  program.command("pull").description("Pull schema from NotCMS").action(pull);
+  program.version("0.0.1");
   program.showHelpAfterError();
   program.configureOutput({
     outputError: (str, write) => write(chalk.red(str)),
   });
+
+  const DEFAULT_ENV_PATH = [".env", ".env.local", ".dev.vars"];
+  program.option(
+    "-e, --env <PATH>",
+    "Specify env file",
+    (o) => o.split(","),
+    DEFAULT_ENV_PATH
+  );
+  program.parseAsync();
+  const options = program.opts<{ env: string[] }>();
+  const path = options.env;
+  config({
+    path: path,
+    logLevel: "error",
+  });
+  console.log({
+    k: process.env.NOTCMS_SECRET_KEY,
+    i: process.env.NOTCMS_WORKSPACE_ID,
+  });
+
+  program.command("init").description("Initialize NotCMS").action(init);
+  program.command("pull").description("Pull schema from NotCMS").action(pull);
 
   await program.parseAsync(process.argv);
 }
