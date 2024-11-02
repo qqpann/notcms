@@ -1,6 +1,6 @@
 {
   "name": "notcms-kit",
-  "version": "0.0.8-development",
+  "version": "0.0.9-development",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "type": "module",
   "bin": {
