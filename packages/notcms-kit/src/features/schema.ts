@@ -37,12 +37,27 @@ export async function fetchSchema(): Promise<string> {
       Authorization: `Bearer ${NOTCMS_SECRET_KEY}`,
     },
   });
-  const data = (await res.json()) as { schema: string };
-  if (typeof data.schema !== "string") {
+  try {
+    const data = (await res.json()) as { schema: string };
+    if (typeof data.schema !== "string") {
+      throw new Error(
+        `Invalid schema. Expected string, found ${typeof data.schema}.`
+      );
+    }
+    return data.schema;
+  } catch (error) {
     throw new Error(
-      `Invalid schema. Expected string, found ${typeof data.schema}.`
+      dedent`
+      Failed to fetch schema from NotCMS.
+
+      ${chalk.bold("Got:")}
+        ${res.status} ${res.statusText}
+
+      ${chalk.bold("Suggested action:")}
+        1. Check your key and id.
+        2. Check your internet connection.
+        3. Try again.
+      `
     );
   }
-
-  return data.schema;
 }
