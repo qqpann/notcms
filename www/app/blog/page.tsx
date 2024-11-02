@@ -5,8 +5,8 @@ import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";
 import { nc } from "~/src/notcms/schema";
 
-export const maxDuration = 30;
-export const revalidate = 0;
+// export const maxDuration = 30;
+export const revalidate = 10;
 
 const categories = ["Blog", "Customer stories", "Changelog"].map((name, i) => ({
   id: i.toString(),
