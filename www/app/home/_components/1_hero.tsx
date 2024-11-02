@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { siteConfig } from "~/src/site-config";
+
 export function Hero() {
   return (
     <section className="container max-w-[1440px] px-32 mx-auto flex flex-col items-center gap-24 pt-24 pb-0 relative">
@@ -59,15 +62,18 @@ export function Hero() {
 
               {/* <div className="absolute w-48 h-9 top-[136px] left-24 bg-[#d9d9d9] rounded-[48px] shadow-[0px_0.39px_4.91px_#00000003,0px_0.56px_8.42px_#00000008,0px_0.48px_11.9px_#00000011,0px_0.13px_16.81px_#00000020,0px_-0.51px_24.84px_#00000038,0px_-1.38px_38.29px_#0000005f,0px_-1.71px_60.75px_#0000009c,0px_18px_99px_#000000] mix-blend-soft-light" /> */}
 
-              <div className="absolute w-48 h-9 top-[136px] left-24 shadow-[0px_2px_4px_#00000052,0px_4px_12px_#00000052]">
+              <Link
+                href={siteConfig.waitList}
+                className="absolute w-48 h-9 top-[136px] left-24 shadow-[0px_2px_4px_#00000052,0px_4px_12px_#00000052]"
+              >
                 <div className="h-9 rounded-[144px] overflow-hidden shadow-[0px_0px_0.17px_#0000003b,0px_0.17px_0.17px_#00000033,0px_0.5px_0.33px_#0000001f,0px_0.83px_0.33px_#0000000a,0px_1.17px_0.33px_transparent] [background:linear-gradient(180deg,rgb(255,135,99)_0%,rgb(254,2,144.8)_100%)] bg-[url(/mask-group-3.png)] bg-[100%_100%]">
                   <div className="relative w-48 h-9 rounded-[46px] border-[0.75px] border-solid border-[#ffffff0a] shadow-[inset_0px_0.5px_0.5px_#fffffff5,inset_0px_1.5px_1.5px_#ffffffa3,inset_0px_3px_3px_#ffffff7a,inset_0px_6px_6px_#ffffff3d] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)]">
                     <div className="absolute w-[185px] top-2.5 left-[3px] [text-shadow:0px_1px_1px_#00000029] [-webkit-text-stroke:0.25px_#0000003d] [font-family:'Inter-Medium',Helvetica] font-medium text-white text-base text-center tracking-[0.16px] leading-[19px]">
-                      Get started
+                      Join Waitlist
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* <div className="absolute w-48 h-9 top-[136px] left-24 rounded-[46px] border-[0.75px] border-solid border-transparent blur-sm [border-image:radial-gradient(rgb(255,255,255),rgba(255,255,255,0))_1] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)]" /> */}
 
