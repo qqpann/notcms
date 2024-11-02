@@ -20,7 +20,6 @@ class DatabaseHandler<TData> {
   private async fetch<T>(
     url: string | URL | globalThis.Request,
     method: string
-    // body?: any
   ) {
     let response: Response | undefined;
     try {
@@ -30,7 +29,6 @@ class DatabaseHandler<TData> {
           Authorization: `Bearer ${this.secretKey}`,
           "Content-Type": "application/json",
         },
-        // body: JSON.stringify(body),
       });
 
       if (!response.ok) {
