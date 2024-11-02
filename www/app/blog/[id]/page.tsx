@@ -3,7 +3,7 @@ import Image from "next/image";
 import React from "react";
 import { nc } from "~/src/notcms/schema";
 
-// export const maxDuration = 30;
+export const maxDuration = 30;
 export const revalidate = 0;
 
 const renderer: Partial<Renderer> = {
