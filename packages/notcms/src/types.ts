@@ -28,7 +28,9 @@ type MapProperties<T extends Properties> = {
 type PropertyTypeMap = {
   string: string | undefined;
   number: number | undefined;
-  date: Date | undefined;
+  // TODO: convert date string to Date object
+  // date: Date | undefined;
+  date: string | undefined;
   boolean: boolean | undefined;
   "string[]": string[] | undefined;
 };
