@@ -3,7 +3,8 @@ import Image from "next/image";
 import React from "react";
 import { nc } from "~/src/notcms/schema";
 
-export const revalidate = 10;
+// TODO: Add revalidate when go to production
+export const revalidate = 0;
 
 const renderer: Partial<Renderer> = {
   paragraph({ tokens }) {
@@ -57,17 +58,17 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
               <img
                 className="relative w-[18px] h-[18px] object-cover"
                 alt="Writer Profile"
-                src={writer?.properties.image[0]}
+                src={writer?.properties.images[0]}
               />
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
-                {writer?.title ?? page.properties.writer}
+                {writer?.title}
               </div>
             </div>
           </div>
           <img
             className="relative self-stretch w-full h-[422px] mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]"
             alt="Key Visual"
-            src={page.properties.thumbnail[0]}
+            src={page.properties.thumbnails[0]}
           />
         </div>
         <main
@@ -91,7 +92,7 @@ function WriterProfileCard({ writer }: { writer: Writer }) {
         height={56}
         className="Image w-14 h-14 rounded-full border border-black/10"
         alt={`${writer.title}'s Profile`}
-        src={writer.properties.image[0]}
+        src={writer.properties.images[0]}
       />
       <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 inline-flex">
         <div className="self-stretch text-white text-lg font-medium font-['Inter'] leading-[18px] tracking-tight">

@@ -102,7 +102,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
         src={post.keyVisualImage}
       /> */}
       <Image
-        src={page.properties.thumbnail[0]}
+        src={page.properties.thumbnails[0]}
         alt="Key Visual"
         width={785}
         height={422}
@@ -132,7 +132,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
                 src={post.writerImage}
               /> */}
               <Image
-                src={writer?.properties.image[0] ?? ""}
+                src={writer?.properties.images[0] ?? ""}
                 alt="Writer Profile"
                 width={18}
                 height={18}
@@ -158,7 +158,7 @@ function BlogPostCard({ className, page, writer }: Props) {
       }
     >
       <Image
-        src={page.properties.thumbnail[0]}
+        src={page.properties.thumbnails[0]}
         alt="Key Visual"
         width={373}
         height={201}
@@ -178,7 +178,7 @@ function BlogPostCard({ className, page, writer }: Props) {
               src={post.writerImage}
             /> */}
             <Image
-              src={writer?.properties.image[0] ?? ""}
+              src={writer?.properties.images[0] ?? ""}
               alt="Writer Profile"
               width={16}
               height={16}
