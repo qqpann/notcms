@@ -3,8 +3,8 @@ import Image from "next/image";
 import React from "react";
 import { nc } from "~/src/notcms/schema";
 
-// TODO: Add revalidate when go to production
-export const revalidate = 0;
+export const maxDuration = 30;
+export const revalidate = 10;
 
 const renderer: Partial<Renderer> = {
   paragraph({ tokens }) {
