@@ -7,7 +7,6 @@ import chalk from "chalk";
 import { Command } from "commander";
 import dedent from "dedent";
 import { dumpConfig, loadConfig } from "./features/config.js";
-import { fetchSchema } from "./features/schema.js";
 import type { Config } from "./types.js";
 
 /**
@@ -87,6 +86,8 @@ function isNextProject() {
  * Pull schema from NotCMS
  */
 async function pull() {
+  // NOTE: fetchSchema depends on the process.env, so it must be imported here
+  const { fetchSchema } = await import("./features/schema.js");
   const config = await loadConfig("notcms.config.json");
   const schemaPath = config.schema;
   // schemaPath: 'src/notcms/schema.ts'
@@ -144,10 +145,6 @@ async function main() {
   config({
     path: path,
     logLevel: "error",
-  });
-  console.log({
-    k: process.env.NOTCMS_SECRET_KEY,
-    i: process.env.NOTCMS_WORKSPACE_ID,
   });
 
   program.command("init").description("Initialize NotCMS").action(init);
