@@ -8,6 +8,7 @@ import { cn } from "~/lib/utils";
 import { siteConfig } from "~/src/site-config";
 
 import "./globals.css";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +30,18 @@ export default function RootLayout({
         <Footer />
       </body>
       <GoogleAnalytics gaId={siteConfig.gaId} />
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.gaId}`}
+        strategy="afterInteractive"
+      />
+      <Script id="ga-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${siteConfig.gaId}');
+        `}
+      </Script>
     </html>
   );
 }
