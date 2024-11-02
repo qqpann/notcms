@@ -127,7 +127,9 @@ export const nc = new Client({ schema });
 
 async function main() {
   const program = new Command("notcms-kit");
-  program.version("0.0.1");
+  // TODO: show version from package.json
+  program.version("0.0.1", "-v, --version");
+  // FIXME: help for commands doesn't show up when hitting -h
   program.showHelpAfterError();
   program.configureOutput({
     outputError: (str, write) => write(chalk.red(str)),
