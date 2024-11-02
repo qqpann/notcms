@@ -9,6 +9,14 @@ export const schema = {
       name: "string",
     },
   },
+  service: {
+    id: "c6a73cf405aa430a9f93cfb6851fcd24",
+    properties: {
+      slug: "string",
+      lang: "string",
+      title: "string",
+    },
+  },
   blog: {
     id: "cb962fce05b44e57b4ffdc0f1f93e96d",
     properties: {
