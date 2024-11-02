@@ -7,4 +7,5 @@ export const siteConfig = {
     handle: "qqpann",
     x: "https://x.com/qqpann",
   },
+  gaId: "G-N10X8ZNV9D",
 } as const;
