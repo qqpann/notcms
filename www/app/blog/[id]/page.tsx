@@ -39,7 +39,10 @@ export default async function Page({ params }: { params: { id: string } }) {
   if (!page) {
     return <div>Page not found</div>;
   }
-  const [writer] = await nc.query.writers.getPage(page.properties.writers[0]);
+  const writerId = page.properties.writers?.[0];
+  const [writer] = writerId
+    ? await nc.query.writers.getPage(writerId)
+    : [undefined];
   return <BlogDetail page={page} writer={writer} />;
 }
 function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
@@ -49,7 +52,9 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
         <div className="flex flex-col w-[784px] items-center gap-12 relative flex-[0_0_auto]">
           <div className="flex flex-col items-center gap-8 relative self-stretch w-full flex-[0_0_auto]">
             <div className="relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-sm text-center tracking-[0.14px] leading-[normal]">
-              {new Date(page.properties.created_at).toLocaleDateString()}
+              {new Date(
+                page.properties.created_at ?? Date.now()
+              ).toLocaleDateString()}
             </div>
             <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl text-center tracking-[0.48px] leading-[normal]">
               {page.title}
@@ -58,7 +63,7 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
               <img
                 className="relative w-[18px] h-[18px] object-cover"
                 alt="Writer Profile"
-                src={writer?.properties.images[0]}
+                src={writer?.properties.images?.[0] ?? "/img/404.png"}
               />
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
                 {writer?.title}
@@ -68,7 +73,7 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
           <img
             className="relative self-stretch w-full h-[422px] mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]"
             alt="Key Visual"
-            src={page.properties.thumbnails[0]}
+            src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
           />
         </div>
         <main
@@ -91,7 +96,7 @@ function WriterProfileCard({ writer }: { writer: Writer }) {
         height={56}
         className="Image w-14 h-14 rounded-full border border-black/10"
         alt={`${writer.title}'s Profile`}
-        src={writer.properties.images[0]}
+        src={writer.properties.images?.[0] ?? "/img/404.png"}
       />
       <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 inline-flex">
         <div className="self-stretch text-white text-lg font-medium font-['Inter'] leading-[18px] tracking-tight">

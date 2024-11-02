@@ -26,11 +26,11 @@ type MapProperties<T extends Properties> = {
     : never;
 };
 type PropertyTypeMap = {
-  string: string;
-  number: number;
-  date: Date;
-  boolean: boolean;
-  "string[]": string[];
+  string: string | undefined;
+  number: number | undefined;
+  date: Date | undefined;
+  boolean: boolean | undefined;
+  "string[]": string[] | undefined;
 };
 /** Make the hover overlay more readable */
 type Prettify<T> = {

@@ -69,13 +69,15 @@ export default async function Blog() {
       <div className="grid grid-cols-1 gap-8">
         <HeroBlogPostCard
           page={pages[0]}
-          writer={writers.find((w) => w.id === pages[0].properties.writers[0])}
+          writer={writers.find(
+            (w) => w.id === pages[0].properties.writers?.[0]
+          )}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {pages.map((page) => {
             const writer = writers.find(
-              (w) => w.id === page.properties.writers[0]
+              (w) => w.id === page.properties.writers?.[0]
             );
             return <BlogPostCard key={page.id} page={page} writer={writer} />;
           })}
@@ -102,7 +104,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
         src={post.keyVisualImage}
       /> */}
       <Image
-        src={page.properties.thumbnails[0]}
+        src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
         alt="Key Visual"
         width={785}
         height={422}
@@ -132,7 +134,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
                 src={post.writerImage}
               /> */}
               <Image
-                src={writer?.properties.images[0] ?? ""}
+                src={writer?.properties.images?.[0] ?? "/img/404.png"}
                 alt="Writer Profile"
                 width={18}
                 height={18}
@@ -158,7 +160,7 @@ function BlogPostCard({ className, page, writer }: Props) {
       }
     >
       <Image
-        src={page.properties.thumbnails[0]}
+        src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
         alt="Key Visual"
         width={373}
         height={201}
@@ -178,7 +180,7 @@ function BlogPostCard({ className, page, writer }: Props) {
               src={post.writerImage}
             /> */}
             <Image
-              src={writer?.properties.images[0] ?? ""}
+              src={writer?.properties.images?.[0] ?? "/img/404.png"}
               alt="Writer Profile"
               width={16}
               height={16}
@@ -197,7 +199,9 @@ function BlogPostCard({ className, page, writer }: Props) {
           </div>
 
           <div className="relative flex-1 font-caption font-[number:var(--caption-font-weight)] text-[#9f9fa5] text-[length:var(--caption-font-size)] text-right tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] [font-style:var(--caption-font-style)]">
-            {new Date(page.properties.created_at).toLocaleDateString()}
+            {new Date(
+              page.properties.created_at ?? Date.now()
+            ).toLocaleDateString()}
           </div>
         </div>
       </div>
