@@ -22,7 +22,7 @@
     "lucide-react": "^0.445.0",
     "marked": "^14.0.0",
     "next": "14.2.5",
-    "notcms": "*",
+    "notcms": "0.0.9-development",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.5.2",

@@ -196,8 +196,8 @@ importers:
         specifier: 14.2.5
         version: 14.2.5(@babel/core@7.24.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       notcms:
-        specifier: '*'
-        version: 0.0.8-development
+        specifier: 0.0.9-development
+        version: 0.0.9-development
       react:
         specifier: ^18
         version: 18.3.1
@@ -4645,8 +4645,8 @@ packages:
     resolution: {integrity: sha512-IO9QvjUMWxPQQhs60oOu10CRkWCiZzSUkzbXGGV9pviYl1fXYcvkzQ5jV9z8Y6un8ARoVRl4EtC6v6jNqbaJ/w==}
     engines: {node: '>=14.16'}
 
-  notcms@0.0.8-development:
-    resolution: {integrity: sha512-cS6ySICSQKLNmfMivn6zptOV4AhETPYZG8iPIAXRjNWMKDVNS8NcJFIDxUFP9Raxqw7s5Jgcpu5n+2kTaR6Y0w==}
+  notcms@0.0.9-development:
+    resolution: {integrity: sha512-KaQ4/oOvVUo9kT2GQIQjoNz6TfofD/EpGkBs8reFqoe56v1QtnvgtPMWHUO04PQSdygIInO/oO6LjfxlOYnjlw==}
     engines: {node: '>=12.0'}
 
   npm-run-path@4.0.1:
@@ -7832,7 +7832,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.4.15
+      '@jridgewell/sourcemap-codec': 1.5.0
 
   '@mdx-js/react@3.0.1(@types/react@18.3.3)(react@18.3.1)':
     dependencies:
@@ -8867,7 +8867,7 @@ snapshots:
 
   acorn-walk@8.3.3:
     dependencies:
-      acorn: 8.12.0
+      acorn: 8.12.1
 
   acorn@7.4.1: {}
 
@@ -11628,7 +11628,7 @@ snapshots:
 
   normalize-url@8.0.1: {}
 
-  notcms@0.0.8-development:
+  notcms@0.0.9-development:
     dependencies:
       '@inquirer/prompts': 5.3.6
 
