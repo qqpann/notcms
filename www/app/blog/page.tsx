@@ -96,7 +96,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
   return (
     <Link
       href={`/blog/${page.id}`}
-      className="flex items-start gap-8 relative self-stretch w-full flex-[0_0_auto]"
+      className="flex items-start p-4 gap-8 relative rounded-3xl self-stretch w-full flex-[0_0_auto] shadow-[inset_0px_-80px_96px_#ffffff14] border-white"
     >
       <div className="w-[576px] h-[310px]">
         <Image
@@ -125,18 +125,15 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
               </div>
             </div>
             <div className="inline-flex items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
-              {/* <img
-                className="w-[18px] h-[18px] relative object-cover"
-                alt="Writer Profile"
-                src={post.writerImage}
-              /> */}
-              <Image
-                src={writer?.properties.images?.[0] ?? "/img/404.png"}
-                alt="Writer Profile"
-                width={18}
-                height={18}
-                className="rounded"
-              />
+              <div className="size-[18px] rounded-full">
+                <Image
+                  src={writer?.properties.images?.[0] ?? "/img/404.png"}
+                  alt="Writer Profile"
+                  width={18}
+                  height={18}
+                  className="size-[18px] rounded-full object-cover"
+                />
+              </div>
               <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
                 {writer?.title}
               </div>
@@ -173,18 +170,15 @@ function BlogPostCard({ className, page, writer }: Props) {
 
         <div className="flex items-center gap-1.5 self-stretch w-full relative flex-[0_0_auto]">
           <div className="inline-flex h-5 items-center justify-center gap-1 pl-0.5 pr-2 py-[9.5px] rounded-[66.5px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_100%)] relative flex-[0_0_auto]">
-            {/* <img
-              className="relative w-4 h-4 mt-[-7.50px] mb-[-7.50px] object-cover"
-              alt="Image"
-              src={post.writerImage}
-            /> */}
-            <Image
-              src={writer?.properties.images?.[0] ?? "/img/404.png"}
-              alt="Writer Profile"
-              width={16}
-              height={16}
-              className="rounded"
-            />
+            <div className="size-4 rounded-full">
+              <Image
+                src={writer?.properties.images?.[0] ?? "/img/404.png"}
+                alt="Writer Profile"
+                width={16}
+                height={16}
+                className="size-4 rounded-full object-cover"
+              />
+            </div>
 
             <div className="relative w-fit mt-[-5.00px] mb-[-3.00px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
               {writer?.title}
