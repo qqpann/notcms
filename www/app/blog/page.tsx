@@ -96,7 +96,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
   return (
     <Link
       href={`/blog/${page.id}`}
-      className="flex items-start p-4 gap-8 relative rounded-3xl self-stretch w-full flex-[0_0_auto] shadow-[inset_0px_-80px_96px_#ffffff14] border-white"
+      className="flex items-start p-4 gap-8 relative rounded-3xl self-stretch w-full flex-[0_0_auto] shadow-[inset_0px_-80px_96px_#ffffff14] border border-white border-opacity-10"
     >
       <div className="w-[576px] h-[310px]">
         <Image
@@ -108,7 +108,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
         />
       </div>
 
-      <div className="flex flex-col items-start gap-4 px-0 py-5 relative flex-1 self-stretch grow">
+      <div className="flex flex-col items-start gap-4 p-0 relative flex-1 self-stretch grow">
         <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
             <p className="text-[25px] tracking-[0.25px] relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white leading-[normal]">
@@ -118,12 +118,8 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
               {page.properties.description}
             </p>
           </div>
+
           <div className="inline-flex items-start gap-2 relative flex-[0_0_auto]">
-            <div className="inline-flex h-6 items-center gap-1.5 px-3 py-0.5 relative flex-[0_0_auto] bg-[#ffffff29] rounded-[40px]">
-              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
-                {page.properties.category}
-              </div>
-            </div>
             <div className="inline-flex items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
               <div className="size-[18px] rounded-full">
                 <Image
@@ -138,6 +134,12 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
                 {writer?.title}
               </div>
             </div>
+
+            <div className="inline-flex h-6 items-center gap-1.5 px-3 py-0.5 relative flex-[0_0_auto] bg-[#ffffff29] rounded-[40px]">
+              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
+                {page.properties.category}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -150,7 +152,7 @@ function BlogPostCard({ className, page, writer }: Props) {
     <Link
       href={`/blog/${page.id}`}
       className={
-        "flex flex-col items-start gap-5 pt-4 pb-5 px-4 bg-[#ffffff03] rounded-3xl overflow-hidden border-[0.5px] border-solid border-transparent shadow-[inset_0px_-80px_96px_#ffffff14]"
+        "flex flex-col items-start gap-5 pt-4 pb-5 px-4 bg-[#ffffff03] rounded-3xl overflow-hidden border-white border-opacity-10 border-[0.5px] shadow-[inset_0px_-80px_96px_#ffffff14]"
       }
     >
       <div className="w-[352px] h-[200px]">
