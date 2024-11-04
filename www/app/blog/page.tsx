@@ -23,9 +23,11 @@ export default async function Blog() {
   pages = pages ?? [];
   writers = writers ?? [];
 
+  pages = pages.filter((page) => page.properties.published);
+
   return (
     <main className="container max-w-[1440px] px-32 mx-auto py-8">
-      <div className="flex flex-col w-full items-start gap-5 flex-[0_0_auto]">
+      <div className="flex flex-col w-full mb-8 items-start gap-5 flex-[0_0_auto]">
         <h2 className="self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
           Recent updates
         </h2>
@@ -34,7 +36,7 @@ export default async function Blog() {
         </p>
       </div>
 
-      <div className="flex items-center gap-12 self-stretch w-full flex-[0_0_auto]">
+      <div className="flex items-center mb-8 gap-12 self-stretch w-full flex-[0_0_auto]">
         <div className="inline-flex items-center gap-3 flex-[0_0_auto]">
           <button className="flex w-[71px] h-6 items-center gap-12 px-0 py-3 rounded-[24.5px] border-[0.5px] border-solid border-[#ffffff1a] [background:linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.1)_100%)]">
             <span className="inline-flex items-center justify-center gap-2 px-3 py-2 flex-[0_0_auto] mt-[-12.00px] mb-[-12.00px] rounded-[30px]">
@@ -62,8 +64,6 @@ export default async function Blog() {
             </span>
           </button>
         </div>
-
-        <Separator className="flex-1 grow h-px" />
       </div>
 
       <div className="grid grid-cols-1 gap-8">
