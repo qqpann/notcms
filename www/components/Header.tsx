@@ -1,9 +1,4 @@
 "use client";
-/*
-We're constantly improving the code you see. 
-Please share your feedback here: https://form.asana.com/?k=uvp-HPgd3_hyoXRBw1IcNg&d=1152665201300829
-*/
-
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,10 +11,10 @@ type NavItem = {
 };
 const navItems: NavItem[] = [
   { title: "Home", href: routes.home },
-  { title: "Pricing", href: routes.pricing },
-  { title: "Templates", href: routes.templates },
+  // { title: "Pricing", href: routes.pricing },
+  // { title: "Templates", href: routes.templates },
   { title: "Blog", href: routes.blog },
-  { title: "Docs", href: routes.docs },
+  // { title: "Docs", href: routes.docs },
 ];
 export function Header() {
   return (
