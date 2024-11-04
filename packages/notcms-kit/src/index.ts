@@ -105,7 +105,7 @@ async function pull() {
 import { Client } from "notcms";
 import type { Schema } from "notcms";
 
-export const schema = ${schema} satisfies Schema;
+export const schema = ${JSON.stringify(schema, null, 2)} satisfies Schema;
 export const nc = new Client({ schema });
     `.trim()
   );

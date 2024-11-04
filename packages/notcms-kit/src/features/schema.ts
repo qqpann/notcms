@@ -4,7 +4,14 @@ import { routes } from "../routes.js";
 
 const DASHBOARD_URL = "https://dash.notcms.com/";
 
-export async function fetchSchema(): Promise<string> {
+type Schema = Record<
+  string,
+  {
+    id: string;
+    properties: Record<string, string>;
+  }
+>;
+export async function fetchSchema(): Promise<Schema> {
   const { NOTCMS_SECRET_KEY, NOTCMS_WORKSPACE_ID } = process.env;
   if (!NOTCMS_SECRET_KEY || !NOTCMS_WORKSPACE_ID) {
     throw new Error(
@@ -38,8 +45,8 @@ export async function fetchSchema(): Promise<string> {
     },
   });
   try {
-    const data = (await res.json()) as { schema: string };
-    if (typeof data.schema !== "string") {
+    const data = (await res.json()) as { schema: Schema };
+    if (typeof data.schema !== "object") {
       throw new Error(
         `Invalid schema. Expected string, found ${typeof data.schema}.`
       );
