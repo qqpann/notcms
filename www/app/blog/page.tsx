@@ -104,7 +104,7 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
           alt="Key Visual"
           width={576}
           height={310}
-          className="rounded object-cover w-[576px] h-[310px]"
+          className="rounded-lg object-cover w-[576px] h-[310px]"
         />
       </div>
 
@@ -162,7 +162,7 @@ function BlogPostCard({ className, page, writer }: Props) {
           alt="Key Visual"
           width={352}
           height={200}
-          className="rounded object-cover w-[352px] h-[200px]"
+          className="rounded-md object-cover w-[352px] h-[200px]"
         />
       </div>
 
