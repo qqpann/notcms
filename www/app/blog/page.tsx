@@ -98,18 +98,15 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
       href={`/blog/${page.id}`}
       className="flex items-start gap-8 relative self-stretch w-full flex-[0_0_auto]"
     >
-      {/* <img
-        className="w-[785px] h-[422px] ml-[-0.50px] bg-black border-[#ffffff1f] relative mt-[-0.50px] mb-[-0.50px] rounded-[10px] border-[0.5px] border-solid shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]"
-        alt="Key Visual"
-        src={post.keyVisualImage}
-      /> */}
-      <Image
-        src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
-        alt="Key Visual"
-        width={785}
-        height={422}
-        className="rounded"
-      />
+      <div className="w-[576px] h-[310px]">
+        <Image
+          src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
+          alt="Key Visual"
+          width={576}
+          height={310}
+          className="rounded object-cover w-[576px] h-[310px]"
+        />
+      </div>
 
       <div className="flex flex-col items-start gap-4 px-0 py-5 relative flex-1 self-stretch grow">
         <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
@@ -159,13 +156,15 @@ function BlogPostCard({ className, page, writer }: Props) {
         "flex flex-col items-start gap-5 pt-4 pb-5 px-4 bg-[#ffffff03] rounded-3xl overflow-hidden border-[0.5px] border-solid border-transparent shadow-[inset_0px_-80px_96px_#ffffff14]"
       }
     >
-      <Image
-        src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
-        alt="Key Visual"
-        width={373}
-        height={201}
-        className="rounded"
-      />
+      <div className="w-[352px] h-[200px]">
+        <Image
+          src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
+          alt="Key Visual"
+          width={352}
+          height={200}
+          className="rounded object-cover w-[352px] h-[200px]"
+        />
+      </div>
 
       <div className="flex flex-col items-start gap-4 px-1.5 py-0 self-stretch w-full flex-[0_0_auto]">
         <p className="self-stretch mt-[-1px] font-h-6 font-[number:var(--h-6-font-weight)] text-white text-[length:var(--h-6-font-size)] tracking-[var(--h-6-letter-spacing)] leading-[var(--h-6-line-height)] [font-style:var(--h-6-font-style)]">
