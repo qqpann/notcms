@@ -61,7 +61,7 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
             </p>
             <div className="flex w-[115px] items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
               <img
-                className="relative w-[18px] h-[18px] object-cover"
+                className="relative size-[18px] object-cover rounded-full"
                 alt="Writer Profile"
                 src={writer?.properties.images?.[0] ?? "/img/404.png"}
               />
