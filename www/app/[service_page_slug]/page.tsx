@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { BlogDetail } from "~/components/BlogDetail";
+import { PostDetail } from "~/components/BlogDetail";
 import { nc } from "~/src/notcms/schema";
 
 export const revalidate = 10;
@@ -26,5 +26,5 @@ export default async function Page({
     title: data.title,
     content: data.content,
   };
-  return <BlogDetail post={page} />;
+  return <PostDetail post={page} />;
 }
