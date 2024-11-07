@@ -18,15 +18,16 @@
   <a href="https://notcms.com/blog">
     Blog
   </a>
-</div>
 
-## Getting Started
+NotCMS makes it easy to create a CMS, from Notion.
 
 [![npm package][npm-img]][npm-url]
 [![Downloads][downloads-img]][downloads-url]
 [![Issues][issues-img]][issues-url]
 
-> NotCMS makes it easy to create a CMS, from Notion.
+</div>
+
+## Getting Started
 
 ## Install
 
