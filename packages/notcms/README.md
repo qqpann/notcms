@@ -8,16 +8,13 @@
 
   <a href="https://notcms.com">
     Website
-  </a>
-  |
+  </a> · 
   <a href="https://dash.notcms.com">
     Dashboard
-  </a>
-  |
+  </a> · 
   <a href="https://notcms.com/templates">
     Templates
-  </a>
-  |
+  </a> · 
   <a href="https://notcms.com/blog">
     Blog
   </a>
