@@ -26,6 +26,7 @@
     "notcms": "0.0.9-development",
     "react": "^18",
     "react-dom": "^18",
+    "simple-icons": "^13.16.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
   },

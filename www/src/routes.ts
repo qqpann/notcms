@@ -7,5 +7,8 @@ export const routes = {
   templates:
     "https://shadowshell.notion.site/NotCMS-Templates-1092c5feb55c80c8b77fef5b589defdd?pvs=4",
   docs: "/docs",
+
   about: "/about",
+  terms: "/terms",
+  privacy: "/privacy",
 } as const;

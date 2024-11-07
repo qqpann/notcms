@@ -207,6 +207,9 @@ importers:
       react-dom:
         specifier: ^18
         version: 18.3.1(react@18.3.1)
+      simple-icons:
+        specifier: ^13.16.0
+        version: 13.16.0
       tailwind-merge:
         specifier: ^2.5.2
         version: 2.5.2
@@ -5521,6 +5524,10 @@ packages:
   signale@1.4.0:
     resolution: {integrity: sha512-iuh+gPf28RkltuJC7W5MRi6XAjTDCAPC/prJUpQoG4vIP3MJZ+GTydVnodXA7pwvTKb2cA0m9OFZW/cdWy/I/w==}
     engines: {node: '>=6'}
+
+  simple-icons@13.16.0:
+    resolution: {integrity: sha512-aMg1efZ0IvYPKdvqUW0woVGSJwb199y9z7j1+6D5zPMn95eMQN0xzKAHefsqQW2K/5LwfgtFK3Gxn9n1eafX0A==}
+    engines: {node: '>=0.12.18'}
 
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
@@ -12529,6 +12536,8 @@ snapshots:
       chalk: 2.4.2
       figures: 2.0.0
       pkg-conf: 2.1.0
+
+  simple-icons@13.16.0: {}
 
   simple-swizzle@0.2.2:
     dependencies:
