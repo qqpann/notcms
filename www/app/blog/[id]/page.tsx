@@ -3,6 +3,7 @@ import { BlogPageDetail } from "~/components/blog/detail";
 import { nc } from "~/src/notcms/schema";
 
 // export const maxDuration = 30;
+export const dynamic = "auto";
 export const revalidate = 10;
 
 export default async function Page({
