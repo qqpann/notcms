@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "marked": "^14.0.0",
-    "next": "14.2.5",
+    "next": "14.2.10",
     "notcms": "0.0.10-development",
     "react": "^18",
     "react-dom": "^18"
