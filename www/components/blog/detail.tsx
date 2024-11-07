@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { nc } from "~/src/notcms/schema";
-import { MainContent } from "../main-content";
+import { MainContent } from "./main-content";
 
 type Page = typeof nc.query.blog.$inferPage;
 type Writer = typeof nc.query.writers.$inferPage;

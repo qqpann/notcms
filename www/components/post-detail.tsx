@@ -1,4 +1,4 @@
-import { MainContent } from "./main-content";
+import { MainContent } from "./blog/main-content";
 
 type PostDetail = {
   id: string;
