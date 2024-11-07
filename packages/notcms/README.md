@@ -50,16 +50,16 @@ const [page] = await nc.query.blog.getPage(pages[0].id);
 
 <!-- -->
 
-[build-img]: https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml/badge.svg
-[build-url]: https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml
-[downloads-img]: https://img.shields.io/npm/dt/typescript-npm-package-template
-[downloads-url]: https://www.npmtrends.com/typescript-npm-package-template
-[npm-img]: https://img.shields.io/npm/v/typescript-npm-package-template
-[npm-url]: https://www.npmjs.com/package/typescript-npm-package-template
-[issues-img]: https://img.shields.io/github/issues/ryansonshine/typescript-npm-package-template
-[issues-url]: https://github.com/ryansonshine/typescript-npm-package-template/issues
-[codecov-img]: https://codecov.io/gh/ryansonshine/typescript-npm-package-template/branch/main/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/ryansonshine/typescript-npm-package-template
+[build-img]: https://github.com/qqpann/notcms/actions/workflows/release.yml/badge.svg
+[build-url]: https://github.com/qqpann/notcms/actions/workflows/release.yml
+[downloads-img]: https://img.shields.io/npm/dt/notcms
+[downloads-url]: https://www.npmtrends.com/notcms
+[npm-img]: https://img.shields.io/npm/v/notcms
+[npm-url]: https://www.npmjs.com/package/notcms
+[issues-img]: https://img.shields.io/github/issues/qqpann/notcms
+[issues-url]: https://github.com/qqpann/notcms/issues
+[codecov-img]: https://codecov.io/gh/qqpann/notcms/branch/main/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/qqpann/notcms
 [semantic-release-img]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
