@@ -14,9 +14,9 @@ const MAP_SLUG_TO_ID = {
 export default async function Page({
   params,
 }: {
-  params: { service_page_slug: string };
+  params: Promise<{ service_page_slug: string }>;
 }) {
-  const slug = params.service_page_slug;
+  const { service_page_slug: slug } = await params;
   const id = MAP_SLUG_TO_ID[slug as keyof typeof MAP_SLUG_TO_ID];
   if (!id) return notFound();
   const [data] = await nc.query.service.getPage(id);

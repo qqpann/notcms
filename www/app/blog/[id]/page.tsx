@@ -5,8 +5,13 @@ import { nc } from "~/src/notcms/schema";
 // export const maxDuration = 30;
 export const revalidate = 10;
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const [page, error] = await nc.query.blog.getPage(params.id);
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const [page, error] = await nc.query.blog.getPage(id);
   if (error) return <div>{error.toString()}</div>;
   if (!page) return <div>Page not found</div>;
 
