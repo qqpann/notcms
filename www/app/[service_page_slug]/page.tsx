@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { PostDetail } from "~/components/BlogDetail";
+import { PostDetail } from "~/components/post-detail";
 import { nc } from "~/src/notcms/schema";
 
 export const revalidate = 10;

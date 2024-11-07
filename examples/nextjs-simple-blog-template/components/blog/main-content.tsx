@@ -26,7 +26,7 @@ export function MainContent({ content }: { content: string }) {
     <main
       className="prose prose-base dark:prose-invert w-[600px] text-justify prose-headings:text-[#f8f7f7] prose-headings:font-medium prose-headings:text-2xl font-['Inter'] leading-tight text-zinc-300 text-sm font-normal"
       dangerouslySetInnerHTML={{
-        __html: marked(content),
+        __html: marked(content ?? ""),
       }}
     />
   );
