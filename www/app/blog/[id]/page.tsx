@@ -94,7 +94,10 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
 }
 function WriterProfileCard({ writer }: { writer: Writer }) {
   return (
-    <div className="w-[600px] p-6 bg-white/0 rounded-[20px] shadow-inner border border-white justify-start items-start gap-6 inline-flex">
+    <div
+      className="w-[600px] p-6 bg-white/1 rounded-[20px] border-white border-[0.5px] border-opacity-10 justify-start items-start gap-6 inline-flex 
+shadow-[inset_0px_-40px_48px_0px_rgba(255,255,255,0.08)]"
+    >
       <Image
         width={56}
         height={56}
