@@ -12,6 +12,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  // https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
   metadataBase: new URL(siteConfig.baseUrl),
   title: siteConfig.name,
   description: siteConfig.description,
