@@ -2,8 +2,8 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-import { Footer } from "~/components/layout-footer";
-import { Header } from "~/components/layout-header";
+import { Footer } from "~/components/footer";
+import { Header } from "~/components/header";
 import { cn } from "~/lib/utils";
 import { siteConfig } from "~/src/site-config";
 
