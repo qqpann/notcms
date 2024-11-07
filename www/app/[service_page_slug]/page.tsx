@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { BlogDetail } from "~/components/BlogDetail";
 import { nc } from "~/src/notcms/schema";
 
+export const revalidate = 10;
+
 const MAP_SLUG_TO_ID = {
   terms: "1f941573-d2ce-4790-b00d-b45ce51f8e72",
   privacy: "bbc1e1f3-0f25-4f27-b9f0-a7452807459a",
