@@ -60,8 +60,10 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
               {page.title}
             </p>
             <div className="flex w-[115px] items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
-              <img
+              <Image
                 className="relative size-[18px] object-cover rounded-full"
+                width={18}
+                height={18}
                 alt="Writer Profile"
                 src={writer?.properties.images?.[0] ?? "/img/404.png"}
               />
@@ -70,8 +72,10 @@ function BlogDetail({ page, writer }: { page: Page; writer?: Writer }) {
               </div>
             </div>
           </div>
-          <img
-            className="relative self-stretch w-full h-[422px] mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]"
+          <Image
+            className="relative self-stretch w-full h-[422px] mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] object-cover"
+            width={784}
+            height={422}
             alt="Key Visual"
             src={page.properties.thumbnails?.[0] ?? "/img/404.png"}
           />
