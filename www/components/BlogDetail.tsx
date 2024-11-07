@@ -27,7 +27,7 @@ export function BlogDetail({ post }: { post: PostDetail }) {
           </div>
         </div>
         <main
-          className="prose prose-base dark:prose-invert prose-h2:text-2xl text-white relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
+          className="prose prose-base dark:prose-invert prose-h2:text-2xl prose-headings:text-[#eee] prose-a:text-white prose-strong:text-white text-white relative w-[600px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-normal text-transparent text-[15px] tracking-[0.15px] leading-[15px]"
           dangerouslySetInnerHTML={{
             __html: marked(post.content ?? ""),
           }}
