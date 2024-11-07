@@ -2,7 +2,7 @@ import { BlogPagesList } from "~/components/blog/list";
 import { nc } from "~/src/notcms/schema";
 
 // export const maxDuration = 30;
-export const dynamic = "auto";
+export const dynamic = "force-dynamic";
 export const revalidate = 10;
 
 export default async function Blog() {
