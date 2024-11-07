@@ -11,4 +11,6 @@ export const routes = {
   about: "/about",
   terms: "/terms",
   privacy: "/privacy",
+
+  dashboard: "https://dash.notcms.com",
 } as const;
