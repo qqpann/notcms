@@ -9,8 +9,19 @@ export function Hero() {
 
       <div className="flex flex-col items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
         <h1 className="w-full [font-family:'Roobert_TRIAL-Bold',Helvetica] font-bold text-white text-[64px] text-center tracking-[-0.64px] leading-[72px]">
-          Instantly create & publish <br /> your website content &nbsp;
-          <span className="[text-shadow:0px_0.5px_0.5px_#fffffff5] [-webkit-text-stroke:0.75px_#ffffff52] blur-[1px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] opacity-20 [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-transparent text-[64px] text-center tracking-[-0.64px] leading-[72px]">
+          Instantly create & publish <br /> your website content&nbsp;
+          <span
+            // className="[text-shadow:0px_0.5px_0.5px_#fffffff5] [-webkit-text-stroke:0.75px_#ffffff52] blur-[1px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] opacity-20 [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-transparent text-[64px] text-center tracking-[-0.64px] leading-[72px]"
+            style={{
+              // background:
+              //   "radial-gradient(50% 50% at 50% 50%, rgba(255,183.02,98.51,0.01) 0%, rgba(255,80.69,195.73,0.01) 100%)",
+              background: "linear-gradient(135deg, #FFB763 0%, #FF51C4 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
             from Notion
           </span>
         </h1>
