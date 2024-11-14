@@ -29,8 +29,8 @@ export function HowWorks() {
           <LayerHeader direction="right">
             <LayerTitle>Your website</LayerTitle>
             <LayerDescription>
-              Powerful and intuitive interfaces that are the fabric of your
-              composable content architecture.
+              Deploy your website to the edge with Vercel, Netlify, or any other
+              static site host.
             </LayerDescription>
           </LayerHeader>
         </Layer>
@@ -47,8 +47,8 @@ export function HowWorks() {
           <LayerHeader direction="left">
             <LayerTitle>Website codebase</LayerTitle>
             <LayerDescription>
-              Powerful and intuitive interfaces that are the fabric of your
-              composable content architecture.
+              Build your website with your design and your favorite frontend
+              framework, like Next.js or Vue.
             </LayerDescription>
           </LayerHeader>
         </Layer>
@@ -65,8 +65,8 @@ export function HowWorks() {
           <LayerHeader direction="right">
             <LayerTitle>NotCMS API</LayerTitle>
             <LayerDescription>
-              Powerful and intuitive interfaces that are the fabric of your
-              composable content architecture.
+              Leverage the power of NotCMS's fast API. Retrieve your content
+              with typed queries.
             </LayerDescription>
           </LayerHeader>
         </Layer>
@@ -83,8 +83,8 @@ export function HowWorks() {
           <LayerHeader direction="left">
             <LayerTitle>NotCMS Dashboard</LayerTitle>
             <LayerDescription>
-              Powerful and intuitive interfaces that are the fabric of your
-              composable content architecture.
+              Manage your databases with a powerful and intuitive dashboard,
+              with features like version history.
             </LayerDescription>
           </LayerHeader>
         </Layer>
@@ -101,8 +101,8 @@ export function HowWorks() {
           <LayerHeader direction="right">
             <LayerTitle>Notion editor/database</LayerTitle>
             <LayerDescription>
-              Powerful and intuitive interfaces that are the fabric of your
-              composable content architecture.
+              Edit your content in Notion, and sync it to your website with a
+              few click.
             </LayerDescription>
           </LayerHeader>
         </Layer>
