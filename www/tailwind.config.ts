@@ -64,6 +64,14 @@ const config: Config = {
           "5": "hsl(var(--chart-5))",
         },
       },
+      gridTemplateColumns: {
+        "46": "repeat(46, minmax(0, 1fr))",
+      },
+      gridColumn: {
+        "span-23": "span 23 / span 23",
+        "span-18": "span 18 / span 18",
+        "span-28": "span 28 / span 28",
+      },
     },
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],

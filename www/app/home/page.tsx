@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Hero } from "./_components/1_hero";
+import { WhyBetterSection } from "./_components/2_why-better";
 
 export const metadata: Metadata = {
   title: "NotCMS - Turn Notion into Blog",
@@ -31,6 +32,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <WhyBetterSection />
     </>
   );
 }
