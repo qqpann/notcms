@@ -10,38 +10,42 @@ import {
 
 import { cn } from "~/lib/utils";
 
-const userGroups = [
+const userGroups: {
+  iconUrl: string;
+  title: string;
+  description: string;
+}[] = [
   // 1st row
   {
     iconUrl: "/img/home/icon-people.svg",
     title: "Developers & engineers",
     description:
-      "Streamline handoffs and code faster with development-ready components",
+      "Write code faster and confidently with a type safe SDK. No more hassle syncing types.",
   },
   {
     iconUrl: "/img/home/icon-people2-group.svg",
     title: "Small teams",
     description:
-      "Streamline handoffs and code faster with development-ready components",
+      "Manage your content and collaborate with your team effortlessly. No more silos.",
   },
   {
     iconUrl: "/img/home/icon-pencil2.svg",
     title: "Content writers",
     description:
-      "Streamline handoffs and code faster with development-ready components",
+      "Write content in a familiar interface and see it go live instantly. No more waiting or back-and-forth.",
   },
   // 2nd row
   {
     iconUrl: "/img/home/icon-people.svg",
     title: "Business managers",
     description:
-      "Streamline handoffs and code faster with development-ready components",
+      "Get a bird's eye view of your content and make data-driven decisions. No more guesswork.",
   },
   {
     iconUrl: "/img/home/icon-people.svg",
     title: "Independent bloggers",
     description:
-      "Streamline handoffs and code faster with development-ready components",
+      "Focus on writing and growing your audience. No more worrying, with the quickstart templates.",
   },
 ];
 
