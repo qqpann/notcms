@@ -137,10 +137,10 @@ const GradientSeparator = React.forwardRef<
       decorative={decorative}
       orientation={orientation}
       className={cn(
-        "shrink-0 from-transparent via-zinc-700 to-transparent",
+        "shrink-0 from-transparent via-zinc-800 to-transparent",
         orientation === "horizontal"
           ? "bg-gradient-to-r h-[1px] w-full"
-          : "bg-gradient-to-b w-[1px] h-full",
+          : "bg-gradient-to-b w-[1px] h-auto min-h-full",
         className
       )}
       {...props}
