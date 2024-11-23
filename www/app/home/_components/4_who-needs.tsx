@@ -10,6 +10,41 @@ import {
 
 import { cn } from "~/lib/utils";
 
+const userGroups = [
+  // 1st row
+  {
+    iconUrl: "/img/home/icon-people.svg",
+    title: "Developers & engineers",
+    description:
+      "Streamline handoffs and code faster with development-ready components",
+  },
+  {
+    iconUrl: "/img/home/icon-people2-group.svg",
+    title: "Small teams",
+    description:
+      "Streamline handoffs and code faster with development-ready components",
+  },
+  {
+    iconUrl: "/img/home/icon-pencil2.svg",
+    title: "Content writers",
+    description:
+      "Streamline handoffs and code faster with development-ready components",
+  },
+  // 2nd row
+  {
+    iconUrl: "/img/home/icon-people.svg",
+    title: "Business managers",
+    description:
+      "Streamline handoffs and code faster with development-ready components",
+  },
+  {
+    iconUrl: "/img/home/icon-people.svg",
+    title: "Independent bloggers",
+    description:
+      "Streamline handoffs and code faster with development-ready components",
+  },
+];
+
 export function WhoNeeds() {
   return (
     <Section>
@@ -22,14 +57,14 @@ export function WhoNeeds() {
           <UserGroup
             icon={
               <Image
-                src="/img/home/icon-people.svg"
-                alt="Developers & engineers"
+                src={userGroups[0].iconUrl}
+                alt={userGroups[0].title}
                 width={16}
                 height={16}
               />
             }
-            title="Developers & engineers"
-            description="Streamline handoffs and code faster with development-ready components"
+            title={userGroups[0].title}
+            description={userGroups[0].description}
           />
 
           <GradientSeparator orientation="vertical" className="mx-3" />
@@ -37,14 +72,14 @@ export function WhoNeeds() {
           <UserGroup
             icon={
               <Image
-                src="/img/home/icon-people2-group.svg"
-                alt="Small teams"
+                src={userGroups[1].iconUrl}
+                alt={userGroups[1].title}
                 width={16}
                 height={16}
               />
             }
-            title="Small teams"
-            description="Streamline handoffs and code faster with development-ready components"
+            title={userGroups[1].title}
+            description={userGroups[1].description}
           />
 
           <GradientSeparator orientation="vertical" className="mx-3" />
@@ -52,14 +87,14 @@ export function WhoNeeds() {
           <UserGroup
             icon={
               <Image
-                src="/img/home/icon-pencil2.svg"
-                alt="Content writers"
+                src={userGroups[2].iconUrl}
+                alt={userGroups[2].title}
                 width={16}
                 height={16}
               />
             }
-            title="Content writers"
-            description="Streamline handoffs and code faster with development-ready components"
+            title={userGroups[2].title}
+            description={userGroups[2].description}
           />
         </div>
 
@@ -69,14 +104,14 @@ export function WhoNeeds() {
           <UserGroup
             icon={
               <Image
-                src="/img/home/icon-people.svg"
-                alt="Business managers"
+                src={userGroups[3].iconUrl}
+                alt={userGroups[3].title}
                 width={16}
                 height={16}
               />
             }
-            title="Business managers"
-            description="Streamline handoffs and code faster with development-ready components"
+            title={userGroups[3].title}
+            description={userGroups[3].description}
           />
 
           <GradientSeparator orientation="vertical" className="mx-3" />
@@ -84,14 +119,14 @@ export function WhoNeeds() {
           <UserGroup
             icon={
               <Image
-                src="/img/home/icon-people.svg"
-                alt="Independent bloggers"
+                src={userGroups[4].iconUrl}
+                alt={userGroups[4].title}
                 width={16}
                 height={16}
               />
             }
-            title="Independent bloggers"
-            description="Streamline handoffs and code faster with development-ready components"
+            title={userGroups[4].title}
+            description={userGroups[4].description}
           />
         </div>
       </div>
