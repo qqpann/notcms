@@ -13,6 +13,16 @@ import {
   SectionTitle,
 } from "./_section";
 
+const CODE = `pnpm add notcms
+
+import { Client } from 'notcms';
+import { schema } from '../notcms/schema';
+const nc = new Client({ schema });
+
+const [pages] = await nc.query.blog.listPages();
+const [page] = await nc.query.blog.getPage('<page_id>');
+`;
+
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
@@ -109,24 +119,9 @@ export function MakeWith() {
             </Button>
           </div>
         </div>
-        <div className="w-full overflow-hidden rounded-[20px] bg-zinc-900 p-6 lg:p-8">
+        <div className="w-full overflow-hidden rounded-[20px] bg-zinc-900 p-1">
           <pre className="overflow-x-auto font-mono text-sm leading-relaxed text-zinc-50">
-            <CodeBlock
-              code={`{notcms}    '@notcms/database/'
-
-GET
-
-sql    neon process.env.DATABASE_URL
-
-rows           process.env.DATABASE_URL
-GET
-
-sql    neon process.env.DATABASE_URL
-
-rows           process.env.DATABASE_URL
-
-Response.json`}
-            />
+            <CodeBlock code={CODE} />
           </pre>
         </div>
       </div>
