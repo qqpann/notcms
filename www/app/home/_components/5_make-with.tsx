@@ -110,7 +110,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+      "inline-flex h-[30px] items-center justify-center rounded-lg",
       className
     )}
     {...props}
@@ -125,7 +125,12 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow",
+      `inline-flex items-center justify-center whitespace-nowrap
+       rounded-[14px] px-4 py-1 text-sm font-medium ring-offset-background
+       transition-all
+       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+       disabled:pointer-events-none disabled:opacity-50 
+       data-[state=active]:bg-silver data-[state=active]:text-white data-[state=active]:shadow`,
       className
     )}
     {...props}
@@ -155,7 +160,7 @@ export function MakeWith() {
     <Section className="w-full py-12 md:py-24 lg:py-32 bg-zinc-950">
       {/* <div className="container max-w-6xl px-4 md:px-6"> */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        <div className="space-y-6">
+        <div className="flex flex-col h-full justify-between">
           <div className="space-y-2">
             <SectionPreTitle>DEVELOPER FORWARD</SectionPreTitle>
             <SectionTitle>Make with your framework in mind.</SectionTitle>
@@ -186,9 +191,9 @@ export function MakeWith() {
             </Button>
           </div>
         </div>
-        <div className="w-full overflow-hidden rounded-[20px] bg-zinc-900 p-1">
-          <Tabs defaultValue={codeExamples[0].id} className="w-[400px]">
-            <TabsList>
+        <div className="w-full overflow-hidden rounded-[20px] bg-zinc-900 px-1 py-1.5">
+          <Tabs defaultValue={codeExamples[0].id} className="w-full">
+            <TabsList className="mb-4">
               {codeExamples.map((example) => (
                 <TabsTrigger key={example.id} value={example.id}>
                   {example.language}
@@ -196,7 +201,11 @@ export function MakeWith() {
               ))}
             </TabsList>
             {codeExamples.map((example) => (
-              <TabsContent key={example.id} value={example.id}>
+              <TabsContent
+                key={example.id}
+                value={example.id}
+                className="px-5 overflow-auto"
+              >
                 <CodeBlock code={example.code} />
               </TabsContent>
             ))}
