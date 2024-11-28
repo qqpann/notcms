@@ -249,7 +249,7 @@ export function MakeWith() {
                 value={example.id}
                 className="px-5 overflow-auto max-h-[300px]"
               >
-                <CodeBlock code={example.code} />
+                <CodeBlock language="tsx" content={example.code} />
               </TabsContent>
             ))}
           </Tabs>

@@ -1,40 +1,27 @@
 "use client";
-import { useLayoutEffect, useState } from "react";
+import { CheckIcon, ClipboardIcon } from "lucide-react";
+import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter";
+import shell from "react-syntax-highlighter/dist/esm/languages/prism/shell-session";
+import tsx from "react-syntax-highlighter/dist/esm/languages/prism/tsx";
+import ts from "react-syntax-highlighter/dist/esm/languages/prism/typescript";
+import style from "react-syntax-highlighter/dist/esm/styles/prism/nord";
 
-import { Fragment } from "react";
+import { Button } from "./ui/button";
 
-import { toJsxRuntime } from "hast-util-to-jsx-runtime";
-import { jsx, jsxs } from "react/jsx-runtime";
-import { codeToHast } from "shiki/bundle/web";
+SyntaxHighlighter.registerLanguage("typescript", ts);
+SyntaxHighlighter.registerLanguage("tsx", tsx);
+SyntaxHighlighter.registerLanguage("shell", shell);
 
-import type { Nodes } from "hast";
-
-// TODO?: consider cloudflare worker?
-// https://shiki.matsu.io/guide/install#cloudflare-workers
-
-export async function highlight(code: string) {
-  const out = await codeToHast(code, {
-    lang: "tsx",
-    theme: "github-dark",
-    transformers: [],
-  });
-
-  return toJsxRuntime(out as Nodes, {
-    Fragment,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    jsx: jsx as any,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    jsxs: jsxs as any,
-  });
+interface CodeBlockProps {
+  language: "tsx" | "typescript" | "shell";
+  content: string;
 }
-
-// https://shiki.matsu.io/packages/next#react-client-component
-export function CodeBlock({ code }: { code: string }) {
-  const [nodes, setNodes] = useState<JSX.Element>();
-
-  useLayoutEffect(() => {
-    void highlight(code).then(setNodes).catch(console.error);
-  }, []);
-
-  return nodes ?? <p>Loading...</p>;
+export function CodeBlock({ language, content }: CodeBlockProps) {
+  return (
+    <div className="relative">
+      <SyntaxHighlighter language={language} style={style} wrapLongLines>
+        {content}
+      </SyntaxHighlighter>
+    </div>
+  );
 }
