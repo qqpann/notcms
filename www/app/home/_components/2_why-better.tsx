@@ -130,6 +130,9 @@ const Card = React.forwardRef<
       "rounded-[20px] border border-white border-opacity-10 bg-zinc-950",
       className
     )}
+    style={{
+      boxShadow: "inset 0 -80px 96px 0 rgba(255, 255, 255, 0.08)",
+    }}
     {...props}
   />
 ));
