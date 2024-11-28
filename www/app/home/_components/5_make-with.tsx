@@ -243,7 +243,12 @@ export function MakeWith() {
             </Button>
           </div>
         </div>
-        <div className="w-full overflow-hidden rounded-[20px] bg-zinc-900 px-1 py-1.5">
+        <div
+          className="w-full border-silver overflow-hidden rounded-[20px] px-1 py-1.5"
+          style={{
+            boxShadow: "inset 0 -32px 80px 0 rgba(255, 255, 255, 0.08)",
+          }}
+        >
           <Tabs defaultValue={codeExamples[0].id} className="w-full">
             <TabsList className="mb-4">
               {codeExamples.map((example) => (
