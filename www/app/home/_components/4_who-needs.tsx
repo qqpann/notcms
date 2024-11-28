@@ -1,14 +1,14 @@
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import Image from "next/image";
 import * as React from "react";
+
+import { cn } from "~/lib/utils";
 import {
   Section,
   SectionHeader,
   SectionPreTitle,
   SectionTitle,
 } from "./_section";
-
-import { cn } from "~/lib/utils";
 
 const userGroups: {
   iconUrl: string;
