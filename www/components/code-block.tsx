@@ -18,7 +18,7 @@ interface CodeBlockProps {
 }
 export function CodeBlock({ language, content }: CodeBlockProps) {
   return (
-    <div className="relative">
+    <div className="relative shiki">
       <SyntaxHighlighter language={language} style={style} wrapLongLines>
         {content}
       </SyntaxHighlighter>

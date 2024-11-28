@@ -102,6 +102,8 @@ body {
 .shiki pre,
 .shiki code {
   background-color: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* line numbers */
@@ -110,7 +112,7 @@ body {
   counter-reset: step;
   counter-increment: step 0;
 }
-.shiki code .line::before {
+.shiki code > span::before {
   content: counter(step);
   counter-increment: step;
   width: 1rem;
