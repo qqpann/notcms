@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
+import { Button } from "./ui/button";
 
 type NavItem = {
   title: string;
@@ -38,14 +39,14 @@ export function Header() {
       </nav>
 
       <div className="flex items-center justify-end gap-2 flex-1 grow">
-        <div className="inline-flex h-7 items-center justify-center gap-2 px-3 py-[9.5px] bg-[#e6e6e61a] rounded-[10px]">
+        <Button size="sm" asChild>
           <Link
             href={routes.dashboard}
-            className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-white text-sm text-center tracking-[0.14px] leading-[normal] whitespace-nowrap"
+            className="mt-[-1.00px] [font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-white text-center tracking-[0.14px] leading-[normal] whitespace-nowrap"
           >
             Get started
           </Link>
-        </div>
+        </Button>
       </div>
     </div>
   );
