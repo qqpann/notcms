@@ -9,7 +9,7 @@ import {
   SectionTitle,
 } from "./_section";
 
-export function WhyBetterSection() {
+export function WhyBetter() {
   return (
     <Section>
       <SectionHeader>

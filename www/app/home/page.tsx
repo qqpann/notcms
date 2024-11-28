@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "./_components/1_hero";
-import { WhyBetterSection } from "./_components/2_why-better";
+import { WhyBetter } from "./_components/2_why-better";
 import { HowWorks } from "./_components/3_how-works";
 import { WhoNeeds } from "./_components/4_who-needs";
 import { MakeWith } from "./_components/5_make-with";
@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <WhyBetterSection />
+      <WhyBetter />
       <HowWorks />
       <WhoNeeds />
       <MakeWith />

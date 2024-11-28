@@ -14,16 +14,6 @@ import {
   SectionTitle,
 } from "./_section";
 
-const CODE = `pnpm add notcms
-
-import { Client } from 'notcms';
-import { schema } from '../notcms/schema';
-const nc = new Client({ schema });
-
-const [pages] = await nc.query.blog.listPages();
-const [page] = await nc.query.blog.getPage('<page_id>');
-`;
-
 const codeExamples: {
   id: string;
   language: string;
@@ -151,8 +141,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
-
 const Tabs = TabsPrimitive.Root;
 
 const TabsList = React.forwardRef<
@@ -204,8 +192,6 @@ const TabsContent = React.forwardRef<
   />
 ));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
-
-export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 export function MakeWith() {
   return (
