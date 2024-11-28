@@ -39,14 +39,6 @@ export function HowWorks() {
         </Layer>
         {/* 2 */}
         <Layer className="z-40">
-          <LayerImage>
-            <Image
-              src="/img/home/lp-3-how-works-2-codebase.png"
-              width={256}
-              height={148}
-              alt="API"
-            />
-          </LayerImage>
           <LayerHeader direction="left">
             <LayerTitle>Website codebase</LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
@@ -55,6 +47,14 @@ export function HowWorks() {
               framework, like Next.js or Vue.
             </LayerDescription>
           </LayerHeader>
+          <LayerImage>
+            <Image
+              src="/img/home/lp-3-how-works-2-codebase.png"
+              width={256}
+              height={148}
+              alt="API"
+            />
+          </LayerImage>
         </Layer>
         {/* 3 */}
         <Layer className="z-30">
@@ -77,14 +77,6 @@ export function HowWorks() {
         </Layer>
         {/* 4 */}
         <Layer className="z-20">
-          <LayerImage>
-            <Image
-              src="/img/home/lp-3-how-works-4-dashboard.png"
-              width={256}
-              height={148}
-              alt="NotCMS Dashboard"
-            />
-          </LayerImage>
           <LayerHeader direction="left">
             <LayerTitle>NotCMS Dashboard</LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
@@ -93,6 +85,14 @@ export function HowWorks() {
               with features like version history.
             </LayerDescription>
           </LayerHeader>
+          <LayerImage>
+            <Image
+              src="/img/home/lp-3-how-works-4-dashboard.png"
+              width={256}
+              height={148}
+              alt="NotCMS Dashboard"
+            />
+          </LayerImage>
         </Layer>
         {/* 5 */}
         <Layer className="z-10 mb-0">
@@ -125,7 +125,7 @@ const Layer = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "relative flex flex-col items-center w-full -mb-[45px]",
+      "grid grid-cols-[1fr_auto_1fr] gap-1 w-full -mb-[45px]",
       className
     )}
     {...props}
@@ -137,7 +137,7 @@ const LayerImage = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mx-auto", className)} {...props} />
+  <div ref={ref} className={cn("col-start-2", className)} {...props} />
 ));
 LayerImage.displayName = "LayerImage";
 
@@ -149,8 +149,10 @@ const LayerHeader = React.forwardRef<HTMLDivElement, LayerHeaderProps>(
     <div
       ref={ref}
       className={cn(
-        "absolute top-[calc(50%-38px)]",
-        direction === "right" ? "pr-8 right-0 text-right" : "pl-8 left-0",
+        "mt-[40px] flex flex-col",
+        direction === "right" ? "col-start-3" : "col-start-1",
+        direction === "right" ? "pr-8 text-right" : "pl-8 left-0",
+        direction === "right" ? "items-end" : "items-start",
         className
       )}
       {...props}
