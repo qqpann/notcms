@@ -29,6 +29,10 @@
     "[json]": {
       "editor.defaultFormatter": "biomejs.biome"
     },
+    "tailwindCSS.experimental.classRegex": [
+      ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+      ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+    ],
     "cSpell.words": ["notcms", "shiki"]
   }
 }
