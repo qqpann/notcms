@@ -76,47 +76,49 @@ export { Button, buttonVariants };
 export function MakeWith() {
   return (
     <Section className="w-full py-12 md:py-24 lg:py-32 bg-zinc-950">
-      <div className="container max-w-6xl px-4 md:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <SectionPreTitle>DEVELOPER FORWARD</SectionPreTitle>
-              <SectionTitle>Make with your framework in mind.</SectionTitle>
-              <SectionDescription>
-                NotCMS comes with a TypeScript SDK. Your databases comes to your
-                hands with a few typed properties.
-              </SectionDescription>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <Button variant="silver">
-                <svg
-                  style={{ width: 20, height: 20, marginLeft: -8 }}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d={siGithub.path}
-                    fillRule="evenodd"
-                  />
-                </svg>
-                View repository
-              </Button>
-              <Button
-                variant="silver"
-                className="inline-flex items-center gap-2"
-              >
-                View docs
-                <ArrowRightIcon
-                  style={{ width: 20, height: 20, marginRight: -4 }}
-                />
-              </Button>
-            </div>
+      {/* <div className="container max-w-6xl px-4 md:px-6"> */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <SectionPreTitle>DEVELOPER FORWARD</SectionPreTitle>
+            <SectionTitle>Make with your framework in mind.</SectionTitle>
+            <SectionDescription>
+              NotCMS comes with a TypeScript SDK. Your databases comes to your
+              hands with a few typed properties.
+            </SectionDescription>
           </div>
-          <div className="w-full overflow-hidden rounded-lg bg-zinc-900 p-6 lg:p-8">
-            <pre className="overflow-x-auto font-mono text-sm leading-relaxed text-zinc-50">
-              <CodeBlock
-                code={`{notcms}    '@notcms/database/'
+          <div className="flex flex-wrap gap-4">
+            <Button variant="silver">
+              <svg
+                style={{ width: 20, height: 20, marginLeft: -8 }}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d={siGithub.path}
+                  fillRule="evenodd"
+                />
+              </svg>
+              View repository
+            </Button>
+            <Button variant="silver" className="inline-flex items-center gap-2">
+              View docs
+              <ArrowRightIcon
+                style={{ width: 20, height: 20, marginRight: -4 }}
+              />
+            </Button>
+          </div>
+        </div>
+        <div className="w-full overflow-hidden rounded-[20px] bg-zinc-900 p-6 lg:p-8">
+          <pre className="overflow-x-auto font-mono text-sm leading-relaxed text-zinc-50">
+            <CodeBlock
+              code={`{notcms}    '@notcms/database/'
 
+GET
+
+sql    neon process.env.DATABASE_URL
+
+rows           process.env.DATABASE_URL
 GET
 
 sql    neon process.env.DATABASE_URL
@@ -124,11 +126,11 @@ sql    neon process.env.DATABASE_URL
 rows           process.env.DATABASE_URL
 
 Response.json`}
-              />
-            </pre>
-          </div>
+            />
+          </pre>
         </div>
       </div>
+      {/* </div> */}
     </Section>
   );
 }

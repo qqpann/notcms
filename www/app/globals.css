@@ -96,3 +96,26 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Shiki */
+.shiki,
+.shiki pre,
+.shiki code {
+  background-color: transparent !important;
+}
+
+/* line numbers */
+/* thanks: https://github.com/shikijs/shiki/issues/3#issuecomment-830564854 */
+.shiki code {
+  counter-reset: step;
+  counter-increment: step 0;
+}
+.shiki code .line::before {
+  content: counter(step);
+  counter-increment: step;
+  width: 1rem;
+  margin-right: 1.5rem;
+  display: inline-block;
+  text-align: right;
+  color: rgba(115, 138, 148, 0.4);
+}
