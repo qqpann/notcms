@@ -165,7 +165,7 @@ const LayerTitle = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <h3
+  <span
     ref={ref}
     className={cn("text-xl font-semibold w-64", className)}
     {...props}
