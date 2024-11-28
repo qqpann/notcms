@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="720" fill="none" viewBox="0 0 1440 720">
+  <mask id="b" width="1440" height="1441" x="0" y="-721" maskUnits="userSpaceOnUse" style="mask-type:alpha">
+    <ellipse cx="720" cy="-.5" fill="url(#a)" rx="720" ry="720.5" />
+  </mask>
+  <g mask="url(#b)">
+    <path fill="url(#c)" d="M0 0h1439v1585H0z" transform="translate(1 -446)" />
+    <rect width="381.333" height="381.333" x="-272.001" y="-197" fill="url(#d)" rx="20" />
+    <rect width="381.333" height="381.333" x="-272.001" y="-197" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="-271.751" y="-196.75" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="-272.001" y="204.333" fill="url(#e)" rx="20" />
+    <rect width="381.333" height="381.333" x="-272.001" y="204.333" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="-271.751" y="204.583" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="128.999" y="-21" fill="url(#f)" rx="20" />
+    <rect width="381.333" height="381.333" x="128.999" y="-21" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="129.249" y="-20.75" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="128.999" y="380.333" fill="url(#g)" rx="20" />
+    <rect width="381.333" height="381.333" x="128.999" y="380.333" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="129.249" y="380.583" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="530.333" y="-245.333" fill="url(#h)" rx="20" />
+    <rect width="381.333" height="381.333" x="530.333" y="-245.333" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="530.583" y="-245.083" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="530.333" y="156" fill="url(#i)" rx="20" />
+    <rect width="381.333" height="381.333" x="530.333" y="156" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="530.583" y="156.25" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="931.666" y="-126.333" fill="url(#j)" rx="20" />
+    <rect width="381.333" height="381.333" x="931.666" y="-126.333" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="931.916" y="-126.083" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="931.666" y="275" fill="url(#k)" rx="20" />
+    <rect width="381.333" height="381.333" x="931.666" y="275" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="931.916" y="275.25" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="1333" y="-294.333" fill="url(#l)" rx="20" />
+    <rect width="381.333" height="381.333" x="1333" y="-294.333" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="1333.25" y="-294.083" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+    <rect width="381.333" height="381.333" x="1333" y="107" fill="url(#m)" rx="20" />
+    <rect width="381.333" height="381.333" x="1333" y="107" fill="#fff" fill-opacity=".12" rx="20" />
+    <rect width="380.833" height="380.833" x="1333.25" y="107.25" stroke="#fff" stroke-opacity=".12" stroke-width=".5"
+      rx="19.75" />
+  </g>
+  <defs>
+    <linearGradient id="d" x1="-81.334" x2="-81.334" y1="-197" y2="184.333" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="e" x1="-81.334" x2="-81.334" y1="204.333" y2="585.667" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="f" x1="319.666" x2="319.666" y1="-21" y2="360.333" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="g" x1="319.666" x2="319.666" y1="380.333" y2="761.667" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="h" x1="720.999" x2="720.999" y1="-245.333" y2="136" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="i" x1="720.999" x2="720.999" y1="156" y2="537.333" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="j" x1="1122.33" x2="1122.33" y1="-126.333" y2="255" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="k" x1="1122.33" x2="1122.33" y1="275" y2="656.333" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="l" x1="1523.67" x2="1523.67" y1="-294.333" y2="87" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <linearGradient id="m" x1="1523.67" x2="1523.67" y1="107" y2="488.333" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".12" />
+    </linearGradient>
+    <radialGradient id="a" cx="0" cy="0" r="1" gradientTransform="matrix(0 731.396 -953.067 0 720 -11.396)"
+      gradientUnits="userSpaceOnUse">
+      <stop stop-opacity=".80" />
+      <stop offset=".756" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="c" cx="0" cy="0" r="1" gradientTransform="matrix(0 804.485 -952.406 0 719.5 780.515)"
+      gradientUnits="userSpaceOnUse">
+      <stop stop-opacity=".56" />
+      <stop offset=".756" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+</svg>

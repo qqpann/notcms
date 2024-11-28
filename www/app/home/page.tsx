@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Hero } from "./_components/1_hero";
 import { WhyBetter } from "./_components/2_why-better";
 import { HowWorks } from "./_components/3_how-works";
@@ -34,6 +35,14 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
+      <Image
+        src="/img/home/hero-bg-tiles.svg"
+        width={1440}
+        height={720}
+        alt=""
+        // center
+        className="absolute top-0 left-[50%] transform -translate-x-1/2 -z-10"
+      />
       <Hero />
       <WhyBetter />
       <HowWorks />
