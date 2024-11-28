@@ -13,7 +13,7 @@ export function HowWorks() {
   return (
     <Section>
       <SectionHeader>
-        <SectionPreTitle>Composable content architecture</SectionPreTitle>
+        <SectionPreTitle>Architecture</SectionPreTitle>
         <SectionTitle>How NotCMS works</SectionTitle>
       </SectionHeader>
       <div className="flex flex-col items-center w-full">
