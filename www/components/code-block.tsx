@@ -14,7 +14,7 @@ import type { Nodes } from "hast";
 
 export async function highlight(code: string) {
   const out = await codeToHast(code, {
-    lang: "ts",
+    lang: "tsx",
     theme: "github-dark",
     transformers: [],
   });

@@ -32,12 +32,64 @@ const codeExamples: {
   {
     id: "nextjs",
     language: "Next.js",
-    code: CODE,
+    code: `// app/blog/page.tsx
+import { Client } from 'notcms';
+import { schema } from '../../notcms/schema';
+
+export default async function Blog() {
+  const nc = new Client({ schema });
+
+  const [pages]: [Page[]] = await nc.query.blog.listPages();
+  const [recentPage]: [Page] = await nc.query.blog.getPage('<page_id>');
+
+  return (
+    <div>
+      <h1>Blog</h1>
+      <h2>{recentPage.title}</h2>
+      <p>{recentPage.content}</p>
+      <ul>
+        {pages.map((p) => (
+          <li key={p.id}>{p.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}`,
   },
   {
     id: "remix",
     language: "Remix",
-    code: CODE,
+    code: `// routes/blog.jsx
+import { json } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+import { Client } from 'notcms';
+import { schema } from '../notcms/schema';
+
+export const loader = async () => {
+  const nc = new Client({ schema });
+
+  const [pages] = await nc.query.blog.listPages();
+  const [page] = await nc.query.blog.getPage('<page_id>');
+
+  return json({ pages, page });
+};
+
+export default function Blog() {
+  const { pages, page } = useLoaderData();
+
+  return (
+    <div>
+      <h1>Blog</h1>
+      <h2>{recentPage.title}</h2>
+      <p>{recentPage.content}</p>
+      <ul>
+        {pages.map((p) => (
+          <li key={p.id}>{p.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}`,
   },
 ];
 
@@ -204,7 +256,7 @@ export function MakeWith() {
               <TabsContent
                 key={example.id}
                 value={example.id}
-                className="px-5 overflow-auto"
+                className="px-5 overflow-auto max-h-[300px]"
               >
                 <CodeBlock code={example.code} />
               </TabsContent>
