@@ -1,6 +1,7 @@
 import Image from "next/image";
 import * as React from "react";
 
+import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
 import {
   Section,
@@ -29,6 +30,7 @@ export function HowWorks() {
           </LayerImage>
           <LayerHeader direction="right">
             <LayerTitle>Your website</LayerTitle>
+            <Separator className="bg-white opacity-[0.12] my-3" />
             <LayerDescription>
               Deploy your website to the edge with Vercel, Netlify, or any other
               static site host.
@@ -47,6 +49,7 @@ export function HowWorks() {
           </LayerImage>
           <LayerHeader direction="left">
             <LayerTitle>Website codebase</LayerTitle>
+            <Separator className="bg-white opacity-[0.12] my-3" />
             <LayerDescription>
               Build your website with your design and your favorite frontend
               framework, like Next.js or Vue.
@@ -65,6 +68,7 @@ export function HowWorks() {
           </LayerImage>
           <LayerHeader direction="right">
             <LayerTitle>NotCMS API</LayerTitle>
+            <Separator className="bg-white opacity-[0.12] my-3" />
             <LayerDescription>
               Leverage the power of NotCMS's fast API. Retrieve your content
               with typed queries.
@@ -83,6 +87,7 @@ export function HowWorks() {
           </LayerImage>
           <LayerHeader direction="left">
             <LayerTitle>NotCMS Dashboard</LayerTitle>
+            <Separator className="bg-white opacity-[0.12] my-3" />
             <LayerDescription>
               Manage your databases with a powerful and intuitive dashboard,
               with features like version history.
@@ -101,6 +106,7 @@ export function HowWorks() {
           </LayerImage>
           <LayerHeader direction="right">
             <LayerTitle>Notion editor/database</LayerTitle>
+            <Separator className="bg-white opacity-[0.12] my-3" />
             <LayerDescription>
               Edit your content in Notion, and sync it to your website with a
               few click.
@@ -143,7 +149,7 @@ const LayerHeader = React.forwardRef<HTMLDivElement, LayerHeaderProps>(
     <div
       ref={ref}
       className={cn(
-        "absolute top-[calc(50%-28px)] w-64",
+        "absolute top-[calc(50%-38px)]",
         direction === "right" ? "pr-8 right-0 text-right" : "pl-8 left-0",
         className
       )}
@@ -159,7 +165,7 @@ const LayerTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-xl font-semibold mb-2", className)}
+    className={cn("text-xl font-semibold w-64", className)}
     {...props}
   />
 ));
@@ -169,6 +175,10 @@ const LayerDescription = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn("text-sm text-gray-400", className)} {...props} />
+  <p
+    ref={ref}
+    className={cn("text-sm text-white text-opacity-70 w-64", className)}
+    {...props}
+  />
 ));
 LayerDescription.displayName = "LayerDescription";
