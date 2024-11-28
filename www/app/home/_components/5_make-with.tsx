@@ -1,3 +1,4 @@
+import { ArrowRightIcon } from "lucide-react";
 import { siGithub } from "simple-icons";
 import { CodeBlock } from "~/components/code-block";
 import {
@@ -28,12 +29,14 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        github: `
-        rounded-full
-        shadow-[0_0_16px_rgba(255,255,255,0.1),0px_-80px_96px_#FFFFFF14_inset,0px_3px_6px_#00000033]
-        text-white
-        hover:bg-white/[0.05]
-      `,
+        silver: `
+          relative 
+          bg-silver border-silver
+          rounded-full
+          text-base leading-4 py-1 pl-2 gap-3
+          shadow-[0_0_16px_rgba(255,255,255,0.1),0px_-80px_96px_#FFFFFF14_inset,0px_3px_6px_#00000033]
+          text-white
+          hover:bg-white/[0.05]`,
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -86,11 +89,11 @@ export function MakeWith() {
               </SectionDescription>
             </div>
             <div className="flex flex-wrap gap-4">
-              <Button
-                variant="github"
-                className="relative bg-silver border-silver text-base leading-4 py-1 pl-2 gap-3"
-              >
-                <svg style={{ width: 20, height: 20 }} viewBox="0 0 24 24">
+              <Button variant="silver">
+                <svg
+                  style={{ width: 20, height: 20, marginLeft: -8 }}
+                  viewBox="0 0 24 24"
+                >
                   <path
                     fill="currentColor"
                     d={siGithub.path}
@@ -100,11 +103,13 @@ export function MakeWith() {
                 View repository
               </Button>
               <Button
-                variant="secondary"
+                variant="silver"
                 className="inline-flex items-center gap-2"
               >
                 View docs
-                <span className="ml-1">→</span>
+                <ArrowRightIcon
+                  style={{ width: 20, height: 20, marginRight: -4 }}
+                />
               </Button>
             </div>
           </div>
