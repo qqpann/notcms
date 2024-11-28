@@ -88,41 +88,8 @@ export function MakeWith() {
             <div className="flex flex-wrap gap-4">
               <Button
                 variant="github"
-                // variant="secondary"
-                // className="inline-flex items-center gap-2"
-                className="relative text-base leading-4 py-1 pl-2 gap-3"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 72%, rgba(255, 255, 255, 0) 100%)",
-                  // border: "1px solid rgba(255, 255, 255, 0.12)",
-                  // border: "1px solid transparent",
-                  // boxShadow: "0 0 0 1px rgba(255, 255, 255, 0.12) inset",
-                  // border: "none",
-                  // boxShadow:
-                  //   "0 0 16px rgba(255, 255, 255, 0.1), 0px -80px 96px #FFFFFF14 inset, 0px 3px 6px #00000033",
-                  // // border image
-                  // borderWidth: "1px",
-                  // borderStyle: "solid",
-                  // borderImage:
-                  //   "linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)) 1",
-                }}
+                className="relative bg-silver border-silver text-base leading-4 py-1 pl-2 gap-3"
               >
-                <span
-                  style={{
-                    content: '""',
-                    position: "absolute",
-                    inset: 0, // 全体をカバー
-                    borderRadius: "inherit", // ボタンの形状に合わせる
-                    padding: "0.5px", // ボーダーの幅
-                    background:
-                      "linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0))", // グラデーション
-                    WebkitMask:
-                      "linear-gradient(white 0 0) content-box, linear-gradient(white 0 0)", // ボーダーの中身を切り抜く
-                    WebkitMaskComposite: "xor",
-                    maskComposite: "exclude",
-                    zIndex: 0, // 背景より下
-                  }}
-                />
                 <svg style={{ width: 20, height: 20 }} viewBox="0 0 24 24">
                   <path
                     fill="currentColor"

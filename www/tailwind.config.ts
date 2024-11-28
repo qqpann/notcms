@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 const config: Config = {
   darkMode: ["class"],
@@ -16,6 +17,8 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        silver:
+          "radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 72%, rgba(255, 255, 255, 0) 100%)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,6 +77,31 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("tailwindcss-animate"),
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        ".border-silver": {
+          position: "relative",
+          zIndex: "0",
+        },
+        ".border-silver::before": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          borderRadius: "inherit",
+          padding: "0.5px", // ボーダーの幅
+          background:
+            "linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0))",
+          WebkitMask:
+            "linear-gradient(white 0 0) content-box, linear-gradient(white 0 0)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+          zIndex: "-1",
+        },
+      });
+    }),
+  ],
 };
 export default config;
