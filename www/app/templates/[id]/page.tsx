@@ -1,41 +1,65 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
+import { nc } from "~/src/notcms/schema";
 import { MainContent } from "../_components/main-content";
 import { TemplateCard } from "../_components/template-card";
 
-export default function Page() {
+// export const maxDuration = 30;
+export const dynamic = "auto";
+export const revalidate = 10;
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const [template, error] = await nc.query.templates.getPage(id);
+  if (error) return <div>{error.toString()}</div>;
+  if (!template) return notFound();
+
+  const _propertyTable: { label: string; value?: string }[] = [
+    { label: "Framework", value: template.properties.framework },
+    { label: "Use case", value: template.properties.use_case },
+    { label: "CSS", value: template.properties.css },
+  ];
+  const propertyTable = _propertyTable.filter((x) => x.value!!);
+
   return (
     <div className="container max-w-[1440px] mx-auto px-32 py-16 space-y-24">
       <div className="self-stretch flex-col justify-start items-start gap-8 flex">
         <div className="self-stretch justify-start items-start gap-8 inline-flex">
           <div className="grow shrink basis-0 flex-col justify-start items-start gap-6 inline-flex">
             <h1 className="text-white text-[32px] font-['Roobert TRIAL'] leading-none">
-              Blog (Light mode)
+              {template.title}
             </h1>
             <p className="self-stretch text-white/70 text-sm font-normal font-['Inter'] tracking-tight">
-              Perfect starter template for you to manage your website’s blog
-              using NotCMS!
+              {template.properties.description}
             </p>
           </div>
-          <Button>Preview</Button>
+          <Button>See preview</Button>
         </div>
 
         <div className="flex flex-row gap-8 w-full">
-          {/* <div className="grow">
-          </div> */}
           <MainContent
             className="grow w-full max-w-full"
-            content={LOREM_IPSUM}
+            content={template.content}
           />
 
           <div className="w-[470px] min-w-[470px] flex-col justify-start items-start gap-8 inline-flex">
             <div className="w-full flex-col justify-start items-start flex gap-3">
-              <Button className="w-full justify-start" size="lg">
-                Deploy with Vercel
+              <Button className="w-full justify-start" size="lg" asChild>
+                <Link href={template.properties.deploy_with_vercel!}>
+                  Deploy with Vercel
+                </Link>
               </Button>
-              <Button className="w-full justify-start" size="lg">
-                Get Notion Template
+              <Button className="w-full justify-start" size="lg" asChild>
+                <Link href={template.properties.notion_template!}>
+                  Get Notion Template
+                </Link>
               </Button>
             </div>
             <Card
@@ -46,38 +70,19 @@ export default function Page() {
             >
               <Table>
                 <TableBody>
-                  <TableRow className="border-b-[0.5px] border-white border-opacity-[0.12] last:border-none hover:bg-inherit">
-                    <TableCell className="text-base text-white/70 font-normal h-[52px] p-0">
-                      Framework
-                    </TableCell>
-                    <TableCell className="text-right text-base text-white font-normal h-[52px] p-0">
-                      Next.js
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-b-[0.5px] border-white border-opacity-[0.12] last:border-none hover:bg-inherit">
-                    <TableCell className="text-base text-white/70 font-normal h-[52px] p-0">
-                      Use case
-                    </TableCell>
-                    <TableCell className="text-right text-base text-white font-normal h-[52px] p-0">
-                      Blog
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-b-[0.5px] border-white border-opacity-[0.12] last:border-none hover:bg-inherit">
-                    <TableCell className="text-base text-white/70 font-normal h-[52px] p-0">
-                      CSS
-                    </TableCell>
-                    <TableCell className="text-right text-base text-white font-normal h-[52px] p-0">
-                      Tailwind
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="border-b-[0.5px] border-white border-opacity-[0.12] last:border-none hover:bg-inherit">
-                    <TableCell className="text-base text-white/70 font-normal h-[52px] p-0">
-                      Creator
-                    </TableCell>
-                    <TableCell className="text-right text-base text-white font-normal h-[52px] p-0">
-                      Tailwind
-                    </TableCell>
-                  </TableRow>
+                  {propertyTable.map((property) => (
+                    <TableRow
+                      key={property.label}
+                      className="border-b-[0.5px] border-white border-opacity-[0.12] last:border-none hover:bg-inherit"
+                    >
+                      <TableCell className="text-base text-white/70 font-normal h-[52px] p-0">
+                        {property.label}
+                      </TableCell>
+                      <TableCell className="text-right text-base text-white font-normal h-[52px] p-0">
+                        {property.value}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Card>
@@ -89,8 +94,8 @@ export default function Page() {
           More templates
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <TemplateCard />
-          <TemplateCard />
+          {/* <TemplateCard /> */}
+          {/* <TemplateCard /> */}
         </div>
       </div>
     </div>
