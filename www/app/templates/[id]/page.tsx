@@ -40,7 +40,15 @@ export default async function Page({
               {template.properties.description}
             </p>
           </div>
-          <Button>See preview</Button>
+          <Button asChild>
+            <Link
+              href={template.properties.preview!}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              See preview
+            </Link>
+          </Button>
         </div>
 
         <div className="flex flex-row gap-8 w-full">
@@ -51,16 +59,28 @@ export default async function Page({
 
           <div className="w-[470px] min-w-[470px] flex-col justify-start items-start gap-8 inline-flex">
             <div className="w-full flex-col justify-start items-start flex gap-3">
-              <Button className="w-full justify-start" size="lg" asChild>
-                <Link href={template.properties.deploy_with_vercel!}>
-                  Deploy with Vercel
-                </Link>
-              </Button>
-              <Button className="w-full justify-start" size="lg" asChild>
-                <Link href={template.properties.notion_template!}>
-                  Get Notion Template
-                </Link>
-              </Button>
+              {template.properties.deploy_with_vercel && (
+                <Button className="w-full justify-start" size="lg" asChild>
+                  <Link
+                    href={template.properties.deploy_with_vercel!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Deploy with Vercel
+                  </Link>
+                </Button>
+              )}
+              {template.properties.notion_template && (
+                <Button className="w-full justify-start" size="lg" asChild>
+                  <Link
+                    href={template.properties.notion_template!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Get Notion Template
+                  </Link>
+                </Button>
+              )}
             </div>
             <Card
               className="bg-silver self-stretch px-6 py-1 flex-col justify-center items-center gap-4 flex"

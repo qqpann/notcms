@@ -33,7 +33,13 @@ export function TemplateCard({ template }: TemplateCardProps) {
           <Link href={`/templates/${template.id}`}>Get started</Link>
         </Button>
         <Button asChild>
-          <Link href={template.properties.preview!}>Preview</Link>
+          <Link
+            href={template.properties.preview!}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Preview
+          </Link>
         </Button>
       </div>
     </Card>
