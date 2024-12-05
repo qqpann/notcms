@@ -15,7 +15,11 @@ export function TemplateCard({ template }: TemplateCardProps) {
     <Card className="p-4 pb-5">
       <Image
         className="h-[400px] object-cover rounded-xl border border-black/10 mb-5"
-        src={template.properties.images?.[0] ?? "/img/404.png"}
+        src={
+          template.properties.thumbnails?.[0] ??
+          template.properties.images?.[0] ??
+          "/img/404.png"
+        }
         alt={`Preview of ${template.title}`}
         width={350}
         height={400}
