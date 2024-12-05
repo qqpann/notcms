@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
 import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
 import { nc } from "~/src/notcms/schema";
 import { MainContent } from "../_components/main-content";
@@ -52,10 +53,29 @@ export default async function Page({
         </div>
 
         <div className="flex flex-row gap-8 w-full">
-          <MainContent
-            className="grow w-full max-w-[calc(1184px-470px-32px)]"
-            content={template.content}
-          />
+          <div className="grow w-full max-w-[calc(1184px-470px-32px)]">
+            {template.properties.images && (
+              <>
+                <div className="flex flex-col gap-5">
+                  {template.properties.images.map((image) => (
+                    <img
+                      key={image}
+                      src={image}
+                      alt={template.title}
+                      className="w-full rounded-[16px]"
+                    />
+                  ))}
+                </div>
+
+                <Separator className="my-8 bg-white/20" />
+              </>
+            )}
+
+            <MainContent
+              className="grow w-full max-w-full"
+              content={template.content}
+            />
+          </div>
 
           <div className="w-[470px] min-w-[470px] flex-col justify-start items-start gap-8 inline-flex">
             <div className="w-full flex-col justify-start items-start flex gap-3">
