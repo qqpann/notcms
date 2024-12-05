@@ -89,15 +89,15 @@ export default async function Page({
           </div>
         </div>
       </div>
-      <div className="flex-col justify-start items-start gap-12 flex">
+      {/* <div className="flex-col justify-start items-start gap-12 flex">
         <div className="text-white text-5xl font-['Roobert TRIAL'] tracking-wide">
           More templates
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* <TemplateCard /> */}
-          {/* <TemplateCard /> */}
+          <TemplateCard />
+          <TemplateCard />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
