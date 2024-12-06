@@ -34,7 +34,7 @@ function WritingCard() {
   return (
     <Card className="col-span-1 md:col-span-23">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Writing is effortless.</span> With
           Notion's user-friendly editor.
         </CardTitle>
@@ -57,7 +57,7 @@ function DevelopmentCard() {
   return (
     <Card className="col-span-1 md:col-span-23">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Faster development.</span> Deploy
           within minutes.
         </CardTitle>
@@ -80,7 +80,7 @@ function ScaleCard() {
   return (
     <Card className="col-span-1 md:col-span-18">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Built for scale.</span> Accelerate
           your audience growth today.
         </CardTitle>
@@ -103,7 +103,7 @@ function CollaborationCard() {
   return (
     <Card className="col-span-1 md:col-span-28 flex flex-col justify-between">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Seamless collaboration.</span> From
           ideation to published in one place.
         </CardTitle>

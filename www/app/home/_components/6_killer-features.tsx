@@ -35,7 +35,7 @@ function ArticleSnapshots() {
   return (
     <Card className="col-span-1 md:col-span-3">
       <CardHeader>
-        <CardTitle>Article snapshots</CardTitle>
+        <CardTitle className="text-xl font-medium">Article snapshots</CardTitle>
         <CardDescription>
           Capture a moment while Notion continues to be edited. While you keep
           writing freely, keep your production not messed up
@@ -55,7 +55,9 @@ function ViaCDN() {
   return (
     <Card className="col-span-1 md:col-span-3 flex flex-col justify-between">
       <CardHeader>
-        <CardTitle>Faster load times via CDN</CardTitle>
+        <CardTitle className="text-xl font-medium">
+          Faster load times via CDN
+        </CardTitle>
         <CardDescription>
           Get the best performance by serving your images via CDN.
           {/* We support all the popular image formats and sizes */}
@@ -75,7 +77,9 @@ function DiffView() {
   return (
     <Card className="col-span-1 md:col-span-3 md:col-start-2">
       <CardHeader>
-        <CardTitle>A Diff View to see your changes</CardTitle>
+        <CardTitle className="text-xl font-medium">
+          A Diff View to see your changes
+        </CardTitle>
         <CardDescription>
           Compare two versions of your content side-by-side. Easily spot the
           differences and make the right decision.
@@ -95,7 +99,9 @@ function SafelyTyped() {
   return (
     <Card className="col-span-1 md:col-span-3">
       <CardHeader>
-        <CardTitle>Data is safely Typed</CardTitle>
+        <CardTitle className="text-xl font-medium">
+          Data is safely Typed
+        </CardTitle>
         <CardDescription>
           We use TypeScript to ensure the best developer experience and
           performance. No more runtime errors.

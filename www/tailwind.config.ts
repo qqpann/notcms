@@ -81,6 +81,9 @@ const config: Config = {
       fontFamily: {
         Roobert: ["var(--font-Roobert)", "Roobert", "sans-serif"],
       },
+      fontWeight: {
+        550: "550",
+      },
     },
   },
   plugins: [
