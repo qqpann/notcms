@@ -43,7 +43,9 @@ export function Footer() {
                 height={64}
                 className="mb-6"
               />
-              <span className="text-2xl tracking-tight mb-3">NotCMS</span>
+              <span className="text-2xl font-semibold font-Roobert mb-3">
+                NotCMS
+              </span>
               <p className="text-sm text-white text-opacity-70">
                 Instantly publish your website content from Notion.
               </p>

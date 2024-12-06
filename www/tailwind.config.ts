@@ -78,6 +78,9 @@ const config: Config = {
         "span-18": "span 18 / span 18",
         "span-28": "span 28 / span 28",
       },
+      fontFamily: {
+        Roobert: ["var(--font-Roobert)", "Roobert", "sans-serif"],
+      },
     },
   },
   plugins: [

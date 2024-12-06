@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { Footer } from "~/components/footer";
 import { Header } from "~/components/header";
 import { cn } from "~/lib/utils";
+import { roobert } from "~/src/fonts/Roobert";
 import { siteConfig } from "~/src/site-config";
 
 import "./globals.css";
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={cn(
           inter.className,
+          roobert.variable,
           "min-h-screen bg-black text-white font-['Inter']"
         )}
       >
