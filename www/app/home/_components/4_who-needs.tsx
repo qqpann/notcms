@@ -103,7 +103,7 @@ export function WhoNeeds() {
 
         <GradientSeparator />
 
-        <div className="gap-3 flex items-start relative self-stretch w-full flex-[0_0_auto]">
+        <div className="flex relative self-stretch w-full flex-[0_0_auto]">
           <UserGroup
             icon={
               <Image
