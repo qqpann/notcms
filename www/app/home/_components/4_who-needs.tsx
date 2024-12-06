@@ -53,7 +53,6 @@ export function WhoNeeds() {
   return (
     <Section>
       <SectionHeader>
-        <SectionPreTitle>Applications</SectionPreTitle>
         <SectionTitle>Who Needs NotCMS</SectionTitle>
       </SectionHeader>
       <div className="flex flex-col w-[984px] relative">
