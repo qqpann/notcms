@@ -27,17 +27,17 @@ const codeExamples: {
 import { Client } from 'notcms';
 import { schema } from '../../notcms/schema';
 
-export default async function Blog() {
-  const nc = new Client({ schema });
+const nc = new Client({ schema });
 
-  const [pages]: [Page[]] = await nc.query.blog.listPages();
-  const [recentPage]: [Page] = await nc.query.blog.getPage('<page_id>');
+export default async function Blog() {
+  const [pages] = await nc.query.blog.listPages();
+  const [page] = await nc.query.blog.getPage('<page_id>');
 
   return (
     <div>
       <h1>Blog</h1>
-      <h2>{recentPage.title}</h2>
-      <p>{recentPage.content}</p>
+      <h2>{page.title}</h2>
+      <p>{page.content}</p>
       <ul>
         {pages.map((p) => (
           <li key={p.id}>{p.title}</li>
@@ -71,8 +71,8 @@ export default function Blog() {
   return (
     <div>
       <h1>Blog</h1>
-      <h2>{recentPage.title}</h2>
-      <p>{recentPage.content}</p>
+      <h2>{page.title}</h2>
+      <p>{page.content}</p>
       <ul>
         {pages.map((p) => (
           <li key={p.id}>{p.title}</li>
