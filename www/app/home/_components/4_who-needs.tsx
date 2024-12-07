@@ -55,8 +55,8 @@ export function WhoNeeds() {
       <SectionHeader>
         <SectionTitle>Who Needs NotCMS</SectionTitle>
       </SectionHeader>
-      <div className="flex flex-col w-[984px] relative">
-        <div className="flex relative self-stretch w-full flex-[0_0_auto]">
+      <div className="flex flex-col max-w-[984px] relative">
+        <div className="flex flex-col md:flex-row relative self-stretch w-full flex-[0_0_auto]">
           <UserGroup
             icon={
               <Image
@@ -71,6 +71,7 @@ export function WhoNeeds() {
           />
 
           <GradientSeparator orientation="vertical" className="mx-3" />
+          <GradientSeparator className="md:hidden" />
 
           <UserGroup
             icon={
@@ -86,6 +87,7 @@ export function WhoNeeds() {
           />
 
           <GradientSeparator orientation="vertical" className="mx-3" />
+          <GradientSeparator className="md:hidden" />
 
           <UserGroup
             icon={
@@ -103,7 +105,7 @@ export function WhoNeeds() {
 
         <GradientSeparator />
 
-        <div className="flex relative self-stretch w-full flex-[0_0_auto]">
+        <div className="flex flex-col md:flex-row relative self-stretch w-full flex-[0_0_auto]">
           <UserGroup
             icon={
               <Image
@@ -118,6 +120,7 @@ export function WhoNeeds() {
           />
 
           <GradientSeparator orientation="vertical" className="mx-3" />
+          <GradientSeparator className="md:hidden" />
 
           <UserGroup
             icon={

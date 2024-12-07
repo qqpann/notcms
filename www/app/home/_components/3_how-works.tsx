@@ -101,11 +101,11 @@ export function HowWorks() {
               src="/img/home/lp-3-how-works-5-editor.png"
               width={256}
               height={148}
-              alt="Notion editor/database"
+              alt="Notion editor / database"
             />
           </LayerImage>
           <LayerHeader direction="right">
-            <LayerTitle>Notion editor/database</LayerTitle>
+            <LayerTitle>Notion editor / database</LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
             <LayerDescription>
               Edit your content in Notion, and sync it to your website with a
@@ -167,7 +167,7 @@ const LayerTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <span
     ref={ref}
-    className={cn("text-xl font-semibold w-64", className)}
+    className={cn("text-xl font-semibold md:w-64", className)}
     {...props}
   />
 ));
@@ -179,7 +179,7 @@ const LayerDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-white text-opacity-70 w-64", className)}
+    className={cn("text-sm text-white text-opacity-70 md:w-64", className)}
     {...props}
   />
 ));

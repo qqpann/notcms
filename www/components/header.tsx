@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
 ];
 export function Header() {
   return (
-    <div className="container max-w-[1440px] px-32 py-0 h-16 mx-auto flex items-center">
+    <div className="container max-w-[1440px] px-10 md:px-32 py-0 h-16 mx-auto flex items-center">
       <Link href={routes.top} className="flex items-center gap-1.5 flex-1 grow">
         <Image
           width={17}
@@ -32,7 +32,7 @@ export function Header() {
         </div>
       </Link>
 
-      <nav className="flex gap-x-10">
+      <nav className="gap-x-10 hidden md:flex">
         {navItems.map((item) => (
           <NavItem key={item.title} title={item.title} href={item.href} />
         ))}

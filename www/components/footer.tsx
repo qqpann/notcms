@@ -32,7 +32,7 @@ export function Footer() {
           "linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0))",
       }}
     >
-      <div className="container max-w-[1440px] mx-auto px-32 pt-16 pb-8">
+      <div className="container max-w-[1440px] mx-auto px-10 pt-16 md:px-32 md:pt-16 pb-8">
         <div className="grid grid-cols-6">
           <div className="col-span-3 flex-col justify-start items-start gap-6 inline-flex">
             <div className="flex flex-col">
