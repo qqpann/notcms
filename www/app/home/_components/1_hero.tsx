@@ -43,7 +43,9 @@ export function Hero() {
           </span>
         </p>
 
-        <CandyButton className="w-[191px]">Get started</CandyButton>
+        <Link href={routes.dashboard}>
+          <CandyButton className="w-[191px]">Get started</CandyButton>
+        </Link>
       </div>
 
       <img
