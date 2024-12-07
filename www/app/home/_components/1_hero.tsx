@@ -42,58 +42,70 @@ export function Hero() {
           </span>
         </p>
 
-        <div className="relative w-48 h-9">
-          <div className="relative w-[386px] h-[289px] top-[-136px] -left-24">
-            <div className="relative h-[289px]">
-              <div className="absolute w-48 h-9 top-[136px] left-24 bg-[#d9d9d9] rounded-[48px] shadow-[0px_0.39px_4.91px_#00000003,0px_0.56px_8.42px_#00000008,0px_0.48px_11.9px_#00000011,0px_0.13px_16.81px_#00000020,0px_-0.51px_24.84px_#00000038,0px_-1.38px_38.29px_#0000005f,0px_-1.71px_60.75px_#0000009c,0px_18px_99px_#000000] mix-blend-soft-light" />
-
-              {/* <div className="absolute w-[200px] h-11 top-[132px] left-[92px]">
-                <div className="relative h-11 rounded-full">
-                  <div className="absolute w-48 h-9 top-1 left-1 rounded-full border-2 border-solid border-transparent blur-[7px] [border-image:linear-gradient(to_bottom,rgba(255,88,183,0)_6.11%,rgba(255,88,183,0.2)_53.57%,rgb(254,2,145)_93.6%)_1]" />
-
-                  <div className="w-48 h-9 top-1 left-1 border-2 border-solid border-transparent blur-[2px] [border-image:linear-gradient(to_bottom,rgba(255,88,183,0)_38.1%,rgba(255,88,183,0.2)_82.47%,rgb(254,2,145)_93.3%)_1] absolute rounded-full" />
-
-                  <div className="w-[200px] h-11 top-0 left-0 blur-[15px] [background:linear-gradient(180deg,rgba(255,88.13,182.82,0)_0%,rgba(255,88.13,182.82,0.2)_18.59%,rgb(209.19,0,118.71)_98.59%)] absolute rounded-full" />
-
-                  <div className="w-48 h-9 top-1 left-1 border-2 border-solid border-transparent blur-[7px] [border-image:linear-gradient(to_bottom,rgba(255,88,183,0)_6.11%,rgba(255,88,183,0.2)_53.57%,rgb(254,2,145)_93.6%)_1] [background:linear-gradient(180deg,rgba(255,255,255,0)_6.11%,rgba(255,255,255,0)_53.57%,rgba(255,255,255,0.01)_93.6%)] absolute rounded-full" />
-                </div>
-              </div> */}
-
-              {/* <div className="absolute w-[200px] h-11 top-[132px] left-[92px] rotate-180">
-                <div className="relative h-11 rounded-full">
-                  <div className="w-48 h-9 top-1 left-1 border-2 border-solid border-transparent blur-[7px] [border-image:linear-gradient(to_bottom,rgba(255,133,96,0)_6.11%,rgba(255,133,96,0.2)_53.57%,rgb(255,92,44)_93.6%)_1] absolute rounded-full" />
-
-                  <div className="w-48 h-9 top-1 left-1 border-2 border-solid border-transparent blur-[2px] [border-image:linear-gradient(to_bottom,rgba(255,133,96,0)_38.1%,rgba(255,133,96,0.2)_82.47%,rgb(255,92,44)_93.3%)_1] absolute rounded-full" />
-
-                  <div className="w-[200px] h-11 top-0 left-0 blur-[15px] [background:linear-gradient(180deg,rgba(255,132.53,96.46,0)_0%,rgba(255,132.53,96.46,0.2)_18.59%,rgb(209.67,47.7,0)_98.59%)] absolute rounded-full" />
-
-                  <div className="w-48 h-9 top-1 left-1 border-2 border-solid border-transparent blur-[7px] [border-image:linear-gradient(to_bottom,rgba(255,133,96,0)_6.11%,rgba(255,133,96,0.2)_53.57%,rgb(255,92,44)_93.6%)_1] [background:linear-gradient(180deg,rgba(255,255,255,0)_6.11%,rgba(255,255,255,0)_53.57%,rgba(255,255,255,0.01)_93.6%)] absolute rounded-full" />
-                </div>
-              </div> */}
-
-              {/* <div className="absolute w-48 h-9 top-[136px] left-24 bg-[#d9d9d903] rounded-[48px] shadow-[0px_0.39px_4.91px_#ffffff03,0px_0.56px_8.42px_#ffffff08,0px_0.48px_11.9px_#ffffff11,0px_0.13px_16.81px_#ffffff20,0px_-0.51px_24.84px_#ffffff38,0px_-1.38px_38.29px_#ffffff5f,0px_-1.71px_60.75px_#ffffff9c,0px_18px_99px_#ffffff] opacity-20" /> */}
-
-              {/* <div className="absolute w-48 h-9 top-[136px] left-24 bg-[#d9d9d9] rounded-[48px] shadow-[0px_0.39px_4.91px_#00000003,0px_0.56px_8.42px_#00000008,0px_0.48px_11.9px_#00000011,0px_0.13px_16.81px_#00000020,0px_-0.51px_24.84px_#00000038,0px_-1.38px_38.29px_#0000005f,0px_-1.71px_60.75px_#0000009c,0px_18px_99px_#000000] mix-blend-soft-light" /> */}
-
-              <Link
-                href={routes.dashboard}
-                className="absolute w-48 h-9 top-[136px] left-24 shadow-[0px_2px_4px_#00000052,0px_4px_12px_#00000052]"
-              >
-                <div className="h-9 rounded-[144px] overflow-hidden shadow-[0px_0px_0.17px_#0000003b,0px_0.17px_0.17px_#00000033,0px_0.5px_0.33px_#0000001f,0px_0.83px_0.33px_#0000000a,0px_1.17px_0.33px_transparent] [background:linear-gradient(180deg,rgb(255,135,99)_0%,rgb(254,2,144.8)_100%)] bg-[url(/mask-group-3.png)] bg-[100%_100%]">
-                  <div className="relative w-48 h-9 rounded-[46px] border-[0.75px] border-solid border-[#ffffff0a] shadow-[inset_0px_0.5px_0.5px_#fffffff5,inset_0px_1.5px_1.5px_#ffffffa3,inset_0px_3px_3px_#ffffff7a,inset_0px_6px_6px_#ffffff3d] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)]">
-                    <div className="absolute w-[185px] top-2.5 left-[3px] [text-shadow:0px_1px_1px_#00000029] [-webkit-text-stroke:0.25px_#0000003d] [font-family:'Inter-Medium',Helvetica] font-medium text-white text-base text-center tracking-[0.16px] leading-[19px]">
-                      Get started
-                    </div>
-                  </div>
-                </div>
-              </Link>
-
-              {/* <div className="absolute w-48 h-9 top-[136px] left-24 rounded-[46px] border-[0.75px] border-solid border-transparent blur-sm [border-image:radial-gradient(rgb(255,255,255),rgba(255,255,255,0))_1] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)]" /> */}
-
-              {/* <div className="absolute w-48 h-9 top-[136px] left-24 rounded-[46px] border-[0.75px] border-solid border-transparent blur-[2px] [border-image:radial-gradient(rgb(255,255,255),rgba(255,255,255,0))_1] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)]" /> */}
-            </div>
-          </div>
-        </div>
+        <button
+          className="h-9 text-base font-medium text-white inline-flex align-center justify-center gap-2 whitespace-nowrap rounded-full"
+          style={{
+            position: "relative",
+            width: "191px",
+            padding: "0.75rem 1.5rem",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: `0 4px 8px rgba(0,0,0,0.2)`,
+          }}
+        >
+          <span
+            className="absolute left-0 top-0 h-9 w-full rounded-full opacity-20 mix-blend-plus-lighter"
+            style={{
+              border: "0.75px solid rgba(255, 255, 255, 0.32)",
+              background:
+                "radial-gradient(115.6% 115.9% at -1.81% 0%, rgba(255, 183, 99, 0.01) 0%, rgba(255, 81, 196, 0.01) 100%)",
+              boxShadow: `
+                0px 0.5px 0.5px 0px rgba(255,255,255,0.96) inset,
+                0px 1.5px 1.5px 0px rgba(255,255,255,0.64) inset,
+                0px 3px 3px 0px rgba(255,255,255,0.48) inset,
+                0px 6px 6px 0px rgba(255,255,255,0.24) inset`,
+              zIndex: 10,
+            }}
+          />
+          <span
+            className="absolute inset-0 left-0 top-0 h-9 w-full rounded-full mix-blend-plus-lighter"
+            style={{
+              padding: "0.5px", // ボーダーの幅
+              background:
+                "linear-gradient(270deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%)",
+              WebkitMask:
+                "linear-gradient(white 0 0) content-box, linear-gradient(white 0 0)",
+              WebkitMaskComposite: "xor",
+              maskComposite: "exclude",
+              zIndex: "-1",
+            }}
+          />
+          <span
+            className="absolute left-0 top-0 h-9 w-full rounded-full -z-10"
+            style={{
+              background:
+                "linear-gradient(116.55deg, #FF8763 18.62%, #FE0291 96.99%)",
+            }}
+          />
+          <img
+            src="/img/candy-glow-left.png"
+            className="absolute left-0 top-0 h-9 z-0 mix-blend-plus-lighter"
+          />
+          <img
+            src="/img/candy-glow-right.png"
+            className="absolute right-0 top-0 h-9 z-0 mix-blend-plus-lighter"
+          />
+          <span
+            className="mix-blend-plus-darker"
+            style={{
+              textShadow:
+                "0 2px 2px rgba(0,0,0,0.24), 0 8px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            Get started
+          </span>
+        </button>
       </div>
 
       <img
