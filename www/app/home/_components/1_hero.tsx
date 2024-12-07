@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button, CandyButton } from "~/components/ui/button";
 
 import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
@@ -42,70 +43,7 @@ export function Hero() {
           </span>
         </p>
 
-        <button
-          className="h-9 text-base font-medium text-white inline-flex align-center justify-center gap-2 whitespace-nowrap rounded-full"
-          style={{
-            position: "relative",
-            width: "191px",
-            padding: "0.75rem 1.5rem",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: `0 4px 8px rgba(0,0,0,0.2)`,
-          }}
-        >
-          <span
-            className="absolute left-0 top-0 h-9 w-full rounded-full opacity-20 mix-blend-plus-lighter"
-            style={{
-              border: "0.75px solid rgba(255, 255, 255, 0.32)",
-              background:
-                "radial-gradient(115.6% 115.9% at -1.81% 0%, rgba(255, 183, 99, 0.01) 0%, rgba(255, 81, 196, 0.01) 100%)",
-              boxShadow: `
-                0px 0.5px 0.5px 0px rgba(255,255,255,0.96) inset,
-                0px 1.5px 1.5px 0px rgba(255,255,255,0.64) inset,
-                0px 3px 3px 0px rgba(255,255,255,0.48) inset,
-                0px 6px 6px 0px rgba(255,255,255,0.24) inset`,
-              zIndex: 10,
-            }}
-          />
-          <span
-            className="absolute inset-0 left-0 top-0 h-9 w-full rounded-full mix-blend-plus-lighter"
-            style={{
-              padding: "0.5px", // ボーダーの幅
-              background:
-                "linear-gradient(270deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%)",
-              WebkitMask:
-                "linear-gradient(white 0 0) content-box, linear-gradient(white 0 0)",
-              WebkitMaskComposite: "xor",
-              maskComposite: "exclude",
-              zIndex: "-1",
-            }}
-          />
-          <span
-            className="absolute left-0 top-0 h-9 w-full rounded-full -z-10"
-            style={{
-              background:
-                "linear-gradient(116.55deg, #FF8763 18.62%, #FE0291 96.99%)",
-            }}
-          />
-          <img
-            src="/img/candy-glow-left.png"
-            className="absolute left-0 top-0 h-9 z-0 mix-blend-plus-lighter"
-          />
-          <img
-            src="/img/candy-glow-right.png"
-            className="absolute right-0 top-0 h-9 z-0 mix-blend-plus-lighter"
-          />
-          <span
-            className="mix-blend-plus-darker"
-            style={{
-              textShadow:
-                "0 2px 2px rgba(0,0,0,0.24), 0 8px 8px rgba(0,0,0,0.08)",
-            }}
-          >
-            Get started
-          </span>
-        </button>
+        <CandyButton className="w-[191px]">Get started</CandyButton>
       </div>
 
       <img
