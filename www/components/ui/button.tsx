@@ -117,10 +117,12 @@ export const CandyButton = React.forwardRef<
       <img
         src="/img/candy-glow-left.png"
         className="absolute left-0 top-0 h-9 z-0 mix-blend-plus-lighter"
+        alt=""
       />
       <img
         src="/img/candy-glow-right.png"
         className="absolute right-0 top-0 h-9 z-0 mix-blend-plus-lighter"
+        alt=""
       />
       <span
         className="mix-blend-plus-darker"
