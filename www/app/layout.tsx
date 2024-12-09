@@ -31,7 +31,7 @@ export default function RootLayout({
         className={cn(
           inter.className,
           roobert.variable,
-          "min-h-screen bg-black text-white font-['Inter']"
+          "min-h-screen bg-black text-white font-['Inter','Inter-Light',Helvetica]"
         )}
       >
         <Header />
