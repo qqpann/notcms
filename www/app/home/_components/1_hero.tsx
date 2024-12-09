@@ -7,10 +7,16 @@ import { siteConfig } from "~/src/site-config";
 
 export function Hero() {
   return (
-    <section className="container max-w-[1440px] px-4 md:px-32 mx-auto flex flex-col items-center gap-24 pt-24 pb-0 relative">
+    <section className="container max-w-[1440px] px-4 md:px-32 mx-auto flex flex-col items-center gap-16 md:gap-24 pt-12 md:pt-24 pb-0 relative">
       <div className="flex flex-col items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
-        <h1 className="w-full font-Roobert font-bold text-white text-4xl md:text-[64px] text-center tracking-[-0.64px] md:leading-[72px]">
-          Instantly create & publish <br /> your website content&nbsp;
+        <h1 className="w-full font-Roobert font-bold text-white text-[36px] leading-[48px] md:text-[64px] text-center tracking-[-0.64px] md:leading-[72px]">
+          <span className="hidden md:inline">Instantly c</span>
+          <span className="inline md:hidden">C</span>
+          reate & publish <br /> your website content
+          <span>
+            <br />{" "}
+          </span>
+          <span> </span>
           <span
             // className="[text-shadow:0px_0.5px_0.5px_#fffffff5] [-webkit-text-stroke:0.75px_#ffffff52] blur-[1px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] opacity-20 [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-transparent text-[64px] text-center tracking-[-0.64px] leading-[72px]"
             style={{
@@ -28,15 +34,11 @@ export function Hero() {
         </h1>
 
         <p className="relative self-stretch [font-family:'Inter-Medium',Helvetica] font-normal text-white text-lg text-center tracking-[-0.18px] leading-[26px]">
-          <span className="font-medium tracking-[-0.03px]">
+          <span className="font-medium tracking-[-0.03px] hidden md:inline">
             Make website content management easier.
           </span>
-
-          <span className="[font-family:'Inter-Regular',Helvetica] tracking-[-0.03px]">
-            &nbsp;
-          </span>
-
-          <span className="[font-family:'Inter-Light',Helvetica] font-light tracking-[-0.03px]">
+          &nbsp;
+          <span className="font-light tracking-[-0.03px] text-white/70">
             Set up your website with NotCMS once <br />
             and update your content in Notion forever. See changes in seconds!
           </span>
