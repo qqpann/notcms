@@ -8,7 +8,7 @@ const Section = React.forwardRef<
   <section
     ref={ref}
     className={cn(
-      "container flex flex-col items-center max-w-[1440px] mx-auto px-10 pt-8 md:px-32 md:pt-24 pb-0 relative",
+      "container flex flex-col items-center max-w-[1440px] mx-auto px-4 pt-8 md:px-32 md:pt-24 pb-0 relative",
       className
     )}
     {...props}

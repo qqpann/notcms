@@ -7,7 +7,7 @@ import { siteConfig } from "~/src/site-config";
 
 export function Hero() {
   return (
-    <section className="container max-w-[1440px] px-10 md:px-32 mx-auto flex flex-col items-center gap-24 pt-24 pb-0 relative">
+    <section className="container max-w-[1440px] px-4 md:px-32 mx-auto flex flex-col items-center gap-24 pt-24 pb-0 relative">
       <div className="flex flex-col items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
         <h1 className="w-full font-Roobert font-bold text-white text-4xl md:text-[64px] text-center tracking-[-0.64px] md:leading-[72px]">
           Instantly create & publish <br /> your website content&nbsp;
