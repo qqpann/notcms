@@ -125,7 +125,6 @@ export const CandyButton = React.forwardRef<
         alt=""
       />
       <span
-        className="mix-blend-plus-darker"
         style={{
           textShadow: "0 2px 2px rgba(0,0,0,0.24), 0 8px 8px rgba(0,0,0,0.08)",
         }}
