@@ -69,7 +69,7 @@ class DatabaseHandler<TData> {
    *      - `Error`: The error encountered.
    *      - `Response | undefined`: The optional HTTP response object.
    */
-  listPages() {
+  list() {
     return this.fetch<Pages<TData>>(
       routes.pages(this.workspaceId, this.databaseId),
       "GET"
@@ -92,7 +92,7 @@ class DatabaseHandler<TData> {
    *      - `Error`: The error encountered.
    *      - `Response | undefined`: The optional HTTP response object.
    */
-  getPage(pageId: string) {
+  get(pageId: string) {
     return this.fetch<Page<TData>>(
       routes.page(this.workspaceId, this.databaseId, pageId),
       "GET"
