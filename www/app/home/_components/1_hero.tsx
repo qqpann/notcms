@@ -13,10 +13,7 @@ export function Hero() {
           <span className="hidden md:inline">Instantly c</span>
           <span className="inline md:hidden">C</span>
           reate & publish <br /> your website content
-          <span>
-            <br />{" "}
-          </span>
-          <span> </span>
+          <br className="md:hidden" />{" "}
           <span
             // className="[text-shadow:0px_0.5px_0.5px_#fffffff5] [-webkit-text-stroke:0.75px_#ffffff52] blur-[1px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,183.02,98.51,0.01)_0%,rgba(255,80.69,195.73,0.01)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] opacity-20 [font-family:'Roobert_TRIAL-SemiBold',Helvetica] font-semibold text-transparent text-[64px] text-center tracking-[-0.64px] leading-[72px]"
             style={{
