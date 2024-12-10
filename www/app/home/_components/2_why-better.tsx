@@ -20,7 +20,7 @@ export function WhyBetter() {
       <SectionHeader>
         <SectionTitle>Why NotCMS is better</SectionTitle>
       </SectionHeader>
-      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-[20px] md:grid-cols-46">
+      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-[20px] lg:grid-cols-46">
         <WritingCard />
         <DevelopmentCard />
         <ScaleCard />
@@ -32,7 +32,7 @@ export function WhyBetter() {
 
 function WritingCard() {
   return (
-    <Card className="col-span-1 md:col-span-23">
+    <Card className="col-span-1 lg:col-span-23">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Writing is effortless.</span> With
@@ -55,7 +55,7 @@ function WritingCard() {
 }
 function DevelopmentCard() {
   return (
-    <Card className="col-span-1 md:col-span-23">
+    <Card className="col-span-1 lg:col-span-23">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Faster development.</span> Deploy
@@ -78,7 +78,7 @@ function DevelopmentCard() {
 }
 function ScaleCard() {
   return (
-    <Card className="col-span-1 md:col-span-18">
+    <Card className="col-span-1 lg:col-span-18">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Built for scale.</span> Accelerate
@@ -101,7 +101,7 @@ function ScaleCard() {
 }
 function CollaborationCard() {
   return (
-    <Card className="col-span-1 md:col-span-28 flex flex-col justify-between">
+    <Card className="col-span-1 lg:col-span-28 flex flex-col justify-between">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <span className="text-rose-500">Seamless collaboration.</span> From
