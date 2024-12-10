@@ -54,7 +54,7 @@ export function Footer() {
           <div className="col-span-1 md:min-h-[200px] flex-col justify-start items-start gap-3 inline-flex">
             <div className="flex-col justify-start items-start gap-2.5 flex">
               <div className="self-stretch justify-start items-start inline-flex">
-                <div className="text-white text-sm font-semibold font-['Inter'] leading-snug">
+                <div className="text-white text-sm font-semibold leading-snug">
                   Links
                 </div>
               </div>
@@ -62,7 +62,7 @@ export function Footer() {
             {links.map((link) => (
               <Link
                 key={link.title}
-                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal font-['Inter'] leading-snug"
+                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal leading-snug"
                 href={link.href}
               >
                 {link.title}
@@ -72,7 +72,7 @@ export function Footer() {
           <div className="col-span-1 md:min-h-[200px] flex-col justify-start items-start gap-3 inline-flex">
             <div className="flex-col justify-start items-start gap-2.5 flex">
               <div className="self-stretch justify-start items-start inline-flex">
-                <div className="text-white text-sm font-semibold font-['Inter'] leading-snug">
+                <div className="text-white text-sm font-semibold leading-snug">
                   Socials
                 </div>
               </div>
@@ -80,7 +80,7 @@ export function Footer() {
             {socials.map((link) => (
               <Link
                 key={link.title}
-                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal font-['Inter'] leading-snug"
+                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal leading-snug"
                 href={link.href}
               >
                 {link.title}
@@ -90,7 +90,7 @@ export function Footer() {
           <div className="col-span-1 md:min-h-[200px] flex-col justify-start items-start gap-3 inline-flex">
             <div className="flex-col justify-start items-start gap-2.5 flex">
               <div className="self-stretch justify-start items-start inline-flex">
-                <div className="text-white text-sm font-semibold font-['Inter'] leading-snug">
+                <div className="text-white text-sm font-semibold leading-snug">
                   Resources
                 </div>
               </div>
@@ -98,7 +98,7 @@ export function Footer() {
             {resources.map((link) => (
               <Link
                 key={link.title}
-                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal font-['Inter'] leading-snug"
+                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal leading-snug"
                 href={link.href}
               >
                 {link.title}

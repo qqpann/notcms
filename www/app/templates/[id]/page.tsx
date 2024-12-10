@@ -37,7 +37,7 @@ export default async function Page({
             <h1 className="text-white text-[32px] font-['Roobert TRIAL'] leading-none">
               {template.title}
             </h1>
-            <p className="self-stretch text-white/70 text-sm font-normal font-['Inter'] tracking-tight">
+            <p className="self-stretch text-white/70 text-sm font-normal tracking-tight">
               {template.properties.description}
             </p>
           </div>

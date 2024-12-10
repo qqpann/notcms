@@ -67,10 +67,10 @@ shadow-[inset_0px_-40px_48px_0px_rgba(255,255,255,0.08)]"
         src={writer.properties.images?.[0] ?? "/img/404.png"}
       />
       <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 inline-flex">
-        <div className="self-stretch text-white text-lg font-medium font-['Inter'] leading-[18px] tracking-tight">
+        <div className="self-stretch text-white text-lg font-medium leading-[18px] tracking-tight">
           {writer.title}
         </div>
-        <div className="self-stretch opacity-70 text-white text-base font-normal font-['Inter'] leading-snug tracking-tight">
+        <div className="self-stretch opacity-70 text-white text-base font-normal leading-snug tracking-tight">
           {writer.content}
         </div>
       </div>

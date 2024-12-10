@@ -34,7 +34,7 @@ export const MainContent = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "prose prose-base dark:prose-invert text-justify prose-headings:text-[#f8f7f7] prose-strong:text-white prose-p:text-zinc-300 prose-a:text-zinc-200 prose-headings:font-medium prose-h1::text-2xl prose-h2:text-lg prose-h3:text-base font-['Inter'] leading-tight text-zinc-300 text-sm font-normal",
+      "prose prose-base dark:prose-invert text-justify prose-headings:text-[#f8f7f7] prose-strong:text-white prose-p:text-zinc-300 prose-a:text-zinc-200 prose-headings:font-medium prose-h1::text-2xl prose-h2:text-lg prose-h3:text-base leading-tight text-zinc-300 text-sm font-normal",
       className
     )}
     {...props}
