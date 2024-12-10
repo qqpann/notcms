@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 10;
 
 export default async function Blog() {
-  let [pages] = await nc.query.blog.listPages();
-  let [writers] = await nc.query.writers.listPages();
+  let [pages] = await nc.query.blog.list();
+  let [writers] = await nc.query.writers.list();
 
   pages = pages ?? [];
   writers = writers ?? [];

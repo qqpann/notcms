@@ -18,7 +18,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [template, error] = await nc.query.templates.getPage(id);
+  const [template, error] = await nc.query.templates.get(id);
   if (error) return <div>{error.toString()}</div>;
   if (!template) return notFound();
 

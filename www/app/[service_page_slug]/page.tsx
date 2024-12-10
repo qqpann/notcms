@@ -19,7 +19,7 @@ export default async function Page({
   const { service_page_slug: slug } = await params;
   const id = MAP_SLUG_TO_ID[slug as keyof typeof MAP_SLUG_TO_ID];
   if (!id) return notFound();
-  const [data] = await nc.query.service.getPage(id);
+  const [data] = await nc.query.service.get(id);
   if (!data) return notFound();
   const page = {
     id: id,

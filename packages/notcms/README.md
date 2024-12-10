@@ -42,8 +42,8 @@ import { Client } from "notcms";
 
 const nc = Client({ schema });
 
-const [pages] = await nc.query.blog.listPages();
-const [page] = await nc.query.blog.getPage(pages[0].id);
+const [pages] = await nc.query.blog.list();
+const [page] = await nc.query.blog.get(pages[0].id);
 ```
 
 <!-- -->

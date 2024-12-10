@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 10;
 
 export default async function Page() {
-  let [templates] = await nc.query.templates.listPages();
+  let [templates] = await nc.query.templates.list();
   templates = templates ?? [];
   templates = templates.filter((template) => template.properties.published);
 

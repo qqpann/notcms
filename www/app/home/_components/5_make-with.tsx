@@ -30,8 +30,8 @@ import { schema } from '../../notcms/schema';
 const nc = new Client({ schema });
 
 export default async function Blog() {
-  const [pages] = await nc.query.blog.listPages();
-  const [page] = await nc.query.blog.getPage('<page_id>');
+  const [pages] = await nc.query.blog.list();
+  const [page] = await nc.query.blog.get('<page_id>');
 
   return (
     <div>
@@ -59,8 +59,8 @@ import { schema } from '../notcms/schema';
 export const loader = async () => {
   const nc = new Client({ schema });
 
-  const [pages] = await nc.query.blog.listPages();
-  const [page] = await nc.query.blog.getPage('<page_id>');
+  const [pages] = await nc.query.blog.list();
+  const [page] = await nc.query.blog.get('<page_id>');
 
   return json({ pages, page });
 };
