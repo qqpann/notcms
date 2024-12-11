@@ -4,15 +4,15 @@ export const schema = {
   abc: {
     id: "abc",
     properties: {
-      slug: "string",
+      slug: "rich_text",
       publishedAt: "date",
-      categories: "string[]",
+      categories: "select",
     },
   },
   "1def": {
     id: "1def",
     properties: {
-      slug: "string",
+      slug: "rich_text",
       category: "number",
     },
   },
