@@ -22,7 +22,7 @@ export default async function Page({
   if (error) return <div>{error.toString()}</div>;
   if (!template) return notFound();
 
-  const _propertyTable: { label: string; value?: string }[] = [
+  const _propertyTable: { label: string; value: string | null }[] = [
     { label: "Framework", value: template.properties.framework },
     { label: "Use case", value: template.properties.use_case },
     { label: "CSS", value: template.properties.css },
