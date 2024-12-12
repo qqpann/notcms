@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Card, CardDescription, CardTitle } from "~/components/ui/card";
+import { Link } from "~/src/i18n/routing";
 import { nc } from "~/src/notcms/schema";
 import { routes } from "~/src/routes";
 

@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "~/src/i18n/routing";
 import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
 import { Button } from "./ui/button";

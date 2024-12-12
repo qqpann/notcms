@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "~/src/i18n/routing";
 import { nc } from "~/src/notcms/schema";
 
 type Pages = typeof nc.query.blog.$inferPages;

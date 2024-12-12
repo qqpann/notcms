@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { Table, TableBody, TableCell, TableRow } from "~/components/ui/table";
+import { Link } from "~/src/i18n/routing";
 import { nc } from "~/src/notcms/schema";
 import { MainContent } from "../_components/main-content";
 import { TemplateCard } from "../_components/template-card";

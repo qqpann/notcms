@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "~/src/i18n/routing";
 import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
 import { Separator } from "./ui/separator";

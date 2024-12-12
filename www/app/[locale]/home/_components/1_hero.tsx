@@ -1,6 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Button, CandyButton } from "~/components/ui/button";
+import { Link } from "~/src/i18n/routing";
 
 import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
