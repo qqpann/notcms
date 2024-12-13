@@ -61,7 +61,7 @@ function PlanCard({ plan }: { plan: Plan }) {
             /month
           </span>
         </div>
-        <Button className="w-full">
+        <Button className="w-full" asChild>
           <a href={routes.dashboard}>{plan.actionTitle || "Get started"}</a>
         </Button>
       </div>
