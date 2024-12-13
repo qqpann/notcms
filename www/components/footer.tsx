@@ -24,6 +24,11 @@ const resources: Item[] = [
 ];
 
 export function Footer() {
+  const legal: Item[] = [
+    { title: "Terms of use", href: routes.terms },
+    { title: "Privacy policy", href: routes.privacy },
+    { title: "Tokushoho", href: routes.tokushoho },
+  ];
   return (
     <footer
       className="h-auto mt-16"
@@ -109,12 +114,15 @@ export function Footer() {
         <Separator className="my-8 opacity-[0.12]" />
         {/* link to terms and policy */}
         <div className="w-full flex text-sm gap-8 lg:flex">
-          <Link className="text-white text-opacity-50" href={routes.terms}>
-            Terms of use
-          </Link>
-          <Link className="text-white text-opacity-50" href={routes.privacy}>
-            Privacy policy
-          </Link>
+          {legal.map((link) => (
+            <Link
+              key={link.title}
+              className="text-white text-opacity-50"
+              href={link.href}
+            >
+              {link.title}
+            </Link>
+          ))}
         </div>
       </div>
     </footer>
