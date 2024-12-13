@@ -2,5 +2,8 @@
   "HomePage": {
     "title": "Hello world!",
     "about": "Go to the about page"
+  },
+  "1_hero": {
+    "get-started": "いますぐ始める"
   }
 }

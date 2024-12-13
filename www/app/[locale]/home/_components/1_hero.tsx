@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Button, CandyButton } from "~/components/ui/button";
 import { Link } from "~/src/i18n/routing";
@@ -6,6 +7,7 @@ import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
 
 export function Hero() {
+  const t = useTranslations("1_hero");
   return (
     <section className="container max-w-[1440px] px-4 md:px-32 mx-auto flex flex-col items-center gap-16 md:gap-24 pt-12 md:pt-24 pb-0 relative">
       <div className="flex flex-col items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
@@ -43,7 +45,7 @@ export function Hero() {
         </p>
 
         <Link href={routes.dashboard}>
-          <CandyButton className="w-[191px]">Get started</CandyButton>
+          <CandyButton className="w-[191px]">{t("get-started")}</CandyButton>
         </Link>
       </div>
 
