@@ -9,6 +9,7 @@ const MAP_SLUG_TO_ID = {
   privacy: "bbc1e1f3-0f25-4f27-b9f0-a7452807459a",
   // company: "5c75d3dc-7ea8-4115-ae46-6ab86833c066",
   about: "1322c5fe-b55c-807b-9ef9-e517748d8760",
+  tokushoho: "15b2c5fe-b55c-800f-82cf-cc85cef2cee9",
 } as const;
 
 export default async function Page({
