@@ -1,5 +1,6 @@
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
+import { routes } from "~/src/routes";
 
 type Plan = {
   title: string;
@@ -60,7 +61,9 @@ function PlanCard({ plan }: { plan: Plan }) {
             /month
           </span>
         </div>
-        <Button className="w-full">{plan.actionTitle || "Get started"}</Button>
+        <Button className="w-full">
+          <a href={routes.dashboard}>{plan.actionTitle || "Get started"}</a>
+        </Button>
       </div>
 
       <Card className="self-stretch px-4 pt-5 pb-4 rounded-t-[10px] rounded-b-2xl shadow-inner border-silver flex-col justify-start items-start gap-4 flex">
