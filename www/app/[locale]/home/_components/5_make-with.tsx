@@ -10,6 +10,7 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { cn } from "~/lib/utils";
+import { siteConfig } from "~/src/site-config";
 import {
   Section,
   SectionDescription,
@@ -156,25 +157,34 @@ export function MakeWith() {
             </SectionDescription>
           </div>
           <div className="flex flex-wrap gap-4">
-            <Button>
-              <svg
-                style={{ width: 20, height: 20, marginLeft: -8 }}
-                viewBox="0 0 24 24"
+            <Button asChild>
+              <a
+                href={siteConfig.github}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <path
-                  fill="currentColor"
-                  d={siGithub.path}
-                  fillRule="evenodd"
+                <svg
+                  style={{ width: 20, height: 20, marginLeft: -8 }}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="currentColor"
+                    d={siGithub.path}
+                    fillRule="evenodd"
+                  />
+                </svg>
+                View repository
+                <ArrowRightIcon
+                  style={{ width: 20, height: 20, marginRight: -4 }}
                 />
-              </svg>
-              View repository
+              </a>
             </Button>
-            <Button className="inline-flex items-center gap-2">
+            {/* <Button className="inline-flex items-center gap-2">
               View docs
               <ArrowRightIcon
                 style={{ width: 20, height: 20, marginRight: -4 }}
               />
-            </Button>
+            </Button> */}
           </div>
         </div>
         <Card
