@@ -152,7 +152,7 @@ const Layer = React.forwardRef<
       className
     )}
     data-sal="slide-up"
-    data-sal-duration="600"
+    data-sal-duration="900"
     data-sal-easing="ease-in-quint"
     data-sal-threshold="1"
     style={{ "--sal-transform": "translateY(200%)" } as React.CSSProperties}
