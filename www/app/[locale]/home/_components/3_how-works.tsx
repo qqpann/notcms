@@ -20,7 +20,15 @@ export function HowWorks() {
   }, []);
 
   return (
-    <Section data-sal-threshold="0.5">
+    <Section
+      data-sal-threshold="0.5"
+      style={{
+        background: `
+          radial-gradient(35% 25.52% at 50% 36.46%, rgba(255, 255, 255, 0.06) 0%, rgba(15, 15, 17, 0) 100%),
+          radial-gradient(35% 27.17% at 50% 61.19%, rgba(255, 255, 255, 0.06) 0%, rgba(15, 15, 17, 0) 100%)
+        `,
+      }}
+    >
       <SectionHeader>
         <SectionPreTitle>How it works</SectionPreTitle>
         <SectionTitle>
