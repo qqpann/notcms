@@ -67,11 +67,11 @@ function DevelopmentCard() {
         </CardDescription>
       </CardHeader>
       <Image
-        src="/img/home/lp-2-why-better-2-development.webp"
-        width={400}
-        height={200}
+        src="/img/home/lp-2-why-better-2-development.svg"
+        width={482}
+        height={157}
         alt="NotCMS SDK in action"
-        className="mr-auto"
+        className="mx-auto"
       />
     </Card>
   );
@@ -94,7 +94,7 @@ function ScaleCard() {
         width={363}
         height={231}
         alt="NotCMS SDK in action"
-        className="ml-auto"
+        className="ml-auto w-full"
       />
     </Card>
   );
