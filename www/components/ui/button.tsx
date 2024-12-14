@@ -70,16 +70,18 @@ Button.displayName = "Button";
 export interface CandyButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
+  extraGlow?: boolean;
 }
 export const CandyButton = React.forwardRef<
   HTMLButtonElement,
   CandyButtonProps
->(({ className, children, asChild = false, ...props }, ref) => {
+>(({ className, children, extraGlow, asChild = false, ...props }, ref) => {
   return (
     <button
       className={cn(
         "relative h-9 text-base font-medium text-white inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full py-3 px-6",
-        className
+        className,
+        extraGlow && "w-[192px]"
       )}
       style={{
         boxShadow: `0 4px 8px rgba(0,0,0,0.2)`,
@@ -131,6 +133,13 @@ export const CandyButton = React.forwardRef<
       >
         {children}
       </span>
+      {extraGlow && (
+        <img
+          src="/img/home/candy-button-extra-glow.png"
+          className="absolute -z-10 left-[-97px] top-[-135.78px] h-[289.2px] max-w-[386px] w-[386px] pointer-events-none"
+          alt=""
+        />
+      )}
     </button>
   );
 });
