@@ -7,6 +7,7 @@ import { siGithub } from "simple-icons";
 
 import { CodeBlock } from "~/components/code-block";
 import { Button } from "~/components/ui/button";
+import { Card } from "~/components/ui/card";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { cn } from "~/lib/utils";
 import {
@@ -176,8 +177,9 @@ export function MakeWith() {
             </Button>
           </div>
         </div>
-        <div
-          className="w-full border-silver overflow-hidden rounded-[20px] px-1 py-1.5"
+        <Card
+          // TODO: reverse rounded tabs & px-1
+          className="w-full border-silver overflow-hidden rounded-[20px] px-1.5 py-1.5"
           style={{
             boxShadow: "inset 0 -32px 80px 0 rgba(255, 255, 255, 0.08)",
           }}
@@ -204,7 +206,7 @@ export function MakeWith() {
               </TabsContent>
             ))}
           </Tabs>
-        </div>
+        </Card>
       </div>
       {/* </div> */}
     </Section>
