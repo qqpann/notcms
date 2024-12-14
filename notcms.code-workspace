@@ -34,6 +34,7 @@
       ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
     ],
     "i18n-ally.keystyle": "nested",
+    "i18n-ally.namespace": true,
     "i18n-ally.enabledFrameworks": ["next-intl"],
     "i18n-ally.extract.keyMaxLength": 40,
     "i18n-ally.extract.keyPrefix": "{fileNameWithoutExt}.",

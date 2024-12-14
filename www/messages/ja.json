@@ -5,5 +5,11 @@
   },
   "1_hero": {
     "get-started": "いますぐ始める"
+  },
+  "home": {
+    "metadata": {
+      "description": "NotCMS は、Notion をコンテンツ データベースに変えるヘッドレス CMS です。\n従来の肥大化した CMS やカスタム CMS に別れを告げて、今すぐ Notion で執筆を始めましょう。 \nNotCMS SDK を使用して自信を持ってブログをデプロイし、視聴者を迅速に拡大します。",
+      "title": "NotCMS - NotionをブログCMSに"
+    }
   }
 }

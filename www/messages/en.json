@@ -1,5 +1,12 @@
 {
   "1_hero": {
     "get-started": "Get started"
-  }
+  },
+  "home": {
+    "metadata": {
+      "description": "NotCMS is a Headless CMS that turns Notion into your content database. Say goodbye to legacy or custom bloated CMS, and start writing in Notion today. Deploy your blog with confidence with NotCMS SDK, and grow your audience fast.",
+      "title": "NotCMS - Turn Notion into CMS"
+    }
+  },
+  "title": "NotCMS - Turn Notion into Blog CMS"
 }
