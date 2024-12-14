@@ -28,6 +28,12 @@ const renderer: Partial<Renderer> = {
   image({ href, title, text }) {
     return `<img src="${href}" alt="${text}" title="${title}" class="relative w-[601px] h-auto bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]">`;
   },
+  code({ text, lang, escaped }) {
+    return `<pre class="bg-[#1e1e1e] rounded-[10px] p-[1rem] overflow-x-auto"><code class="text-[#f8f7f7]">${text}</code></pre>`;
+  },
+  codespan({ text }) {
+    return `<code class="text-[#f8f7f7] bg-[#1e1e1e] rounded-[10px] p-[0.25rem]">${text}</code>`;
+  },
 } as Renderer;
 marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
 
