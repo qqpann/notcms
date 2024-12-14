@@ -22,8 +22,12 @@ export function HowWorks() {
   return (
     <Section data-sal-threshold="0.5">
       <SectionHeader>
-        <SectionPreTitle>Architecture</SectionPreTitle>
-        <SectionTitle>How NotCMS works</SectionTitle>
+        <SectionPreTitle>How it works</SectionPreTitle>
+        <SectionTitle>
+          Complete customization
+          <br />
+          across every layer
+        </SectionTitle>
       </SectionHeader>
       <div className="flex flex-col items-center w-full">
         {/* 1 */}

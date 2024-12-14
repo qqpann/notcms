@@ -18,7 +18,8 @@ export function WhyBetter() {
   return (
     <Section className="md:pt-0">
       <SectionHeader>
-        <SectionTitle>Why NotCMS is better</SectionTitle>
+        <SectionPreTitle>Why NotCMS?</SectionPreTitle>
+        <SectionTitle>A superior headless CMS</SectionTitle>
       </SectionHeader>
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-[20px] lg:grid-cols-46">
         <WritingCard />

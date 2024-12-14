@@ -18,8 +18,8 @@ export function KillerFeatures() {
   return (
     <Section>
       <SectionHeader>
-        <SectionPreTitle>Designed for speed</SectionPreTitle>
-        <SectionTitle>Killer features for everyone</SectionTitle>
+        <SectionPreTitle>Core features</SectionPreTitle>
+        <SectionTitle>What's inside NotCMS?</SectionTitle>
       </SectionHeader>
       <div className="w-full grid grid-cols-1 gap-[20px] md:grid-cols-7">
         <ArticleSnapshots />

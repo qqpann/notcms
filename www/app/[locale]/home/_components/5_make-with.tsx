@@ -144,7 +144,11 @@ export function MakeWith() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="flex flex-col h-full justify-between">
           <div className="space-y-2">
-            <SectionTitle>Make with your framework in mind.</SectionTitle>
+            <SectionTitle>
+              Make with your
+              <br />
+              framework in mind.
+            </SectionTitle>
             <SectionDescription>
               NotCMS comes with a TypeScript SDK. Your databases comes to your
               hands with a few typed properties.
