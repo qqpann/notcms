@@ -1,5 +1,7 @@
+"use client";
 import Image from "next/image";
 import * as React from "react";
+import sal from "sal.js";
 
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
@@ -11,15 +13,23 @@ import {
 } from "./_section";
 
 export function HowWorks() {
+  const ref = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    sal();
+  }, []);
+
   return (
-    <Section>
+    <Section data-sal-threshold="0.5">
       <SectionHeader>
         <SectionPreTitle>Architecture</SectionPreTitle>
         <SectionTitle>How NotCMS works</SectionTitle>
       </SectionHeader>
       <div className="flex flex-col items-center w-full">
         {/* 1 */}
-        <Layer className="z-50">
+        <Layer
+          className="z-50"
+          style={{ "--sal-delay": "100ms" } as React.CSSProperties}
+        >
           <LayerImage>
             <Image
               src="/img/home/lp-3-how-works-1-website.png"
@@ -38,7 +48,10 @@ export function HowWorks() {
           </LayerHeader>
         </Layer>
         {/* 2 */}
-        <Layer className="z-40">
+        <Layer
+          className="z-40"
+          style={{ "--sal-delay": "200ms" } as React.CSSProperties}
+        >
           <LayerHeader direction="left">
             <LayerTitle>Website codebase</LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
@@ -56,8 +69,12 @@ export function HowWorks() {
             />
           </LayerImage>
         </Layer>
+        <span ref={ref} />
         {/* 3 */}
-        <Layer className="z-30">
+        <Layer
+          className="z-30"
+          style={{ "--sal-delay": "300ms" } as React.CSSProperties}
+        >
           <LayerImage>
             <Image
               src="/img/home/lp-3-how-works-3-api.png"
@@ -76,7 +93,10 @@ export function HowWorks() {
           </LayerHeader>
         </Layer>
         {/* 4 */}
-        <Layer className="z-20">
+        <Layer
+          className="z-20"
+          style={{ "--sal-delay": "400ms" } as React.CSSProperties}
+        >
           <LayerHeader direction="left">
             <LayerTitle>NotCMS Dashboard</LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
@@ -95,7 +115,10 @@ export function HowWorks() {
           </LayerImage>
         </Layer>
         {/* 5 */}
-        <Layer className="z-10 mb-0">
+        <Layer
+          className="z-10 mb-0"
+          style={{ "--sal-delay": "500ms" } as React.CSSProperties}
+        >
           <LayerImage>
             <Image
               src="/img/home/lp-3-how-works-5-editor.png"
@@ -128,6 +151,11 @@ const Layer = React.forwardRef<
       "grid grid-cols-[1fr_auto_1fr] gap-1 w-full -mb-[45px]",
       className
     )}
+    data-sal="slide-up"
+    data-sal-duration="600"
+    data-sal-easing="ease-in-quint"
+    data-sal-threshold="1"
+    style={{ "--sal-transform": "translateY(200%)" } as React.CSSProperties}
     {...props}
   />
 ));

@@ -121,3 +121,6 @@ body {
   text-align: right;
   color: rgba(115, 138, 148, 0.4);
 }
+
+/* Sal.js */
+@import "sal.js/dist/sal.css";

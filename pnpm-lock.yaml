@@ -197,6 +197,9 @@ importers:
       react-syntax-highlighter:
         specifier: ^15.6.1
         version: 15.6.1(react@18.3.1)
+      sal.js:
+        specifier: ^0.8.5
+        version: 0.8.5
       simple-icons:
         specifier: ^13.16.0
         version: 13.16.0
@@ -5861,6 +5864,10 @@ packages:
 
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
+
+  sal.js@0.8.5:
+    resolution: {integrity: sha512-KUb3fNrVZ1oWxxkEAfQfQ4Mrd910yboIRHqsvioBkulQInqMVeSMah+J5f7ch7KXFLicKlAaE0TzTsG/eJ02Dg==}
+    engines: {node: '>=12.0.0'}
 
   sass-loader@13.3.3:
     resolution: {integrity: sha512-mt5YN2F1MOZr3d/wBRcZxeFgwgkH44wVc2zohO2YF6JiOMkiXe4BYRZpSu2sO1g71mo/j16txzUhsKZlqjVGzA==}
@@ -13470,6 +13477,8 @@ snapshots:
       is-regex: 1.1.4
 
   safer-buffer@2.1.2: {}
+
+  sal.js@0.8.5: {}
 
   sass-loader@13.3.3(webpack@5.94.0(esbuild@0.23.1)):
     dependencies:
