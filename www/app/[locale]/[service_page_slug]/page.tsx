@@ -10,6 +10,7 @@ const MAP_SLUG_TO_ID = {
   // company: "5c75d3dc-7ea8-4115-ae46-6ab86833c066",
   about: "1322c5fe-b55c-807b-9ef9-e517748d8760",
   tokushoho: "15b2c5fe-b55c-800f-82cf-cc85cef2cee9",
+  pricing: "15c2c5fe-b55c-8047-b3cf-c69b8b6864ac",
 } as const;
 
 export default async function Page({
@@ -20,7 +21,7 @@ export default async function Page({
   const { service_page_slug: slug } = await params;
   const id = MAP_SLUG_TO_ID[slug as keyof typeof MAP_SLUG_TO_ID];
   if (!id) return notFound();
-  const [data] = await nc.query.service.get(id);
+  const [data, err, res] = await nc.query.service.get(id);
   if (!data) return notFound();
   const page = {
     id: id,
