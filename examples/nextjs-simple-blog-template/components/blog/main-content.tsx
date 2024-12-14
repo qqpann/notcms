@@ -5,6 +5,12 @@ const renderer: Partial<Renderer> = {
     const text = this.parser.parseInline(tokens);
     return `<p class="font-light text-zinc-300 tracking-[0.02px] leading-[25px]">${text}</p>`;
   },
+  link({ href, title, tokens }) {
+    const text = this.parser.parseInline(tokens);
+    return `<a href="${href}" title="${
+      title ?? text
+    }" class="text-white underline">${text}</a>`;
+  },
   strong({ tokens }) {
     const text = this.parser.parseInline(tokens);
     return `<strong class="font-semibold text-white">${text}</strong>`;
@@ -28,7 +34,7 @@ marked.use({ renderer: renderer, pedantic: false, gfm: true, breaks: true });
 export function MainContent({ content }: { content: string }) {
   return (
     <main
-      className="prose prose-base dark:prose-invert w-[600px] text-justify prose-headings:text-[#f8f7f7] prose-strong:text-white prose-p:text-zinc-300 prose-headings:font-medium prose-headings:text-2xl leading-tight text-zinc-300 text-sm font-normal"
+      className="prose prose-base dark:prose-invert w-[600px] text-justify prose-headings:text-[#f8f7f7] prose-strong:text-white prose-p:text-zinc-300 prose-a:text-white prose-headings:font-medium prose-headings:text-2xl leading-tight text-zinc-300 text-sm font-normal"
       dangerouslySetInnerHTML={{
         __html: marked(content ?? ""),
       }}
