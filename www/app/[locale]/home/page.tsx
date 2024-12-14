@@ -50,7 +50,7 @@ export default function Home() {
       <WhoNeeds />
       <MakeWith />
       <KillerFeatures />
-      <LastCatch />
+      {/* <LastCatch /> */}
     </>
   );
 }
