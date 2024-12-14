@@ -1,4 +1,4 @@
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, EyeIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 import { siNotion } from "simple-icons";
 import { Button } from "~/components/ui/button";
@@ -49,6 +49,7 @@ export default async function Page({
               target="_blank"
               rel="noopener noreferrer"
             >
+              <EyeIcon className="size-5 -ml-1" />
               See preview
             </Link>
           </Button>
