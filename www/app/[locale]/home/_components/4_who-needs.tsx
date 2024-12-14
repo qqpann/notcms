@@ -11,46 +11,45 @@ import {
   SectionTitle,
 } from "./_section";
 
-const userGroups: {
-  iconUrl: string;
-  title: string;
-  description: string;
-}[] = [
-  // 1st row
-  {
-    iconUrl: "/img/home/icon-people.svg",
-    title: "Developers & engineers",
-    description:
-      "Write code faster and confidently with a type safe SDK. No more hassle syncing types.",
-  },
-  {
-    iconUrl: "/img/home/icon-people2-group.svg",
-    title: "Small teams",
-    description:
-      "Manage your content and collaborate with your team effortlessly. No more silos.",
-  },
-  {
-    iconUrl: "/img/home/icon-pencil2.svg",
-    title: "Content writers",
-    description:
-      "Write content in a familiar interface and see it go live instantly. No more waiting or back-and-forth.",
-  },
-  // 2nd row
-  {
-    iconUrl: "/img/home/icon-people.svg",
-    title: "Business managers",
-    description:
-      "Get a bird's eye view of your content and make data-driven decisions. No more guesswork.",
-  },
-  {
-    iconUrl: "/img/home/icon-people.svg",
-    title: "Independent bloggers",
-    description:
-      "Focus on writing and growing your audience. No more worrying, with the quickstart templates.",
-  },
-];
-
 export function WhoNeeds() {
+  const userGroups: {
+    iconUrl: string;
+    title: string;
+    description: string;
+  }[] = [
+    // 1st row
+    {
+      iconUrl: "/img/home/icon-people.svg",
+      title: "Independent bloggers",
+      description:
+        "Focus on writing and growing your audience. No more worrying, with the quickstart templates.",
+    },
+    {
+      iconUrl: "/img/home/icon-pencil2.svg",
+      title: "Content writers",
+      description:
+        "Write content in a familiar interface and see it go live instantly. No more waiting or back-and-forth.",
+    },
+    {
+      iconUrl: "/img/home/icon-people.svg",
+      title: "Developers & engineers",
+      description:
+        "Write code faster and confidently with a type safe SDK. No more hassle syncing types.",
+    },
+    // 2nd row
+    {
+      iconUrl: "/img/home/icon-people.svg",
+      title: "Business managers",
+      description:
+        "Get a bird's eye view of your content and make data-driven decisions. No more guesswork.",
+    },
+    {
+      iconUrl: "/img/home/icon-people2-group.svg",
+      title: "Small teams",
+      description:
+        "Manage your content and collaborate with your team effortlessly. No more silos.",
+    },
+  ];
   return (
     <Section>
       <SectionHeader>
