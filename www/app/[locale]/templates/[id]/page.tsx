@@ -1,4 +1,6 @@
+import { ArrowRightIcon } from "lucide-react";
 import { notFound } from "next/navigation";
+import { siNotion } from "simple-icons";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
@@ -97,7 +99,15 @@ export default async function Page({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Get Notion Template
+                    <svg
+                      className="size-5 -ml-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d={siNotion.path} />
+                    </svg>
+                    <span className="mr-auto">Get Notion Template</span>
+                    <ArrowRightIcon className="size-5 -mr-4" />
                   </Link>
                 </Button>
               )}
