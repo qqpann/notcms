@@ -6,6 +6,7 @@ import { HowWorks } from "./_components/3_how-works";
 import { WhoNeeds } from "./_components/4_who-needs";
 import { MakeWith } from "./_components/5_make-with";
 import { KillerFeatures } from "./_components/6_killer-features";
+import { LastCatch } from "./_components/last-catch";
 
 export const metadata: Metadata = {
   title: "NotCMS - Turn Notion into Blog",
@@ -49,6 +50,7 @@ export default function Home() {
       <WhoNeeds />
       <MakeWith />
       <KillerFeatures />
+      <LastCatch />
     </>
   );
 }
