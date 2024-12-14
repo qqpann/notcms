@@ -3,7 +3,8 @@ import Image from "next/image";
 import * as React from "react";
 import sal from "sal.js";
 
-import { Separator } from "~/components/ui/separator";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
+import { GradientSeparator, Separator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
 import {
   Section,
@@ -39,9 +40,12 @@ export function HowWorks() {
             />
           </LayerImage>
           <LayerHeader direction="right">
-            <LayerTitle>Your website</LayerTitle>
+            <LayerTitle>
+              <span className="md:hidden inline-block">1</span>
+              <span className="hidden md:inline-block">Your Website</span>
+            </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription>
+            <LayerDescription className="hidden md:block">
               Deploy your website to the edge with Vercel, Netlify, or any other
               static site host.
             </LayerDescription>
@@ -53,9 +57,12 @@ export function HowWorks() {
           style={{ "--sal-delay": "200ms" } as React.CSSProperties}
         >
           <LayerHeader direction="left">
-            <LayerTitle>Website codebase</LayerTitle>
+            <LayerTitle>
+              <span className="md:hidden inline-block">2</span>
+              <span className="hidden md:inline-block">Website codebase</span>
+            </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription>
+            <LayerDescription className="hidden md:block">
               Build your website with your design and your favorite frontend
               framework, like Next.js or Vue.
             </LayerDescription>
@@ -84,9 +91,12 @@ export function HowWorks() {
             />
           </LayerImage>
           <LayerHeader direction="right">
-            <LayerTitle>NotCMS API</LayerTitle>
+            <LayerTitle>
+              <span className="md:hidden inline-block">3</span>
+              <span className="hidden md:inline-block">NotCMS API</span>
+            </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription>
+            <LayerDescription className="hidden md:block">
               Leverage the power of NotCMS's fast API. Retrieve your content
               with typed queries.
             </LayerDescription>
@@ -98,9 +108,12 @@ export function HowWorks() {
           style={{ "--sal-delay": "400ms" } as React.CSSProperties}
         >
           <LayerHeader direction="left">
-            <LayerTitle>NotCMS Dashboard</LayerTitle>
+            <LayerTitle>
+              <span className="md:hidden inline-block">4</span>
+              <span className="hidden md:inline-block">NotCMS Dashboard</span>
+            </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription>
+            <LayerDescription className="hidden md:block">
               Manage your databases with a powerful and intuitive dashboard,
               with features like version history.
             </LayerDescription>
@@ -128,14 +141,20 @@ export function HowWorks() {
             />
           </LayerImage>
           <LayerHeader direction="right">
-            <LayerTitle>Notion editor / database</LayerTitle>
+            <LayerTitle>
+              <span className="md:hidden inline-block">5</span>
+              <span className="hidden md:inline-block">
+                Notion editor / database
+              </span>
+            </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription>
+            <LayerDescription className="hidden md:block">
               Edit your content in Notion, and sync it to your website with a
               few click.
             </LayerDescription>
           </LayerHeader>
         </Layer>
+        <HorizontalLayerDescription />
       </div>
     </Section>
   );
@@ -212,3 +231,109 @@ const LayerDescription = React.forwardRef<
   />
 ));
 LayerDescription.displayName = "LayerDescription";
+
+// Horizontal descriptions
+function HorizontalLayerDescription({
+  children,
+  className,
+}: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) {
+  return (
+    <ScrollArea className="w-full md:hidden">
+      <div className="self-stretch justify-start items-start inline-flex">
+        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
+          <Image
+            src="/img/central-icons/compass-square.svg"
+            alt=""
+            className="size-[24px]"
+            width={24}
+            height={24}
+          />
+          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+            1. Your website
+          </div>
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+            Deploy your website to the edge with Vercel, Netlify, or any other
+            static site host.
+          </div>
+        </div>
+
+        <GradientSeparator orientation="vertical" className="mx-3" />
+
+        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
+          <Image
+            src="/img/central-icons/code-brackets.svg"
+            alt=""
+            className="size-[24px]"
+            width={24}
+            height={24}
+          />
+          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+            2. Website codebase
+          </div>
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+            Build your website with your design and your favorite frontend
+            framework, like Next.js or Vue.
+          </div>
+        </div>
+
+        <GradientSeparator orientation="vertical" className="mx-3" />
+
+        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
+          <Image
+            src="/img/central-icons/plugin.svg"
+            alt=""
+            className="size-[24px]"
+            width={24}
+            height={24}
+          />
+          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+            3. NotCMS API
+          </div>
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+            Leverage the power of NotCMS's fast API. Retrieve your content with
+            typed queries.
+          </div>
+        </div>
+
+        <GradientSeparator orientation="vertical" className="mx-3" />
+
+        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
+          <Image
+            src="/img/central-icons/dashboard-low.svg"
+            alt=""
+            className="size-[24px]"
+            width={24}
+            height={24}
+          />
+          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+            4. NotCMS Dashboard
+          </div>
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+            Manage your databases with a powerful and intuitive dashboard, with
+            features like version history.
+          </div>
+        </div>
+
+        <GradientSeparator orientation="vertical" className="mx-3" />
+
+        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
+          <Image
+            src="/img/central-icons/server-2.svg"
+            alt=""
+            className="size-[24px]"
+            width={24}
+            height={24}
+          />
+          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+            5. Notion editor / database
+          </div>
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+            Edit your content in Notion, and sync it to your website with a few
+            click.
+          </div>
+        </div>
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
+  );
+}

@@ -26,4 +26,29 @@ const Separator = React.forwardRef<
 );
 Separator.displayName = SeparatorPrimitive.Root.displayName;
 
-export { Separator };
+const GradientSeparator = React.forwardRef<
+  React.ElementRef<typeof SeparatorPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>
+>(
+  (
+    { className, orientation = "horizontal", decorative = true, ...props },
+    ref
+  ) => (
+    <SeparatorPrimitive.Root
+      ref={ref}
+      decorative={decorative}
+      orientation={orientation}
+      className={cn(
+        "shrink-0 from-transparent via-zinc-800 to-transparent",
+        orientation === "horizontal"
+          ? "bg-gradient-to-r h-[1px] w-full"
+          : "bg-gradient-to-b w-[1px] h-auto min-h-full",
+        className
+      )}
+      {...props}
+    />
+  )
+);
+GradientSeparator.displayName = SeparatorPrimitive.Root.displayName;
+
+export { Separator, GradientSeparator };
