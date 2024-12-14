@@ -7,6 +7,7 @@ import { siGithub } from "simple-icons";
 
 import { CodeBlock } from "~/components/code-block";
 import { Button } from "~/components/ui/button";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { cn } from "~/lib/utils";
 import {
   Section,
@@ -191,7 +192,11 @@ export function MakeWith() {
                 value={example.id}
                 className="px-5 overflow-auto max-h-[300px]"
               >
-                <CodeBlock language="typescript" content={example.code} />
+                <ScrollArea>
+                  <CodeBlock language="typescript" content={example.code} />
+                  <ScrollBar orientation="horizontal" className="opacity-10" />
+                  <ScrollBar orientation="vertical" />
+                </ScrollArea>
               </TabsContent>
             ))}
           </Tabs>

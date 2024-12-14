@@ -16,7 +16,7 @@ import {
 
 export function WhyBetter() {
   return (
-    <Section>
+    <Section className="md:pt-0">
       <SectionHeader>
         <SectionTitle>Why NotCMS is better</SectionTitle>
       </SectionHeader>
