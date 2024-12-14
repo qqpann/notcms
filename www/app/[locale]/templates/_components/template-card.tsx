@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button } from "~/components/ui/button";
+import { Button, CandyButton } from "~/components/ui/button";
 import { Card, CardDescription, CardTitle } from "~/components/ui/card";
 import { Link } from "~/src/i18n/routing";
 import { nc } from "~/src/notcms/schema";
@@ -33,9 +33,9 @@ export function TemplateCard({ template }: TemplateCardProps) {
       </CardDescription>
 
       <div className="grid grid-cols-2 gap-[10px]">
-        <Button asChild>
-          <Link href={`/templates/${template.id}`}>Get started</Link>
-        </Button>
+        <Link href={`/templates/${template.id}`}>
+          <CandyButton className="w-full">Get started</CandyButton>
+        </Link>
         <Button asChild>
           <Link
             href={template.properties.preview!}
