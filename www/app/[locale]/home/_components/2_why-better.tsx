@@ -31,13 +31,33 @@ export function WhyBetter() {
   );
 }
 
+function HighlightSpan({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      style={{
+        background: `
+          linear-gradient(112.64deg, #FF8763 6.05%, #FE0291 50.08%),
+          linear-gradient(215.66deg, rgba(255, 255, 255, 0) 30.91%, rgba(255, 255, 255, 0.8) 38.97%, rgba(255, 255, 255, 0.8) 41.4%, rgba(255, 255, 255, 0) 48.71%)
+        `,
+        backgroundSize: "cover",
+        // Follow the order! webkit first!
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+        color: "transparent",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
 function WritingCard() {
   return (
     <Card className="col-span-1 lg:col-span-23">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
-          <span className="text-rose-500">Writing is effortless.</span> With
-          Notion's user-friendly editor.
+          <HighlightSpan>Writing is effortless.</HighlightSpan> With Notion's
+          user-friendly editor.
         </CardTitle>
         <CardDescription>
           Most CMS' have editors with high learning curves. NotCMS uses the
@@ -59,8 +79,8 @@ function DevelopmentCard() {
     <Card className="col-span-1 lg:col-span-23">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
-          <span className="text-rose-500">Faster development.</span> Deploy
-          within minutes.
+          <HighlightSpan>Faster development.</HighlightSpan> Deploy within
+          minutes.
         </CardTitle>
         <CardDescription>
           NotCMS SDK turns what properties you have into TypeScript type, and
@@ -82,8 +102,8 @@ function ScaleCard() {
     <Card className="col-span-1 lg:col-span-18">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
-          <span className="text-rose-500">Built for scale.</span> Accelerate
-          your audience growth today.
+          <HighlightSpan>Built for scale.</HighlightSpan> Accelerate your
+          audience growth today.
         </CardTitle>
         <CardDescription>
           Drive growth and retention with fast loading times that support your
@@ -105,8 +125,8 @@ function CollaborationCard() {
     <Card className="col-span-1 lg:col-span-28 flex flex-col justify-between">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
-          <span className="text-rose-500">Seamless collaboration.</span> From
-          ideation to published in one place.
+          <HighlightSpan>Seamless collaboration.</HighlightSpan> From ideation
+          to published in one place.
         </CardTitle>
         <CardDescription>
           Using Notion's multiplayer capabilities and user roles, everyone gets
