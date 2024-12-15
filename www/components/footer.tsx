@@ -12,15 +12,15 @@ const links: Item[] = [
   { title: "Home", href: routes.home },
   { title: "Templates", href: routes.templates },
   { title: "Blog", href: routes.blog },
+  // { title: "About", href: routes.about },
 ];
 const socials: Item[] = [
   { title: "X", href: siteConfig.author.x },
   // { title: "Notion template", href: "/" },
 ];
 const resources: Item[] = [
-  { title: "Docs", href: routes.docs },
+  // { title: "Docs", href: routes.docs },
   { title: "GitHub", href: siteConfig.github },
-  { title: "About", href: routes.about },
 ];
 
 export function Footer() {
