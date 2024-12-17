@@ -3,7 +3,7 @@ import { type Renderer, marked } from "marked";
 const renderer: Partial<Renderer> = {
   paragraph({ tokens }) {
     const text = this.parser.parseInline(tokens);
-    return `<p class="font-light text-zinc-300 tracking-[0.02px] leading-[25px]">${text}</p>`;
+    return `<p class="font-light text-zinc-300 leading-[25px]">${text}</p>`;
   },
   link({ href, title, tokens }) {
     const text = this.parser.parseInline(tokens);
@@ -18,7 +18,7 @@ const renderer: Partial<Renderer> = {
   heading({ tokens, depth }) {
     const text = this.parser.parseInline(tokens);
     const escapedText = text.toLowerCase().replace(/[^\w]+/g, "-");
-    return `<h${depth} class="[font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-[#f8f7f7] tracking-[0.06px] leading-8 mb-[1.5rem]">
+    return `<h${depth} class="[font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-[#f8f7f7] leading-8 mb-[1.5rem]">
               <a name="${escapedText}" class="anchor" href="#${escapedText}">
                 <span class="header-link"></span>
               </a>

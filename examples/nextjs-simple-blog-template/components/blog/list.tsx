@@ -20,10 +20,10 @@ export function BlogPagesList({
   return (
     <main className="container max-w-[1440px] px-32 mx-auto py-8">
       <div className="flex flex-col w-full mb-8 items-start gap-5 flex-[0_0_auto]">
-        <h2 className="self-stretch mt-[-1.00px] font-Roobert [font-family:'Roobert','Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
+        <h2 className="self-stretch mt-[-1.00px] font-Roobert [font-family:'Roobert','Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl leading-[normal]">
           Recent updates
         </h2>
-        <p className="self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa4] text-[15px] tracking-[0.15px] leading-[normal]">
+        <p className="self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa4] text-[15px] leading-[normal]">
           This blog is maintained using NotCMS itself!
         </p>
       </div>
@@ -32,26 +32,26 @@ export function BlogPagesList({
         <div className="inline-flex items-center gap-3 flex-[0_0_auto]">
           <button className="flex w-[71px] h-6 items-center gap-12 px-0 py-3 rounded-[24.5px] border-[0.5px] border-solid border-[#ffffff1a] [background:linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.1)_100%)]">
             <span className="inline-flex items-center justify-center gap-2 px-3 py-2 flex-[0_0_auto] mt-[-12.00px] mb-[-12.00px] rounded-[30px]">
-              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+              <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-xs leading-[normal] whitespace-nowrap">
                 All posts
               </span>
             </span>
           </button>
 
           <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
-            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs leading-[normal] whitespace-nowrap">
               Blogs
             </span>
           </button>
 
           <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
-            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs leading-[normal] whitespace-nowrap">
               Customer stories
             </span>
           </button>
 
           <button className="inline-flex items-center justify-center gap-2 px-3 py-0 flex-[0_0_auto]">
-            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs tracking-[0.12px] leading-[normal] whitespace-nowrap">
+            <span className="w-fit mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-[#9f9fa5] text-xs leading-[normal] whitespace-nowrap">
               Changelog
             </span>
           </button>
@@ -103,10 +103,10 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
       <div className="flex flex-col items-start gap-4 p-0 relative flex-1 self-stretch grow">
         <div className="flex flex-col items-start gap-6 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-            <p className="text-[25px] tracking-[0.25px] relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white leading-[normal]">
+            <p className="text-[25px] relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white leading-[normal]">
               {page.title}
             </p>
-            <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-[15px] tracking-[0.15px] leading-5">
+            <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-[15px] leading-5">
               {page.properties.description}
             </p>
           </div>
@@ -122,13 +122,13 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
                   className="size-[18px] rounded-full object-cover"
                 />
               </div>
-              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
+              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] leading-[normal] whitespace-nowrap">
                 {writer?.title}
               </div>
             </div>
 
             <div className="inline-flex h-6 items-center gap-1.5 px-3 py-0.5 relative flex-[0_0_auto] bg-[#ffffff29] rounded-[40px]">
-              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
+              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] leading-[normal] whitespace-nowrap">
                 {page.properties.category}
               </div>
             </div>
@@ -158,7 +158,7 @@ function BlogPostCard({ className, page, writer }: Props) {
       </div>
 
       <div className="flex flex-col items-start gap-4 px-1.5 py-0 self-stretch w-full flex-[0_0_auto]">
-        <p className="self-stretch mt-[-1px] font-h-6 font-[number:var(--h-6-font-weight)] text-white text-[length:var(--h-6-font-size)] tracking-[var(--h-6-letter-spacing)] leading-[var(--h-6-line-height)] [font-style:var(--h-6-font-style)]">
+        <p className="self-stretch mt-[-1px] font-h-6 font-[number:var(--h-6-font-weight)] text-white text-[length:var(--h-6-font-size)] leading-[var(--h-6-line-height)] [font-style:var(--h-6-font-style)]">
           {page.title}
         </p>
 
@@ -174,18 +174,18 @@ function BlogPostCard({ className, page, writer }: Props) {
               />
             </div>
 
-            <div className="relative w-fit mt-[-5.00px] mb-[-3.00px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
+            <div className="relative w-fit mt-[-5.00px] mb-[-3.00px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
               {writer?.title}
             </div>
           </div>
 
           <div className="inline-flex h-5 items-center justify-center gap-2 pt-[9.5px] pb-[10.5px] px-2 rounded-[66.5px] [background:radial-gradient(50%_50%_at_50%_50%,rgba(255,255,255,0.12)_0%,rgba(255,255,255,0)_100%)] relative flex-[0_0_auto]">
-            <div className="relative w-fit mt-[-5.50px] mb-[-3.50px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
+            <div className="relative w-fit mt-[-5.50px] mb-[-3.50px] font-caption font-[number:var(--caption-font-weight)] text-white text-[length:var(--caption-font-size)] leading-[var(--caption-line-height)] whitespace-nowrap [font-style:var(--caption-font-style)]">
               {page.properties.category}
             </div>
           </div>
 
-          <div className="relative flex-1 font-caption font-[number:var(--caption-font-weight)] text-[#9f9fa5] text-[length:var(--caption-font-size)] text-right tracking-[var(--caption-letter-spacing)] leading-[var(--caption-line-height)] [font-style:var(--caption-font-style)]">
+          <div className="relative flex-1 font-caption font-[number:var(--caption-font-weight)] text-[#9f9fa5] text-[length:var(--caption-font-size)] text-right leading-[var(--caption-line-height)] [font-style:var(--caption-font-style)]">
             {new Date(
               page.properties.created_at ?? Date.now()
             ).toLocaleDateString()}

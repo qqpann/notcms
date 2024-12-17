@@ -26,7 +26,7 @@ export function Header() {
           alt="NotCMS logo"
           src="/img/notcms-icon.png"
         />
-        <div className="w-fit [text-shadow:0px_1px_2px_#0000000f] font-Roobert font-semibold text-white text-xl tracking-[0.60px] leading-[normal] whitespace-nowrap">
+        <div className="w-fit [text-shadow:0px_1px_2px_#0000000f] font-Roobert font-semibold text-white text-xl leading-[normal] whitespace-nowrap">
           NotCMS
         </div>
       </Link>
@@ -41,7 +41,7 @@ export function Header() {
         <Button size="sm" asChild>
           <Link
             href={routes.dashboard}
-            className="mt-[-1.00px] [font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-white text-center tracking-[0.14px] leading-[normal] whitespace-nowrap"
+            className="mt-[-1.00px] [font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-white text-center leading-[normal] whitespace-nowrap"
           >
             Get started
           </Link>
@@ -60,7 +60,7 @@ function NavItem({ title, href }: { title: string; href: string }) {
       <div
         className={`${
           isActive ? "text-white" : "text-[#aaafb5]"
-        } text-sm text-center tracking-[0.14px] leading-[normal] whitespace-nowrap`}
+        } text-sm text-center leading-[normal] whitespace-nowrap`}
       >
         {title}
       </div>

@@ -39,7 +39,7 @@ export default async function Page({
             <h1 className="text-white text-[32px] font-['Roobert TRIAL'] leading-none">
               {template.title}
             </h1>
-            <p className="self-stretch text-white/70 text-sm font-normal tracking-tight">
+            <p className="self-stretch text-white/70 text-sm font-normal">
               {template.properties.description}
             </p>
           </div>
@@ -141,7 +141,7 @@ export default async function Page({
         </div>
       </div>
       {/* <div className="flex-col justify-start items-start gap-12 flex">
-        <div className="text-white text-5xl font-['Roobert TRIAL'] tracking-wide">
+        <div className="text-white text-5xl font-['Roobert TRIAL']">
           More templates
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

@@ -17,12 +17,12 @@ export function BlogPageDetail({
       <div className="flex flex-col items-center gap-12 pt-16 pb-32 px-32 relative self-stretch w-full flex-[0_0_auto]">
         <div className="flex flex-col w-[784px] items-center gap-12 relative flex-[0_0_auto]">
           <div className="flex flex-col items-center gap-8 relative self-stretch w-full flex-[0_0_auto]">
-            <div className="relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-sm text-center tracking-[0.14px] leading-[normal]">
+            <div className="relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-sm text-center leading-[normal]">
               {new Date(
                 page.properties.created_at ?? Date.now()
               ).toLocaleDateString()}
             </div>
-            <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl text-center tracking-[0.48px] leading-[normal]">
+            <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl text-center leading-[normal]">
               {page.title}
             </p>
             <div className="flex w-[115px] items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
@@ -33,7 +33,7 @@ export function BlogPageDetail({
                 alt="Writer Profile"
                 src={writer?.properties.images?.[0] ?? "/img/404.png"}
               />
-              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] tracking-[0.15px] leading-[normal] whitespace-nowrap">
+              <div className="relative w-fit [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-white text-[15px] leading-[normal] whitespace-nowrap">
                 {writer?.title}
               </div>
             </div>
@@ -67,10 +67,10 @@ shadow-[inset_0px_-40px_48px_0px_rgba(255,255,255,0.08)]"
         src={writer.properties.images?.[0] ?? "/img/404.png"}
       />
       <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 inline-flex">
-        <div className="self-stretch text-white text-lg font-medium leading-[18px] tracking-tight">
+        <div className="self-stretch text-white text-lg font-medium leading-[18px]">
           {writer.title}
         </div>
-        <div className="self-stretch opacity-70 text-white text-base font-normal leading-snug tracking-tight">
+        <div className="self-stretch opacity-70 text-white text-base font-normal leading-snug">
           {writer.content}
         </div>
       </div>

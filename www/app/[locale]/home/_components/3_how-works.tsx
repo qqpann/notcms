@@ -260,10 +260,10 @@ function HorizontalLayerDescription({
             width={24}
             height={24}
           />
-          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+          <div className="self-stretch text-white text-base font-medium leading-none">
             1. Your website
           </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
             Deploy your website to the edge with Vercel, Netlify, or any other
             static site host.
           </div>
@@ -279,10 +279,10 @@ function HorizontalLayerDescription({
             width={24}
             height={24}
           />
-          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+          <div className="self-stretch text-white text-base font-medium leading-none">
             2. Website codebase
           </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
             Build your website with your design and your favorite frontend
             framework, like Next.js or Vue.
           </div>
@@ -298,10 +298,10 @@ function HorizontalLayerDescription({
             width={24}
             height={24}
           />
-          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+          <div className="self-stretch text-white text-base font-medium leading-none">
             3. NotCMS API
           </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
             Leverage the power of NotCMS's fast API. Retrieve your content with
             typed queries.
           </div>
@@ -317,10 +317,10 @@ function HorizontalLayerDescription({
             width={24}
             height={24}
           />
-          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+          <div className="self-stretch text-white text-base font-medium leading-none">
             4. NotCMS Dashboard
           </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
             Manage your databases with a powerful and intuitive dashboard, with
             features like version history.
           </div>
@@ -336,10 +336,10 @@ function HorizontalLayerDescription({
             width={24}
             height={24}
           />
-          <div className="self-stretch text-white text-base font-medium leading-none tracking-tight">
+          <div className="self-stretch text-white text-base font-medium leading-none">
             5. Notion editor / database
           </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug tracking-tight">
+          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
             Edit your content in Notion, and sync it to your website with a few
             click.
           </div>

@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="container max-w-[1440px] px-4 md:px-32 mx-auto flex flex-col items-center gap-16 md:gap-24 pt-12 md:pt-24 pb-0 relative">
       <div className="flex flex-col items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
-        <h1 className="w-full font-Roobert font-bold text-white text-[36px] leading-[48px] md:text-[64px] text-center tracking-[-0.64px] md:leading-[72px]">
+        <h1 className="w-full font-Roobert font-bold text-white text-[36px] leading-[48px] md:text-[64px] text-center md:leading-[72px]">
           Create & publish <br /> your website content
           <br className="md:hidden" />{" "}
           <span
@@ -31,12 +31,12 @@ export function Hero() {
           </span>
         </h1>
 
-        <p className="relative self-stretch [font-family:'Inter-Medium',Helvetica] font-normal text-white text-base md:text-lg text-center tracking-[-0.18px] leading-[26px]">
-          <span className="font-medium tracking-[-0.03px] hidden md:inline">
+        <p className="relative self-stretch [font-family:'Inter-Medium',Helvetica] font-normal text-white text-base md:text-lg text-center leading-[26px]">
+          <span className="font-medium hidden md:inline">
             Make website content management easier.
           </span>
           &nbsp;
-          <span className="font-light tracking-[-0.03px] text-white/70">
+          <span className="font-light text-white/70">
             Set up your website with NotCMS once <br />
             and update your content in Notion forever.{" "}
             <br className="md:hidden" /> See changes in seconds!

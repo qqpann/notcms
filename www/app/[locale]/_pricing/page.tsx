@@ -32,7 +32,7 @@ export default function PricingPage() {
   return (
     <main className="container max-w-[1440px] px-32 mx-auto py-8">
       <div className="flex flex-col w-full mb-8 items-start gap-5 flex-[0_0_auto]">
-        <h2 className="self-stretch mt-[-1.00px] font-Roobert [font-family:'Roobert','Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl tracking-[0.48px] leading-[normal]">
+        <h2 className="self-stretch mt-[-1.00px] font-Roobert [font-family:'Roobert','Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl leading-[normal]">
           Choose the right plan for yourself
         </h2>
       </div>
@@ -50,14 +50,14 @@ function PlanCard({ plan }: { plan: Plan }) {
   return (
     <Card className="p-2 rounded-3xl flex-col items-start gap-4 inline-flex">
       <div className="self-stretch flex-col justify-start items-center gap-4 p-4 flex">
-        <div className="self-stretch text-white text-xl font-normal leading-none tracking-tight">
+        <div className="self-stretch text-white text-xl font-normal leading-none">
           {plan.title}
         </div>
         <div className="self-stretch">
-          <span className="text-white text-[32px] font-medium leading-none tracking-tight mr-1">
+          <span className="text-white text-[32px] font-medium leading-none mr-1">
             ${plan.price}
           </span>
-          <span className="text-white text-xl font-normal leading-none tracking-tight">
+          <span className="text-white text-xl font-normal leading-none">
             /month
           </span>
         </div>
@@ -70,7 +70,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         {plan.features.map((feature) => (
           <div
             key={feature}
-            className="self-stretch text-white/70 text-base font-normal leading-none tracking-tight"
+            className="self-stretch text-white/70 text-base font-normal leading-none"
           >
             {feature}
           </div>

@@ -156,11 +156,11 @@ function UserGroup({ icon, title, description }: UserGroupProps) {
       {icon}
 
       <div className="flex-col gap-4 flex items-start relative self-stretch w-full flex-[0_0_auto]">
-        <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-white text-xl tracking-[0.20px] leading-5">
+        <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-white text-xl leading-5">
           {title}
         </div>
 
-        <p className="relative self-stretch opacity-70 [font-family:'Inter-Regular',Helvetica] font-normal text-white text-base tracking-[0.16px] leading-[22px]">
+        <p className="relative self-stretch opacity-70 [font-family:'Inter-Regular',Helvetica] font-normal text-white text-base leading-[22px]">
           {description}
         </p>
       </div>

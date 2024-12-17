@@ -45,7 +45,7 @@ export default async function RootLayout({
         className={cn(
           inter.className,
           roobert.variable,
-          "min-h-screen bg-black text-white font-['Inter','Inter-Light',Helvetica]"
+          "min-h-screen bg-black text-white font-['Inter','Inter-Light',Helvetica] tracking-normal"
         )}
       >
         <NextIntlClientProvider messages={messages}>
