@@ -226,7 +226,7 @@ const LayerTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <span
     ref={ref}
-    className={cn("text-xl font-semibold md:w-64", className)}
+    className={cn("text-base font-Roobert font-semibold md:w-64", className)}
     {...props}
   />
 ));
