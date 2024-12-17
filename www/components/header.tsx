@@ -20,12 +20,6 @@ export function Header() {
   return (
     <div className="container max-w-[1440px] px-10 md:px-32 py-0 h-16 mx-auto flex items-center">
       <Link href={routes.top} className="flex items-center gap-1.5 flex-1 grow">
-        <Image
-          width={17}
-          height={17}
-          alt="NotCMS logo"
-          src="/img/notcms-icon.png"
-        />
         <div className="w-fit [text-shadow:0px_1px_2px_#0000000f] font-Roobert tracking-[-0.01em] font-semibold text-white text-xl leading-[normal] whitespace-nowrap">
           NotCMS
         </div>
