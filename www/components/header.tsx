@@ -26,7 +26,7 @@ export function Header() {
           alt="NotCMS logo"
           src="/img/notcms-icon.png"
         />
-        <div className="w-fit [text-shadow:0px_1px_2px_#0000000f] font-Roobert font-semibold text-white text-xl leading-[normal] whitespace-nowrap">
+        <div className="w-fit [text-shadow:0px_1px_2px_#0000000f] font-Roobert tracking-[-0.01em] font-semibold text-white text-xl leading-[normal] whitespace-nowrap">
           NotCMS
         </div>
       </Link>

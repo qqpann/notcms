@@ -50,7 +50,7 @@ const SectionTitle = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "text-3xl font-semibold font-Roobert sm:text-5xl text-white",
+      "text-3xl font-semibold font-Roobert tracking-[-0.01em] sm:text-5xl text-white",
       className
     )}
     {...props}

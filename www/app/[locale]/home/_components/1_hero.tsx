@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section className="container max-w-[1440px] px-4 md:px-32 mx-auto flex flex-col items-center gap-16 md:gap-24 pt-12 md:pt-24 pb-0 relative">
       <div className="flex flex-col items-center gap-12 relative self-stretch w-full flex-[0_0_auto]">
-        <h1 className="w-full font-Roobert font-bold text-white text-[36px] leading-[48px] md:text-[64px] text-center md:leading-[72px]">
+        <h1 className="w-full font-Roobert tracking-[-0.01em] font-bold text-white text-[36px] leading-[48px] md:text-[64px] text-center md:leading-[72px]">
           Create & publish <br /> your website content
           <br className="md:hidden" />{" "}
           <span

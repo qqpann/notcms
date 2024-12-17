@@ -32,7 +32,7 @@ export default function PricingPage() {
   return (
     <main className="container max-w-[1440px] px-32 mx-auto py-8">
       <div className="flex flex-col w-full mb-8 items-start gap-5 flex-[0_0_auto]">
-        <h2 className="self-stretch mt-[-1.00px] font-Roobert [font-family:'Roobert','Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl leading-[normal]">
+        <h2 className="self-stretch mt-[-1.00px] font-Roobert tracking-[-0.01em] font-normal text-white text-5xl leading-[normal]">
           Choose the right plan for yourself
         </h2>
       </div>
