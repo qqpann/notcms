@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cn } from "~/lib/utils";
 import { Link } from "~/src/i18n/routing";
 import { nc } from "~/src/notcms/schema";
 
@@ -60,18 +61,26 @@ export function BlogPagesList({
 
       <div className="grid grid-cols-1 gap-8">
         <HeroBlogPostCard
+          className="hidden md:flex"
           page={pages[0]}
           writer={writers.find(
             (w) => w.id === pages[0].properties.writers?.[0]
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {pages.map((page) => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:first:hidden">
+          {pages.map((page, i) => {
             const writer = writers.find(
               (w) => w.id === page.properties.writers?.[0]
             );
-            return <BlogPostCard key={page.id} page={page} writer={writer} />;
+            return (
+              <BlogPostCard
+                key={page.id}
+                page={page}
+                writer={writer}
+                className={i === 0 ? "md:hidden" : undefined}
+              />
+            );
           })}
         </div>
       </div>
@@ -88,7 +97,10 @@ function HeroBlogPostCard({ className, page, writer }: Props) {
   return (
     <Link
       href={`/blog/${page.id}`}
-      className="flex items-start p-4 gap-8 relative rounded-3xl self-stretch w-full flex-[0_0_auto] shadow-[inset_0px_-80px_96px_#ffffff14] border border-white border-opacity-10"
+      className={cn(
+        "flex items-start p-4 gap-8 relative rounded-3xl self-stretch w-full flex-[0_0_auto] shadow-[inset_0px_-80px_96px_#ffffff14] border border-white border-opacity-10",
+        className
+      )}
     >
       <div className="w-[576px] h-[310px]">
         <Image
@@ -143,9 +155,10 @@ function BlogPostCard({ className, page, writer }: Props) {
     // TODO: border?
     <Link
       href={`/blog/${page.id}`}
-      className={
-        "flex flex-col items-start gap-5 pt-4 pb-5 px-4 bg-[#ffffff03] rounded-3xl overflow-hidden border-white border-opacity-10 border-[0.5px] shadow-[inset_0px_-80px_96px_#ffffff14]"
-      }
+      className={cn(
+        "flex flex-col items-start gap-5 pt-4 pb-5 px-4 bg-[#ffffff03] rounded-3xl overflow-hidden border-white border-opacity-10 border-[0.5px] shadow-[inset_0px_-80px_96px_#ffffff14]",
+        className
+      )}
     >
       <div className="w-[352px] h-[200px]">
         <Image
