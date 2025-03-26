@@ -11,7 +11,7 @@ export default async function Page() {
   templates = templates.filter((template) => template.properties.published);
 
   return (
-    <div className="mx-auto px-32 py-16 flex flex-col justify-start items-center gap-16">
+    <div className="mx-auto px-4 md:px-32 py-16 flex flex-col justify-start items-center gap-16">
       <div className="self-stretch text-center text-white text-5xl font-Roobert tracking-[-0.01em]">
         Find what you need
       </div>

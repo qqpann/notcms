@@ -13,9 +13,9 @@ export function BlogPageDetail({
   writer?: Writer;
 }) {
   return (
-    <div className="container max-w-[1440px] px-32 mx-auto flex flex-col items-start relative">
-      <div className="flex flex-col items-center gap-12 pt-16 pb-32 px-32 relative self-stretch w-full flex-[0_0_auto]">
-        <div className="flex flex-col w-[784px] items-center gap-12 relative flex-[0_0_auto]">
+    <div className="container max-w-[1440px] px-4 md:px-32 mx-auto flex flex-col items-start relative">
+      <div className="flex flex-col items-center gap-12 pt-16 p-0 md:p-32 relative self-stretch w-full flex-[0_0_auto]">
+        <div className="flex flex-col max-w-[784px] items-center gap-12 relative flex-[0_0_auto]">
           <div className="flex flex-col items-center gap-8 relative self-stretch w-full flex-[0_0_auto]">
             <div className="relative self-stretch mt-[-1.00px] [font-family:'Selecta_VF_Trial-Light',Helvetica] font-light text-zinc-400 text-sm text-center leading-[normal]">
               {new Date(
@@ -25,7 +25,7 @@ export function BlogPageDetail({
             <p className="relative self-stretch [font-family:'Selecta_VF_Trial-Regular',Helvetica] font-normal text-white text-5xl text-center leading-[normal]">
               {page.title}
             </p>
-            <div className="flex w-[115px] items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
+            <div className="flex max-w-[115px] items-center gap-1.5 pl-[3px] pr-2.5 py-[3px] relative flex-[0_0_auto] bg-[#ffffff0a] rounded-[40px] border-[0.5px] border-solid border-[#ffffff1f]">
               <Image
                 className="relative size-[18px] object-cover rounded-full"
                 width={18}
@@ -39,7 +39,7 @@ export function BlogPageDetail({
             </div>
           </div>
           <Image
-            className="relative self-stretch w-full h-[422px] mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] object-cover"
+            className="relative self-stretch w-full h-full mb-[-0.50px] ml-[-0.50px] mr-[-0.50px] bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000] object-cover"
             width={784}
             height={422}
             alt="Key Visual"
@@ -56,7 +56,7 @@ export function BlogPageDetail({
 function WriterProfileCard({ writer }: { writer: Writer }) {
   return (
     <div
-      className="w-[600px] p-6 bg-white/1 rounded-[20px] border-white border-[0.5px] border-opacity-10 justify-start items-start gap-6 inline-flex 
+      className="max-w-[600px] p-6 bg-white/1 rounded-[20px] border-white border-[0.5px] border-opacity-10 justify-start items-start gap-6 inline-flex 
 shadow-[inset_0px_-40px_48px_0px_rgba(255,255,255,0.08)]"
     >
       <Image

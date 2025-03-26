@@ -32,7 +32,7 @@ export default async function Page({
   const propertyTable = _propertyTable.filter((x) => x.value!!);
 
   return (
-    <div className="container max-w-[1440px] mx-auto px-32 py-16 space-y-24">
+    <div className="container max-w-[1440px] mx-auto px-4 md:px-32 py-16 space-y-24">
       <div className="self-stretch flex-col justify-start items-start gap-8 flex">
         <div className="self-stretch justify-start items-start gap-8 inline-flex">
           <div className="grow shrink basis-0 flex-col justify-start items-start gap-6 inline-flex">
@@ -56,7 +56,66 @@ export default async function Page({
         </div>
 
         <div className="flex flex-row gap-8 w-full">
-          <div className="grow w-full max-w-[calc(1184px-470px-32px)]">
+          <div className="grow w-full max-w-[calc(1184px-470px-32px)] space-y-3">
+            {/* Info on Mobile */}
+            <div className="w-full flex-col justify-start items-start flex md:hidden gap-3">
+              {template.properties.deploy_with_vercel && (
+                <Button className="w-full justify-start" size="lg" asChild>
+                  <Link
+                    href={template.properties.deploy_with_vercel!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Deploy with Vercel
+                  </Link>
+                </Button>
+              )}
+              {template.properties.notion_template && (
+                <Button className="w-full justify-start" size="lg" asChild>
+                  <Link
+                    href={template.properties.notion_template!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg
+                      className="size-5 -ml-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d={siNotion.path} />
+                    </svg>
+                    <span className="mr-auto">Get Notion Template</span>
+                    <ArrowRightIcon className="size-5 -mr-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+            <Card
+              className="bg-silver self-stretch px-6 py-1 flex-col justify-center items-center gap-4 flex md:hidden"
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.06)",
+              }}
+            >
+              <Table>
+                <TableBody>
+                  {propertyTable.map((property) => (
+                    <TableRow
+                      key={property.label}
+                      className="border-b-[0.5px] border-white border-opacity-[0.12] last:border-none hover:bg-inherit"
+                    >
+                      <TableCell className="text-base text-white/70 font-normal h-[52px] p-0">
+                        {property.label}
+                      </TableCell>
+                      <TableCell className="text-right text-base text-white font-normal h-[52px] p-0">
+                        {property.value}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+            {/* -- end of info on mobile-- */}
+
             {template.properties.images && (
               <>
                 <div className="flex flex-col gap-5">
@@ -80,7 +139,8 @@ export default async function Page({
             />
           </div>
 
-          <div className="w-[470px] min-w-[470px] flex-col justify-start items-start gap-8 inline-flex">
+          <div className="w-[470px] min-w-[470px] flex-col justify-start items-start gap-8 hidden md:inline-flex">
+            {/* Info on Desktop */}
             <div className="w-full flex-col justify-start items-start flex gap-3">
               {template.properties.deploy_with_vercel && (
                 <Button className="w-full justify-start" size="lg" asChild>
