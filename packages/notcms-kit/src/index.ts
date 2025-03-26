@@ -76,7 +76,6 @@ async function init() {
 function isNextProject() {
   // js, ts, mjs, cjs
   const ext = [".js", ".ts", ".mjs", ".cjs"];
-  return true;
   return ext.some((e) =>
     existsSync(path.resolve(process.cwd(), `next.config${e}`))
   );
