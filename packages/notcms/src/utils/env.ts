@@ -19,46 +19,36 @@
 export function getEnv(key: string): string | undefined {
   // Node.js
   if (typeof process !== "undefined" && process.env && key in process.env) {
-    return process.env[key];
+    return process.env?.[key]?.trim() ?? undefined;
   }
 
   // Deno
   if (
     typeof globalThis === "object" &&
     "Deno" in globalThis &&
-    typeof (globalThis as any).Deno?.env?.get === "function"
+    typeof (globalThis as any).Deno?.env?.get === "function" &&
+    typeof (globalThis as any).Deno.env.get(key) === "string"
   ) {
-    try {
-      return (globalThis as any).Deno.env.get(key);
-    } catch {
-      return undefined;
-    }
+    return (globalThis as any).Deno.env.get(key).trim() ?? undefined;
   }
 
   // Bun
   if (
     typeof globalThis === "object" &&
     "Bun" in globalThis &&
-    typeof (globalThis as any).Bun?.env === "object"
+    typeof (globalThis as any).Bun?.env === "object" &&
+    typeof (globalThis as any).Bun.env[key] === "string"
   ) {
-    return (globalThis as any).Bun.env[key];
+    return (globalThis as any).Bun.env[key].trim() ?? undefined;
   }
 
   // Vite / Astro
-  try {
-    if (
-      // @ts-ignore
-      typeof import.meta !== "undefined" &&
-      // @ts-ignore
-      import.meta.env &&
-      // @ts-ignore
-      key in import.meta.env
-    ) {
-      // @ts-ignore
-      return import.meta.env[key];
-    }
-  } catch {
-    // ignore
+  if (
+    typeof import.meta === "object" &&
+    "env" in import.meta &&
+    typeof (import.meta as any).env[key] === "string"
+  ) {
+    return (import.meta as any).env[key];
   }
 
   return undefined;
