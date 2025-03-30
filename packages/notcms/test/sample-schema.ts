@@ -1,4 +1,4 @@
-import type { Schema } from "./types";
+import type { Schema } from "../src/types";
 
 export const schema = {
   abc: {

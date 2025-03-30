@@ -1,5 +1,5 @@
 import { Client } from "../src/client";
-import { schema } from "../src/sample-schema";
+import { schema } from "./sample-schema";
 
 describe("notcms", () => {
   it.skip("should successfully list pages", async () => {
