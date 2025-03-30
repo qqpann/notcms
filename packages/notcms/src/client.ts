@@ -1,5 +1,6 @@
 import { routes } from "./routes";
 import type { InferProperties, Page, Pages, Schema } from "./types";
+import { getEnv } from "./utils/env";
 
 class DatabaseHandler<TData> {
   constructor(
@@ -115,8 +116,8 @@ export class Client<TSchema extends Schema> {
     workspaceId?: string;
     schema: TSchema;
   }) {
-    const secretKey = options?.secretKey || process.env.NOTCMS_SECRET_KEY;
-    const workspaceId = options?.workspaceId || process.env.NOTCMS_WORKSPACE_ID;
+    const secretKey = options?.secretKey || getEnv("NOTCMS_SECRET_KEY");
+    const workspaceId = options?.workspaceId || getEnv("NOTCMS_WORKSPACE_ID");
     if (!secretKey) {
       throw new Error(
         "secretKey is required. Pass it as an option or set it as an environment variable."
