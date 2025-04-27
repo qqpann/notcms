@@ -29,11 +29,11 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 
 ## Key Features
 
-- **Type Safety**: Fully typed queries and responses using TypeScript
-- **Simple API**: Clean and intuitive API for fetching content
-- **Notion as Backend**: Use Notion's user-friendly editor for content creation
-- **Framework Agnostic**: Works with any JavaScript framework (Next.js, React, Vue, etc.)
-- **CLI Tools**: Includes notcms-kit for easy project setup and schema management
+- 🛡️ **Type Safety**: Fully typed queries and responses using TypeScript
+- 🎯 **Simple API**: Clean and intuitive API for fetching content
+- 📝 **Notion as Backend**: Use Notion's user-friendly editor for content creation
+- 🔄 **Framework Agnostic**: Works with any JavaScript framework (Next.js, React, Vue, etc.)
+- 🛠️ **CLI Tools**: Includes notcms-kit for easy project setup and schema management
 
 ## Getting Started
 
@@ -120,8 +120,8 @@ if (error) {
 
 Check out these examples to get started quickly:
 
-- [Next.js Simple Blog Template](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
-- [More templates available on our website](https://notcms.com/templates)
+- 📚 [Next.js Simple Blog Template](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
+- 🎨 [More templates available on our website](https://notcms.com/templates)
 
 ## Troubleshooting
 
