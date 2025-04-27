@@ -119,6 +119,6 @@ dist
 # Compiled code
 dist/
 
-# samples
-samples/*
-!samples/blog-demo
+# examples
+examples/*
+!examples/nextjs-simple-blog-template
