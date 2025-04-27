@@ -145,11 +145,6 @@ If you encounter schema-related errors:
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-## Community
-
-- [Discord Community](https://discord.gg/notcms)
-- [Twitter](https://twitter.com/notcms)
-
 ## License
 
 This project is organized as a monorepo with multiple packages:
