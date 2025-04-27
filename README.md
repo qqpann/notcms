@@ -39,21 +39,13 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 
 ### Installation
 
-#### Core Library
-
 ```bash
 npm install notcms
 ```
 
-#### CLI Tools (Optional)
-
-```bash
-npm install notcms-kit
-```
-
 ### Usage
 
-#### 1. Set Up Environment Variables
+#### 0. Set Up Environment Variables
 
 Create a `.env` file in your project root:
 
@@ -64,9 +56,27 @@ NOTCMS_WORKSPACE_ID=your_workspace_id
 
 You can get these values from the NotCMS Dashboard.
 
+#### 1. Initialize a Project
+
+NotCMS Kit provides command-line tools to streamline your workflow. You can use it directly with npx:
+
+```bash
+npx notcms-kit init
+```
+
+This will create a `notcms.config.json` file in your project root.
+
 #### 2. Define Your Schema
 
-Create a schema file that maps your Notion databases:
+The easiest way to define your schema is to use NotCMS Kit:
+
+```bash
+npx notcms-kit pull
+```
+
+This will automatically fetch your database schema from Notion and generate a TypeScript schema file.
+
+For reference, the generated schema will look something like this:
 
 ```ts
 // src/notcms/schema.ts
@@ -80,7 +90,7 @@ export const schema = {
       description: "rich_text",
       published: "checkbox",
       thumbnails: "files",
-      // Add other properties as needed
+      // Run notcms-kit pull again when properties are updated
     },
   },
 } satisfies Schema;
@@ -105,26 +115,6 @@ if (error) {
   console.error("Failed to fetch blog posts:", error);
 }
 ```
-
-### Using NotCMS Kit (CLI)
-
-NotCMS Kit provides command-line tools to streamline your workflow.
-
-#### Initialize a Project
-
-```bash
-npx notcms-kit init
-```
-
-This will create a `notcms.config.json` file in your project root.
-
-#### Pull Schema from Notion
-
-```bash
-npx notcms-kit pull
-```
-
-This will fetch your database schema from Notion and generate a TypeScript schema file.
 
 ## Examples and Templates
 
