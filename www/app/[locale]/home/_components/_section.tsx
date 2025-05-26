@@ -35,7 +35,7 @@ const SectionPreTitle = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "h-7 p-3 bg-[#1f1f20] rounded-[52px] justify-center items-center gap-2 inline-flex text-center text-white text-xs font-normal font-['DM Mono'] leading-snug",
+      "h-7 p-3 bg-[#1f1f20] rounded-[52px] justify-center items-center gap-2 inline-flex text-center text-white text-xs font-normal leading-snug",
       className
     )}
     {...props}

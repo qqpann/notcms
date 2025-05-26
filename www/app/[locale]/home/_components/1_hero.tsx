@@ -31,7 +31,7 @@ export function Hero() {
           </span>
         </h1>
 
-        <p className="relative self-stretch [font-family:'Inter-Medium',Helvetica] font-normal text-white text-base md:text-lg text-center leading-[26px]">
+        <p className="relative self-stretch font-normal text-white text-base md:text-lg text-center leading-[26px]">
           <span className="font-medium hidden md:inline">
             Make website content management easier.
           </span>
