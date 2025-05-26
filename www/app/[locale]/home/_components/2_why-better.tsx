@@ -14,11 +14,29 @@ import {
   SectionTitle,
 } from "./_section";
 
+const SparkleIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M12.9367 3.64886L12.0003 1.15198L11.064 3.64886C9.66542 7.37843 7.3788 9.66506 3.64922 11.0636L1.15234 12L3.64922 12.9363C7.3788 14.3349 9.66542 16.6215 11.064 20.3511L12.0003 22.848L12.9367 20.3511C14.3353 16.6215 16.6219 14.3349 20.3515 12.9363L22.8483 12L20.3515 11.0636C16.6219 9.66506 14.3353 7.37843 12.9367 3.64886Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
 export function WhyBetter() {
   return (
     <Section className="md:pt-0">
       <SectionHeader>
-        <SectionPreTitle>Why NotCMS?</SectionPreTitle>
+        <SectionPreTitle>
+          <SparkleIcon />
+          Why NotCMS?
+        </SectionPreTitle>
         <SectionTitle>A superior headless CMS</SectionTitle>
       </SectionHeader>
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-[20px] lg:grid-cols-46">
