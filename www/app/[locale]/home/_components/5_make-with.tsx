@@ -18,6 +18,21 @@ import {
   SectionTitle,
 } from "./_section";
 
+const LightningIcon = () => (
+  <svg
+    width="12"
+    height="13"
+    viewBox="0 0 12 13"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M4.53222 1.09766C4.24814 1.09766 3.98844 1.25816 3.8614 1.51225L1.6114 6.01226C1.36206 6.51091 1.72468 7.09766 2.28222 7.09766H3.81491L2.81154 10.1914C2.57555 10.919 3.45253 11.4916 4.02378 10.9828L10.845 4.90773C11.3597 4.4493 11.0354 3.59766 10.3461 3.59766H8.3858L9.2043 2.23353C9.5042 1.73364 9.14415 1.09766 8.56115 1.09766H4.53222Z"
+      fill="#CCCCCC"
+    />
+  </svg>
+);
+
 const codeExamples: {
   id: string;
   language: string;
@@ -146,6 +161,10 @@ export function MakeWith() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div className="flex flex-col h-full justify-between">
           <div className="space-y-2">
+            <SectionPreTitle>
+              <LightningIcon />
+              Development ready
+            </SectionPreTitle>
             <SectionTitle>
               Make with your
               <br />
