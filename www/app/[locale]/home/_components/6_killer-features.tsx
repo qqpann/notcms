@@ -14,11 +14,31 @@ import {
   SectionTitle,
 } from "./_section";
 
+const MagnifyingGlassIcon = () => (
+  <svg
+    width="13"
+    height="13"
+    viewBox="0 0 13 13"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M10.5 10.0977L8.525 8.12266M9.5 5.59766C9.5 7.53066 7.933 9.09766 6 9.09766C4.06701 9.09766 2.5 7.53066 2.5 5.59766C2.5 3.66466 4.06701 2.09766 6 2.09766C7.933 2.09766 9.5 3.66466 9.5 5.59766Z"
+      stroke="#CCCCCC"
+      strokeWidth="1.33"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
 export function KillerFeatures() {
   return (
     <Section>
       <SectionHeader>
-        <SectionPreTitle>Core features</SectionPreTitle>
+        <SectionPreTitle>
+          <MagnifyingGlassIcon />
+          Core features
+        </SectionPreTitle>
         <SectionTitle>What's inside NotCMS?</SectionTitle>
       </SectionHeader>
       <div className="w-full grid grid-cols-1 gap-[20px] md:grid-cols-7">
