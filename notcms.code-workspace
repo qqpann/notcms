@@ -1,6 +1,10 @@
 {
   "folders": [
     {
+      "name": "root",
+      "path": "."
+    },
+    {
       "path": "packages/notcms"
     },
     {
@@ -11,10 +15,6 @@
     },
     {
       "path": "examples"
-    },
-    {
-      "name": "root",
-      "path": "."
     }
   ],
   "settings": {
