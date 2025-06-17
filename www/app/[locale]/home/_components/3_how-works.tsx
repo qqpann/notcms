@@ -75,10 +75,6 @@ export function HowWorks() {
               <span className="hidden md:inline-block">Your Website</span>
             </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription className="hidden md:block">
-              Deploy your website to the edge with Vercel, Netlify, or any other
-              static site host.
-            </LayerDescription>
           </LayerHeader>
         </Layer>
         {/* 2 */}
@@ -92,10 +88,6 @@ export function HowWorks() {
               <span className="hidden md:inline-block">Website codebase</span>
             </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription className="hidden md:block">
-              Build your website with your design and your favorite frontend
-              framework, like Next.js or Vue.
-            </LayerDescription>
           </LayerHeader>
           <LayerImage>
             <Image
@@ -126,10 +118,6 @@ export function HowWorks() {
               <span className="hidden md:inline-block">NotCMS API</span>
             </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription className="hidden md:block">
-              Leverage the power of NotCMS's fast API. Retrieve your content
-              with typed queries.
-            </LayerDescription>
           </LayerHeader>
         </Layer>
         {/* 4 */}
@@ -143,10 +131,6 @@ export function HowWorks() {
               <span className="hidden md:inline-block">NotCMS Dashboard</span>
             </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription className="hidden md:block">
-              Manage your databases with a powerful and intuitive dashboard,
-              with features like version history.
-            </LayerDescription>
           </LayerHeader>
           <LayerImage>
             <Image
@@ -178,10 +162,6 @@ export function HowWorks() {
               </span>
             </LayerTitle>
             <Separator className="bg-white opacity-[0.12] my-3" />
-            <LayerDescription className="hidden md:block">
-              Edit your content in Notion, and sync it to your website with a
-              few click.
-            </LayerDescription>
           </LayerHeader>
         </Layer>
         <HorizontalLayerDescription />
