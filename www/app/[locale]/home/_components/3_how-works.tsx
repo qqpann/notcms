@@ -266,107 +266,96 @@ const LayerDescription = React.forwardRef<
 LayerDescription.displayName = "LayerDescription";
 
 // Horizontal descriptions
+const horizontalLayerDescriptions: {
+  imageUrl: string;
+  title: string;
+  description: string;
+}[] = [
+  {
+    imageUrl: "/img/central-icons/compass-square.svg",
+    title: "Your website",
+    description:
+      "Deploy your website to the edge with Vercel, Netlify, or any other static site host.",
+  },
+  {
+    imageUrl: "/img/central-icons/code-brackets.svg",
+    title: "Website codebase",
+    description:
+      "Build your website with your design and your favorite frontend framework, like Next.js or Vue.",
+  },
+  {
+    imageUrl: "/img/central-icons/plugin.svg",
+    title: "NotCMS API",
+    description:
+      "Leverage the power of NotCMS's fast API. Retrieve your content with typed queries.",
+  },
+  {
+    imageUrl: "/img/central-icons/dashboard-low.svg",
+    title: "NotCMS Dashboard",
+    description:
+      "Manage your databases with a powerful and intuitive dashboard, with features like version history.",
+  },
+  {
+    imageUrl: "/img/central-icons/server-2.svg",
+    title: "Notion editor / database",
+    description:
+      "Edit your content in Notion, and sync it to your website with a few click.",
+  },
+];
+
 function HorizontalLayerDescription({
   children,
   className,
 }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) {
   return (
-    <ScrollArea className="w-full md:hidden">
+    <ScrollArea className="w-full">
       <div className="self-stretch justify-start items-start inline-flex">
-        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
-          <Image
-            src="/img/central-icons/compass-square.svg"
-            alt=""
-            className="size-[24px]"
-            width={24}
-            height={24}
-          />
-          <div className="self-stretch text-white text-base font-medium leading-none">
-            1. Your website
-          </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
-            Deploy your website to the edge with Vercel, Netlify, or any other
-            static site host.
-          </div>
-        </div>
-
-        <GradientSeparator orientation="vertical" className="mx-3" />
-
-        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
-          <Image
-            src="/img/central-icons/code-brackets.svg"
-            alt=""
-            className="size-[24px]"
-            width={24}
-            height={24}
-          />
-          <div className="self-stretch text-white text-base font-medium leading-none">
-            2. Website codebase
-          </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
-            Build your website with your design and your favorite frontend
-            framework, like Next.js or Vue.
-          </div>
-        </div>
-
-        <GradientSeparator orientation="vertical" className="mx-3" />
-
-        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
-          <Image
-            src="/img/central-icons/plugin.svg"
-            alt=""
-            className="size-[24px]"
-            width={24}
-            height={24}
-          />
-          <div className="self-stretch text-white text-base font-medium leading-none">
-            3. NotCMS API
-          </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
-            Leverage the power of NotCMS's fast API. Retrieve your content with
-            typed queries.
-          </div>
-        </div>
-
-        <GradientSeparator orientation="vertical" className="mx-3" />
-
-        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
-          <Image
-            src="/img/central-icons/dashboard-low.svg"
-            alt=""
-            className="size-[24px]"
-            width={24}
-            height={24}
-          />
-          <div className="self-stretch text-white text-base font-medium leading-none">
-            4. NotCMS Dashboard
-          </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
-            Manage your databases with a powerful and intuitive dashboard, with
-            features like version history.
-          </div>
-        </div>
-
-        <GradientSeparator orientation="vertical" className="mx-3" />
-
-        <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
-          <Image
-            src="/img/central-icons/server-2.svg"
-            alt=""
-            className="size-[24px]"
-            width={24}
-            height={24}
-          />
-          <div className="self-stretch text-white text-base font-medium leading-none">
-            5. Notion editor / database
-          </div>
-          <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
-            Edit your content in Notion, and sync it to your website with a few
-            click.
-          </div>
-        </div>
+        {horizontalLayerDescriptions.map((item, index) => (
+          <>
+            {index > 0 && (
+              <GradientSeparator orientation="vertical" className="mx-3" />
+            )}
+            <HorizontalLayerDescriptionItem
+              key={index}
+              imageUrl={item.imageUrl}
+              number={index + 1}
+              title={item.title}
+              description={item.description}
+            />
+          </>
+        ))}
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
+  );
+}
+
+function HorizontalLayerDescriptionItem({
+  imageUrl,
+  number,
+  title,
+  description,
+}: React.PropsWithChildren<{
+  imageUrl: string;
+  number: number;
+  title: string;
+  description: string;
+}>) {
+  return (
+    <div className="w-64 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
+      <Image
+        src={imageUrl}
+        alt=""
+        className="size-[24px]"
+        width={24}
+        height={24}
+      />
+      <div className="self-stretch text-white text-base font-medium leading-none">
+        {number}. {title}
+      </div>
+      <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
+        {description}
+      </div>
+    </div>
   );
 }
