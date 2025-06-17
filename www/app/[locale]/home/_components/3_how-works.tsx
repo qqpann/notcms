@@ -208,7 +208,9 @@ const LayerHeader = React.forwardRef<HTMLDivElement, LayerHeaderProps>(
       className={cn(
         "mt-[40px] flex flex-col",
         direction === "right" ? "col-start-3" : "col-start-1",
-        direction === "right" ? "pr-8 text-right" : "pl-8 left-0",
+        direction === "right"
+          ? "pr-2.5 md:pr-16 text-right"
+          : "pl-2.5 md:pl-16 left-0",
         direction === "right" ? "items-end" : "items-start",
         className
       )}
