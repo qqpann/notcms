@@ -350,13 +350,11 @@ function HorizontalLayerDescriptionItem({
         width={24}
         height={24}
       />
-      <div className="self-stretch text-white text-base font-medium leading-none">
-        <span className="text-white text-base font-medium leading-none md:hidden">
-          {number}.
-        </span>{" "}
+      <div className="self-stretch text-white text-[15px] leading-none font-semibold">
+        <span className="text-white font-medium md:hidden">{number}.</span>{" "}
         {title}
       </div>
-      <div className="self-stretch opacity-70 text-white text-sm font-normal leading-snug">
+      <div className="self-stretch opacity-70 text-white text-sm font-normal">
         {description}
       </div>
     </div>
