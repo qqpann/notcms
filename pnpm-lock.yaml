@@ -50,7 +50,7 @@ importers:
         version: 18.3.0
       postcss:
         specifier: ^8
-        version: 8.4.41
+        version: 8.5.3
       tailwindcss:
         specifier: ^3
         version: 3.4.10(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4))
@@ -143,6 +143,9 @@ importers:
 
   www:
     dependencies:
+      '@central-icons-react/round-filled-radius-2-stroke-1.5':
+        specifier: ^0.0.29
+        version: 0.0.29(react@18.3.1)
       '@next/third-parties':
         specifier: ^15.0.3
         version: 15.0.3(next@14.2.26(@babel/core@7.24.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -157,7 +160,7 @@ importers:
         version: 1.1.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot':
         specifier: ^1.1.0
-        version: 1.1.0(@types/react@18.3.3)(react@18.3.1)
+        version: 1.1.1(@types/react@18.3.3)(react@18.3.1)
       '@radix-ui/react-tabs':
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -254,7 +257,7 @@ importers:
         version: 15.5.13
       postcss:
         specifier: ^8
-        version: 8.4.41
+        version: 8.5.3
       storybook:
         specifier: ^8.3.2
         version: 8.3.2
@@ -1036,6 +1039,11 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
+
+  '@central-icons-react/round-filled-radius-2-stroke-1.5@0.0.29':
+    resolution: {integrity: sha512-oolWK0dTRV1OciS1uvSJcGCIPYB8VHQSI8/ljx3aOjljYAcR4C1C3tzgKcLB19fGpicN0MCOk8GwOu0sO29rAQ==}
+    peerDependencies:
+      react: '>=14.0.0 <= 19'
 
   '@chromatic-com/storybook@1.9.0':
     resolution: {integrity: sha512-vYQ+TcfktEE3GHnLZXHCzXF/sN9dw+KivH8a5cmPyd9YtQs7fZtHrEgsIjWpYycXiweKMo1Lm1RZsjxk8DH3rA==}
@@ -5381,11 +5389,6 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@3.3.7:
-    resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
@@ -5929,10 +5932,6 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.4.41:
-    resolution: {integrity: sha512-TesUflQ0WKZqAvg52PWL6kHgLKP6xB6heTOdoYM0Wt2UHyxNa4K25EZZMgKns3BH1RLVbZCREPpLY0rhnNoHVQ==}
-    engines: {node: ^10 || ^12 || >=14}
-
   postcss@8.5.3:
     resolution: {integrity: sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==}
     engines: {node: ^10 || ^12 || >=14}
@@ -6411,10 +6410,6 @@ packages:
   slice-ansi@7.1.0:
     resolution: {integrity: sha512-bSiSngZ/jWeX93BqeIAbImyTbEihizcwNjFoRUIY/T1wWQsfsm2Vw1agPKylXvQTU7iASGdHhyqRlqQzfz+Htg==}
     engines: {node: '>=18'}
-
-  source-map-js@1.2.0:
-    resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
-    engines: {node: '>=0.10.0'}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -8305,6 +8300,10 @@ snapshots:
   '@biomejs/cli-win32-x64@1.9.4':
     optional: true
 
+  '@central-icons-react/round-filled-radius-2-stroke-1.5@0.0.29(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+
   '@chromatic-com/storybook@1.9.0(react@18.3.1)':
     dependencies:
       chromatic: 11.10.3
@@ -9827,8 +9826,8 @@ snapshots:
       next: 14.2.26(@babel/core@7.24.7)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       node-polyfill-webpack-plugin: 2.0.1(webpack@5.94.0(esbuild@0.23.1))
       pnp-webpack-plugin: 1.7.0(typescript@5.5.4)
-      postcss: 8.4.41
-      postcss-loader: 8.1.1(postcss@8.4.41)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1))
+      postcss: 8.5.3
+      postcss-loader: 8.1.1(postcss@8.5.3)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-refresh: 0.14.2
@@ -13407,8 +13406,6 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  nanoid@3.3.7: {}
-
   natural-compare@1.4.0: {}
 
   negotiator@0.6.3: {}
@@ -13803,31 +13800,31 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-import@15.1.0(postcss@8.4.41):
+  postcss-import@15.1.0(postcss@8.5.3):
     dependencies:
-      postcss: 8.4.41
+      postcss: 8.5.3
       postcss-value-parser: 4.2.0
       read-cache: 1.0.0
       resolve: 1.22.8
 
-  postcss-js@4.0.1(postcss@8.4.41):
+  postcss-js@4.0.1(postcss@8.5.3):
     dependencies:
       camelcase-css: 2.0.1
-      postcss: 8.4.41
+      postcss: 8.5.3
 
-  postcss-load-config@4.0.2(postcss@8.4.41)(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4)):
+  postcss-load-config@4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4)):
     dependencies:
       lilconfig: 3.1.2
       yaml: 2.5.0
     optionalDependencies:
-      postcss: 8.4.41
+      postcss: 8.5.3
       ts-node: 10.9.2(@types/node@20.14.15)(typescript@5.5.4)
 
-  postcss-loader@8.1.1(postcss@8.4.41)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1)):
+  postcss-loader@8.1.1(postcss@8.5.3)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1)):
     dependencies:
       cosmiconfig: 9.0.0(typescript@5.5.4)
       jiti: 1.21.6
-      postcss: 8.4.41
+      postcss: 8.5.3
       semver: 7.6.2
     optionalDependencies:
       webpack: 5.94.0(esbuild@0.23.1)
@@ -13855,9 +13852,9 @@ snapshots:
       icss-utils: 5.1.0(postcss@8.5.3)
       postcss: 8.5.3
 
-  postcss-nested@6.2.0(postcss@8.4.41):
+  postcss-nested@6.2.0(postcss@8.5.3):
     dependencies:
-      postcss: 8.4.41
+      postcss: 8.5.3
       postcss-selector-parser: 6.1.2
 
   postcss-selector-parser@6.0.10:
@@ -13877,12 +13874,6 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
-
-  postcss@8.4.41:
-    dependencies:
-      nanoid: 3.3.7
-      picocolors: 1.0.1
-      source-map-js: 1.2.0
 
   postcss@8.5.3:
     dependencies:
@@ -14509,8 +14500,6 @@ snapshots:
       ansi-styles: 6.2.1
       is-fullwidth-code-point: 5.0.0
 
-  source-map-js@1.2.0: {}
-
   source-map-js@1.2.1: {}
 
   source-map-support@0.5.13:
@@ -14761,11 +14750,11 @@ snapshots:
       normalize-path: 3.0.0
       object-hash: 3.0.0
       picocolors: 1.0.1
-      postcss: 8.4.41
-      postcss-import: 15.1.0(postcss@8.4.41)
-      postcss-js: 4.0.1(postcss@8.4.41)
-      postcss-load-config: 4.0.2(postcss@8.4.41)(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4))
-      postcss-nested: 6.2.0(postcss@8.4.41)
+      postcss: 8.5.3
+      postcss-import: 15.1.0(postcss@8.5.3)
+      postcss-js: 4.0.1(postcss@8.5.3)
+      postcss-load-config: 4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4))
+      postcss-nested: 6.2.0(postcss@8.5.3)
       postcss-selector-parser: 6.1.2
       resolve: 1.22.8
       sucrase: 3.35.0
