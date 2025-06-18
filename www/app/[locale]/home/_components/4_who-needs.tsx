@@ -96,22 +96,22 @@ export function WhoNeeds() {
             description={userGroups[0].description}
           />
 
-          <GradientSeparator orientation="vertical" className="mx-3" />
           <GradientSeparator className="md:hidden" />
 
           <UserGroup
             icon={userGroups[1].icon}
             title={userGroups[1].title}
             description={userGroups[1].description}
+            className="md:border-l md:border-light-up-gradient"
           />
 
-          <GradientSeparator orientation="vertical" className="mx-3" />
           <GradientSeparator className="md:hidden" />
 
           <UserGroup
             icon={userGroups[2].icon}
             title={userGroups[2].title}
             description={userGroups[2].description}
+            className="md:border-l md:border-light-up-gradient"
           />
         </div>
 
@@ -124,13 +124,13 @@ export function WhoNeeds() {
             description={userGroups[3].description}
           />
 
-          <GradientSeparator orientation="vertical" className="mx-3" />
           <GradientSeparator className="md:hidden" />
 
           <UserGroup
             icon={userGroups[4].icon}
             title={userGroups[4].title}
             description={userGroups[4].description}
+            className="md:border-l md:border-light-down-gradient"
           />
         </div>
       </div>
@@ -142,10 +142,16 @@ type UserGroupProps = {
   icon: React.ReactNode;
   title: string;
   description: string;
+  className?: string;
 };
-function UserGroup({ icon, title, description }: UserGroupProps) {
+function UserGroup({ icon, title, description, className }: UserGroupProps) {
   return (
-    <div className="flex flex-col items-start gap-5 pt-6 pb-7 px-6 relative flex-1 grow">
+    <div
+      className={cn(
+        "flex flex-col items-start gap-5 pt-6 pb-7 px-6 relative flex-1 grow",
+        className
+      )}
+    >
       <div className="flex items-center justify-center size-10 rounded-3xl bg-gradient-to-b from-[#262626] to-[#181819]">
         {icon}
       </div>
