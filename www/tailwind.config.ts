@@ -109,9 +109,13 @@ const config: Config = {
           maskComposite: "exclude",
           zIndex: "-1",
         },
-        ".border-silver-gradient": {
+        ".border-light-down-gradient": {
           borderImage:
             "linear-gradient(to bottom, rgb(39 39 42) 0%, transparent 100%) 1",
+        },
+        ".border-light-up-gradient": {
+          borderImage:
+            "linear-gradient(to bottom, transparent 0%, rgb(39 39 42) 100%) 1",
         },
       });
     }),

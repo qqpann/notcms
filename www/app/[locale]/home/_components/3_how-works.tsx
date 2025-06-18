@@ -319,7 +319,7 @@ function HorizontalLayerDescriptionItem({
   description: string;
 }>) {
   return (
-    <div className="w-64 md:w-auto md:col-span-1 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex border-t-[0.5px] border-l-[0.5px] border-silver-gradient first:border-l-0">
+    <div className="w-64 md:w-auto md:col-span-1 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex border-t-[0.5px] border-l-[0.5px] border-light-down-gradient first:border-l-0">
       <Image
         src={imageUrl}
         alt=""
