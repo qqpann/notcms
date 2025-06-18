@@ -293,18 +293,13 @@ function HorizontalLayerDescription({
     <ScrollArea className="w-full">
       <div className="self-stretch justify-start items-start inline-flex">
         {horizontalLayerDescriptions.map((item, index) => (
-          <>
-            {index > 0 && (
-              <GradientSeparator orientation="vertical" className="mx-3" />
-            )}
-            <HorizontalLayerDescriptionItem
-              key={index}
-              imageUrl={item.imageUrl}
-              number={index + 1}
-              title={item.title}
-              description={item.description}
-            />
-          </>
+          <HorizontalLayerDescriptionItem
+            key={index}
+            imageUrl={item.imageUrl}
+            number={index + 1}
+            title={item.title}
+            description={item.description}
+          />
         ))}
       </div>
       <ScrollBar orientation="horizontal" />
@@ -324,7 +319,7 @@ function HorizontalLayerDescriptionItem({
   description: string;
 }>) {
   return (
-    <div className="w-64 md:w-auto px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex">
+    <div className="w-64 md:w-auto px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex border-l border-[#3d3d3f] first:border-l-0">
       <Image
         src={imageUrl}
         alt=""
