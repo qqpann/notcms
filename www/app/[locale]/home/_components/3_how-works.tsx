@@ -55,7 +55,7 @@ export function HowWorks() {
           across every layer
         </SectionTitle>
       </SectionHeader>
-      <div className="flex flex-col items-center w-full">
+      <div className="flex flex-col items-center w-full mb-8 md:mb-20">
         {/* 1 */}
         <Layer
           className="z-50"
@@ -164,8 +164,8 @@ export function HowWorks() {
             <Separator className="bg-white opacity-[0.12] my-3" />
           </LayerHeader>
         </Layer>
-        <HorizontalLayerDescription />
       </div>
+      <HorizontalLayerDescription />
     </Section>
   );
 }
