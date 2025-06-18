@@ -228,7 +228,7 @@ export function MakeWith() {
               <TabsContent
                 key={example.id}
                 value={example.id}
-                className="px-5 overflow-auto max-h-[300px]"
+                className="px-5 overflow-auto max-h-[300px] text-sm"
               >
                 <ScrollArea>
                   <CodeBlock language="typescript" content={example.code} />
