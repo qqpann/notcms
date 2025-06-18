@@ -86,7 +86,7 @@ export function WhoNeeds() {
           type of collaboration and team
         </SectionTitle>
       </SectionHeader>
-      <div className="flex flex-col max-w-[984px] relative">
+      <div className="flex flex-col relative w-full">
         <div className="flex flex-col md:flex-row relative self-stretch w-full flex-[0_0_auto]">
           <UserGroup
             icon={
