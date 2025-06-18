@@ -1,6 +1,8 @@
-import * as SeparatorPrimitive from "@radix-ui/react-separator";
-import Image from "next/image";
-import * as React from "react";
+import { IconChart2 } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconChart2";
+import { IconCodeInsert } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconCodeInsert";
+import { IconGroup2 } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconGroup2";
+import { IconPeople } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconPeople";
+import { IconWrite1 } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconWrite1";
 
 import { GradientSeparator } from "~/components/ui/separator";
 import { cn } from "~/lib/utils";
@@ -36,38 +38,38 @@ const CirculationIcon = () => (
 
 export function WhoNeeds() {
   const userGroups: {
-    iconUrl: string;
+    icon: React.ReactNode;
     title: string;
     description: string;
   }[] = [
     // 1st row
     {
-      iconUrl: "/img/home/icon-independent-bloggers.svg",
+      icon: <IconPeople className="size-4" />,
       title: "Independent bloggers",
       description:
         "Focus on writing and growing your audience. No more worrying, with the quickstart templates.",
     },
     {
-      iconUrl: "/img/home/icon-content-writers.svg",
+      icon: <IconWrite1 className="size-4" />,
       title: "Content writers",
       description:
         "Write content in a familiar interface and see it go live instantly. No more waiting or back-and-forth.",
     },
     {
-      iconUrl: "/img/home/icon-devs-engineers.svg",
+      icon: <IconCodeInsert className="size-4" />,
       title: "Developers & engineers",
       description:
         "Write code faster and confidently with a type safe SDK. No more hassle syncing types.",
     },
     // 2nd row
     {
-      iconUrl: "/img/home/icon-business-managers.svg",
+      icon: <IconChart2 className="size-4" />,
       title: "Business managers",
       description:
         "Get a bird's eye view of your content and make data-driven decisions. No more guesswork.",
     },
     {
-      iconUrl: "/img/home/icon-small-teams.svg",
+      icon: <IconGroup2 className="size-4" />,
       title: "Small teams",
       description:
         "Manage your content and collaborate with your team effortlessly. No more silos.",
@@ -89,14 +91,7 @@ export function WhoNeeds() {
       <div className="flex flex-col relative w-full">
         <div className="flex flex-col md:flex-row relative self-stretch w-full flex-[0_0_auto]">
           <UserGroup
-            icon={
-              <Image
-                src={userGroups[0].iconUrl}
-                alt={userGroups[0].title}
-                width={40}
-                height={40}
-              />
-            }
+            icon={userGroups[0].icon}
             title={userGroups[0].title}
             description={userGroups[0].description}
           />
@@ -105,14 +100,7 @@ export function WhoNeeds() {
           <GradientSeparator className="md:hidden" />
 
           <UserGroup
-            icon={
-              <Image
-                src={userGroups[1].iconUrl}
-                alt={userGroups[1].title}
-                width={40}
-                height={40}
-              />
-            }
+            icon={userGroups[1].icon}
             title={userGroups[1].title}
             description={userGroups[1].description}
           />
@@ -121,14 +109,7 @@ export function WhoNeeds() {
           <GradientSeparator className="md:hidden" />
 
           <UserGroup
-            icon={
-              <Image
-                src={userGroups[2].iconUrl}
-                alt={userGroups[2].title}
-                width={40}
-                height={40}
-              />
-            }
+            icon={userGroups[2].icon}
             title={userGroups[2].title}
             description={userGroups[2].description}
           />
@@ -138,14 +119,7 @@ export function WhoNeeds() {
 
         <div className="flex flex-col md:flex-row relative self-stretch w-full flex-[0_0_auto]">
           <UserGroup
-            icon={
-              <Image
-                src={userGroups[3].iconUrl}
-                alt={userGroups[3].title}
-                width={40}
-                height={40}
-              />
-            }
+            icon={userGroups[3].icon}
             title={userGroups[3].title}
             description={userGroups[3].description}
           />
@@ -154,14 +128,7 @@ export function WhoNeeds() {
           <GradientSeparator className="md:hidden" />
 
           <UserGroup
-            icon={
-              <Image
-                src={userGroups[4].iconUrl}
-                alt={userGroups[4].title}
-                width={40}
-                height={40}
-              />
-            }
+            icon={userGroups[4].icon}
             title={userGroups[4].title}
             description={userGroups[4].description}
           />
@@ -179,7 +146,9 @@ type UserGroupProps = {
 function UserGroup({ icon, title, description }: UserGroupProps) {
   return (
     <div className="flex flex-col items-start gap-5 pt-6 pb-7 px-6 relative flex-1 grow">
-      {icon}
+      <div className="flex items-center justify-center size-10 bg-white/15 rounded-full">
+        {icon}
+      </div>
 
       <div className="flex-col gap-4 flex items-start relative self-stretch w-full flex-[0_0_auto]">
         <div className="relative self-stretch mt-[-1.00px] font-550 text-white text-xl leading-5">
