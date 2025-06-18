@@ -291,7 +291,7 @@ function HorizontalLayerDescription({
 }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) {
   return (
     <ScrollArea className="w-full">
-      <div className="self-stretch justify-start items-start inline-flex">
+      <div className="self-stretch justify-start items-start inline-flex md:grid md:grid-cols-5">
         {horizontalLayerDescriptions.map((item, index) => (
           <HorizontalLayerDescriptionItem
             key={index}
@@ -319,7 +319,7 @@ function HorizontalLayerDescriptionItem({
   description: string;
 }>) {
   return (
-    <div className="w-64 md:w-auto px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex border-l border-silver-gradient first:border-l-0">
+    <div className="w-64 md:w-auto md:col-span-1 px-5 pt-4 pb-5 flex-col justify-start items-start gap-5 inline-flex border-l border-silver-gradient first:border-l-0">
       <Image
         src={imageUrl}
         alt=""
