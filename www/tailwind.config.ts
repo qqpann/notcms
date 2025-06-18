@@ -111,7 +111,7 @@ const config: Config = {
         },
         ".border-silver-gradient": {
           borderImage:
-            "linear-gradient(to bottom, transparent 0%, rgb(39 39 42) 50%, transparent 100%) 1",
+            "linear-gradient(to bottom, rgb(39 39 42) 0%, transparent 100%) 1",
         },
       });
     }),
