@@ -146,7 +146,7 @@ type UserGroupProps = {
 function UserGroup({ icon, title, description }: UserGroupProps) {
   return (
     <div className="flex flex-col items-start gap-5 pt-6 pb-7 px-6 relative flex-1 grow">
-      <div className="flex items-center justify-center size-10 bg-white/15 rounded-full">
+      <div className="flex items-center justify-center size-10 rounded-3xl bg-gradient-to-b from-[#262626] to-[#181819]">
         {icon}
       </div>
 
