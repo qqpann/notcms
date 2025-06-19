@@ -47,6 +47,8 @@ export default async function RootLayout({
           roobert.variable,
           "min-h-screen bg-black text-white font-['Inter','Inter-Light'] tracking-normal"
         )}
+        // ss10 sets Roobert "?" mark style to normal
+        style={{ fontFeatureSettings: "'ss10'" }}
       >
         <NextIntlClientProvider messages={messages}>
           <Header />
