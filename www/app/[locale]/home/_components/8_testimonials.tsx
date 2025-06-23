@@ -1,4 +1,4 @@
-import { IconPeople } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconPeople";
+import { IconPeopleLike } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconPeopleLike";
 import Image from "next/image";
 import * as React from "react";
 import { Card } from "~/components/ui/card";
@@ -174,7 +174,7 @@ export function Testimonials() {
     >
       <SectionHeader>
         <SectionPreTitle>
-          <IconPeople className="size-3" />
+          <IconPeopleLike className="size-3" />
           Testimonials
         </SectionPreTitle>
         <SectionTitle>Writers & teams love us!</SectionTitle>
