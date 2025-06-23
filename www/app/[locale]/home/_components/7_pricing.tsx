@@ -1,3 +1,5 @@
+import { IconCheckmark2 } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconCheckmark2";
+import { IconCoin1 } from "@central-icons-react/round-filled-radius-2-stroke-1.5/IconCoin1";
 import * as React from "react";
 import { Button, CandyButton } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -8,44 +10,6 @@ import {
   SectionPreTitle,
   SectionTitle,
 } from "./_section";
-
-// Checkmark icon component for feature lists
-const CheckIcon = () => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 12 12"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M9.5 3.5L4.5 8.5L2.5 6.5"
-      stroke="#ffffff"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-// Coin icon for pricing tag
-const CoinIcon = () => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 12 12"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <circle cx="6" cy="6" r="5" fill="#FFB563" />
-    <path
-      d="M4.5 4.5L7.5 7.5M7.5 4.5L4.5 7.5"
-      stroke="white"
-      strokeWidth="1"
-      strokeLinecap="round"
-    />
-  </svg>
-);
 
 interface Plan {
   title: string;
@@ -108,9 +72,7 @@ const PricingCard = ({
           <ul className="flex flex-col gap-4 list-none">
             {features.map((feature, index) => (
               <li key={index} className="flex flex-row gap-3 items-center">
-                <span className="shrink-0 w-3 h-3">
-                  <CheckIcon />
-                </span>
+                <IconCheckmark2 className="size-3 shrink-0" />
                 <span className="font-normal text-white text-[16px] tracking-[-0.16px] leading-4">
                   {feature}
                 </span>
@@ -167,9 +129,7 @@ const EnterprisePlan = ({
                         key={index}
                         className="flex flex-row gap-3 items-center w-full"
                       >
-                        <div className="shrink-0 w-3 h-3">
-                          <CheckIcon />
-                        </div>
+                        <IconCheckmark2 className="size-3 shrink-0" />
                         <div className="font-normal text-white text-[16px] tracking-[-0.16px] leading-4">
                           {feature}
                         </div>
@@ -246,7 +206,7 @@ export function Pricing() {
     <Section>
       <SectionHeader>
         <SectionPreTitle>
-          <CoinIcon />
+          <IconCoin1 className="size-3" />
           Pricing
         </SectionPreTitle>
         <SectionTitle>Find the right plan for you</SectionTitle>
