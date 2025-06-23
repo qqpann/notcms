@@ -104,23 +104,19 @@ const PricingCard = ({
         </div>
 
         {/* Features Section */}
-        <div className="bg-white/8 rounded-bl-3 rounded-br-3 rounded-tl-[10px] rounded-tr-[10px] border border-white/50 flex-1">
-          <div className="flex flex-col gap-4 p-4">
-            <div className="flex flex-col gap-5">
-              <div className="flex flex-col gap-4">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex flex-row gap-3 items-center">
-                    <div className="shrink-0 w-3 h-3">
-                      <CheckIcon />
-                    </div>
-                    <div className="font-normal text-white text-[16px] tracking-[-0.16px] leading-4">
-                      {feature}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+        <div className="bg-white bg-opacity-[0.08] rounded-b-[12px] rounded-t-[10px] border-silver flex-1 px-4 py-5">
+          <ul className="flex flex-col gap-4 list-none">
+            {features.map((feature, index) => (
+              <li key={index} className="flex flex-row gap-3 items-center">
+                <span className="shrink-0 w-3 h-3">
+                  <CheckIcon />
+                </span>
+                <span className="font-normal text-white text-[16px] tracking-[-0.16px] leading-4">
+                  {feature}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </Card>
