@@ -9,6 +9,7 @@ import { WhoNeeds } from "./_components/4_who-needs";
 import { MakeWith } from "./_components/5_make-with";
 import { KillerFeatures } from "./_components/6_killer-features";
 import { Pricing } from "./_components/7_pricing";
+import { Testimonials } from "./_components/8_testimonials";
 
 export async function generateMetadata({
   params,
@@ -68,6 +69,9 @@ export default function Home() {
       <WhoNeeds />
       <MakeWith />
       <KillerFeatures />
+      <UnderDevelopment>
+        <Testimonials />
+      </UnderDevelopment>
       <UnderDevelopment>
         <Pricing />
       </UnderDevelopment>
