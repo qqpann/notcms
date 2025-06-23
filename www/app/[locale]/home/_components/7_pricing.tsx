@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Button, CandyButton } from "~/components/ui/button";
+import { Card } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
 import {
   Section,
@@ -66,7 +68,7 @@ const PricingCard = ({
   description,
 }: PricingCardProps) => {
   return (
-    <div className="bg-zinc-900 rounded-3xl border border-white/50 flex flex-col h-full">
+    <Card className="flex flex-col h-full">
       <div className="flex flex-col gap-4 p-2">
         {/* Header Section */}
         <div className="flex flex-col gap-2 items-center">
@@ -93,28 +95,11 @@ const PricingCard = ({
           </div>
           {/* Button Section */}
           <div className="w-full px-4">
-            <button
-              className={cn(
-                "h-9 w-full rounded-full border border-white/50 flex items-center justify-center relative",
-                isPopular
-                  ? "bg-gradient-to-r from-[#ff8763] to-[#fe0291] text-white shadow-sm"
-                  : "bg-white/1 text-white shadow-inner"
-              )}
-              style={
-                !isPopular
-                  ? {
-                      background:
-                        "linear-gradient(178.071deg, rgba(255, 255, 255, 0.12) 11.048%, rgba(255, 255, 255, 0.03) 68.85%, rgba(255, 255, 255, 0) 91.328%)",
-                      boxShadow:
-                        "0px -80px 96px 0px inset rgba(255,255,255,0.08)",
-                    }
-                  : undefined
-              }
-            >
-              <span className="font-medium text-[16px] tracking-[-0.16px]">
-                {buttonText}
-              </span>
-            </button>
+            {isPopular ? (
+              <CandyButton className="w-full">{buttonText}</CandyButton>
+            ) : (
+              <Button className="w-full">{buttonText}</Button>
+            )}
           </div>
         </div>
 
@@ -138,7 +123,7 @@ const PricingCard = ({
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -150,8 +135,8 @@ const EnterprisePlan = ({
   description,
 }: EnterprisePlanProps) => {
   return (
-    <div
-      className="bg-zinc-900 rounded-3xl border border-white/50 relative overflow-hidden"
+    <Card
+      className="relative overflow-hidden"
       style={{
         backgroundImage:
           "url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 984 201\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'0.2\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(3.5908e-14 -10.675 14.101 -1.6891e-8 125 193.21)\\'><stop stop-color=\\'rgba(255,255,255,0.72)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(255,255,255,0)\\' offset=\\'1\\'/></radialGradient></defs></svg>')",
@@ -172,21 +157,7 @@ const EnterprisePlan = ({
                 </div>
               </div>
               <div className="w-full">
-                <div className="flex flex-col gap-2">
-                  <button
-                    className="h-9 rounded-full border border-white/50 flex items-center justify-center px-[18px] bg-white/1 text-white"
-                    style={{
-                      background:
-                        "linear-gradient(175.755deg, rgba(255, 255, 255, 0.12) 11.048%, rgba(255, 255, 255, 0.03) 68.85%, rgba(255, 255, 255, 0) 91.328%)",
-                      boxShadow:
-                        "0px -80px 96px 0px inset rgba(255,255,255,0.08)",
-                    }}
-                  >
-                    <span className="font-medium text-[16px]">
-                      {buttonText}
-                    </span>
-                  </button>
-                </div>
+                <Button>{buttonText}</Button>
               </div>
             </div>
           </div>
@@ -215,7 +186,7 @@ const EnterprisePlan = ({
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
