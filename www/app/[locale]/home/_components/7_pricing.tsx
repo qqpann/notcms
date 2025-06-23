@@ -32,54 +32,52 @@ const PricingCard = ({
   description,
 }: PricingCardProps) => {
   return (
-    <Card className="flex flex-col h-full">
-      <div className="flex flex-col gap-4 p-2">
-        {/* Header Section */}
-        <div className="flex flex-col gap-2 items-center">
-          <div className="rounded-bl-2 rounded-br-2 rounded-tl-4 rounded-tr-4 w-full">
-            <div className="flex flex-col gap-4 p-4 text-white text-left">
-              <div className="font-normal opacity-70 text-[15px] tracking-[-0.15px]">
-                {title}
-              </div>
-              <div className="font-medium text-[32px] tracking-[-0.64px] leading-[72px]">
-                {price ? (
-                  <>
-                    <span>{price}</span>
-                    {priceUnit && (
-                      <span className="font-normal text-[20px] text-white/70 tracking-[-0.2px]">
-                        {priceUnit}
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  "Free"
-                )}
-              </div>
+    <Card className="flex flex-col gap-4 p-2 h-full">
+      {/* Header Section */}
+      <div className="flex flex-col gap-2 items-center">
+        <div className="rounded-bl-2 rounded-br-2 rounded-tl-4 rounded-tr-4 w-full">
+          <div className="flex flex-col gap-4 p-4 text-white text-left">
+            <div className="font-normal opacity-70 text-[15px] tracking-[-0.15px]">
+              {title}
+            </div>
+            <div className="font-medium text-[32px] tracking-[-0.64px] leading-[72px]">
+              {price ? (
+                <>
+                  <span>{price}</span>
+                  {priceUnit && (
+                    <span className="font-normal text-[20px] text-white/70 tracking-[-0.2px]">
+                      {priceUnit}
+                    </span>
+                  )}
+                </>
+              ) : (
+                "Free"
+              )}
             </div>
           </div>
-          {/* Button Section */}
-          <div className="w-full px-4">
-            {isPopular ? (
-              <CandyButton className="w-full">{buttonText}</CandyButton>
-            ) : (
-              <Button className="w-full">{buttonText}</Button>
-            )}
-          </div>
         </div>
+        {/* Button Section */}
+        <div className="w-full px-4">
+          {isPopular ? (
+            <CandyButton className="w-full">{buttonText}</CandyButton>
+          ) : (
+            <Button className="w-full">{buttonText}</Button>
+          )}
+        </div>
+      </div>
 
-        {/* Features Section */}
-        <div className="bg-white bg-opacity-[0.08] rounded-b-[12px] rounded-t-[10px] border-silver flex-1 px-4 py-5">
-          <ul className="flex flex-col gap-4 list-none">
-            {features.map((feature, index) => (
-              <li key={index} className="flex flex-row gap-3 items-center">
-                <IconCheckmark2 className="size-3 shrink-0" />
-                <span className="font-normal text-white text-[16px] tracking-[-0.16px] leading-4">
-                  {feature}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Features Section */}
+      <div className="bg-white bg-opacity-[0.08] rounded-b-[12px] rounded-t-[10px] border-silver flex-1 px-4 py-5 h-full flex-grow">
+        <ul className="flex flex-col gap-4 list-none">
+          {features.map((feature, index) => (
+            <li key={index} className="flex flex-row gap-3 items-center">
+              <IconCheckmark2 className="size-3 shrink-0" />
+              <span className="font-normal text-white text-[16px] tracking-[-0.16px] leading-4">
+                {feature}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </Card>
   );
