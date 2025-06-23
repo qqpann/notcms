@@ -40,7 +40,7 @@ const PricingCard = ({
             <div className="font-normal opacity-70 text-[15px] tracking-[-0.15px]">
               {title}
             </div>
-            <div className="font-medium text-[32px] tracking-[-0.64px] leading-[72px]">
+            <div className="font-medium text-[32px] tracking-[-0.64px] leading-none">
               {price ? (
                 <>
                   <span>{price}</span>
@@ -104,7 +104,7 @@ const EnterprisePlan = ({
             <div className="flex flex-col gap-8">
               <div className="rounded-bl-2 rounded-br-2 rounded-tl-4 rounded-tr-4 w-full">
                 <div className="flex flex-col gap-5 text-white text-left">
-                  <div className="font-medium text-[32px] tracking-[-0.64px] leading-[72px]">
+                  <div className="font-medium text-[32px] tracking-[-0.64px] leading-none">
                     {title}
                   </div>
                   <div className="font-normal opacity-70 text-[16px] tracking-[-0.16px] leading-[22px]">
