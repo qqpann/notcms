@@ -7,6 +7,7 @@ import { HowWorks } from "./_components/3_how-works";
 import { WhoNeeds } from "./_components/4_who-needs";
 import { MakeWith } from "./_components/5_make-with";
 import { KillerFeatures } from "./_components/6_killer-features";
+import { Pricing } from "./_components/7_pricing";
 import { LastCatch } from "./_components/last-catch";
 
 export async function generateMetadata({
@@ -67,6 +68,7 @@ export default function Home() {
       <WhoNeeds />
       <MakeWith />
       <KillerFeatures />
+      <Pricing />
       {/* <LastCatch /> */}
     </>
   );
