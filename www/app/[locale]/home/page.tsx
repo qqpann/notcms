@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import { UnderDevelopment } from "~/components/under-development";
 import { Hero } from "./_components/1_hero";
 import { WhyBetter } from "./_components/2_why-better";
 import { HowWorks } from "./_components/3_how-works";
@@ -8,7 +9,6 @@ import { WhoNeeds } from "./_components/4_who-needs";
 import { MakeWith } from "./_components/5_make-with";
 import { KillerFeatures } from "./_components/6_killer-features";
 import { Pricing } from "./_components/7_pricing";
-import { LastCatch } from "./_components/last-catch";
 
 export async function generateMetadata({
   params,
@@ -68,7 +68,9 @@ export default function Home() {
       <WhoNeeds />
       <MakeWith />
       <KillerFeatures />
-      <Pricing />
+      <UnderDevelopment>
+        <Pricing />
+      </UnderDevelopment>
       {/* <LastCatch /> */}
     </>
   );
