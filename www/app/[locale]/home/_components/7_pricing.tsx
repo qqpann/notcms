@@ -45,17 +45,17 @@ const CoinIcon = () => (
   </svg>
 );
 
-interface PricingCardProps {
+interface Plan {
   title: string;
   price?: string;
   priceUnit?: string;
   features: string[];
   buttonText: string;
   isPopular?: boolean;
-  isEnterprise?: boolean;
   description?: string;
 }
 
+interface PricingCardProps extends Plan {}
 const PricingCard = ({
   title,
   price,
@@ -63,16 +63,10 @@ const PricingCard = ({
   features,
   buttonText,
   isPopular = false,
-  isEnterprise = false,
   description,
 }: PricingCardProps) => {
   return (
-    <div
-      className={cn(
-        "bg-zinc-900 rounded-3xl border border-white/50 flex flex-col h-full",
-        isEnterprise && "rounded-[20px]"
-      )}
-    >
+    <div className="bg-zinc-900 rounded-3xl border border-white/50 flex flex-col h-full">
       <div className="flex flex-col gap-4 p-2">
         {/* Header Section */}
         <div className="flex flex-col gap-2 items-center">
@@ -148,7 +142,13 @@ const PricingCard = ({
   );
 };
 
-const EnterprisePlan = () => {
+interface EnterprisePlanProps extends Plan {}
+const EnterprisePlan = ({
+  title,
+  features,
+  buttonText,
+  description,
+}: EnterprisePlanProps) => {
   return (
     <div
       className="bg-zinc-900 rounded-3xl border border-white/50 relative overflow-hidden"
@@ -164,11 +164,10 @@ const EnterprisePlan = () => {
               <div className="rounded-bl-2 rounded-br-2 rounded-tl-4 rounded-tr-4 w-full">
                 <div className="flex flex-col gap-5 text-white text-left">
                   <div className="font-medium text-[32px] tracking-[-0.64px] leading-[72px]">
-                    Enterprise
+                    {title}
                   </div>
                   <div className="font-normal opacity-70 text-[16px] tracking-[-0.16px] leading-[22px]">
-                    Dedicated support, full migrations and custom integrations,
-                    custom usage needs, and more.
+                    {description}
                   </div>
                 </div>
               </div>
@@ -183,7 +182,9 @@ const EnterprisePlan = () => {
                         "0px -80px 96px 0px inset rgba(255,255,255,0.08)",
                     }}
                   >
-                    <span className="font-medium text-[16px]">Contact us</span>
+                    <span className="font-medium text-[16px]">
+                      {buttonText}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -194,12 +195,7 @@ const EnterprisePlan = () => {
               <div className="flex flex-col gap-4 items-end justify-center w-full">
                 <div className="w-full">
                   <div className="flex flex-col gap-4 items-center">
-                    {[
-                      "Free to Hobby Usage",
-                      "Feature name here",
-                      "Feature name here",
-                      "Feature name here",
-                    ].map((feature, index) => (
+                    {features.map((feature, index) => (
                       <div
                         key={index}
                         className="flex flex-row gap-3 items-center w-full"
@@ -224,7 +220,7 @@ const EnterprisePlan = () => {
 };
 
 export function Pricing() {
-  const hobbyPlan: PricingCardProps = {
+  const hobbyPlan: Plan = {
     title: "Hobby",
     features: [
       "Free to Hobby Usage",
@@ -235,7 +231,7 @@ export function Pricing() {
     buttonText: "Start for free",
   };
 
-  const basicPlan: PricingCardProps = {
+  const basicPlan: Plan = {
     title: "Basic",
     price: "$9",
     priceUnit: "/workspace",
@@ -251,7 +247,7 @@ export function Pricing() {
     isPopular: true,
   };
 
-  const proPlan: PricingCardProps = {
+  const proPlan: Plan = {
     title: "Pro",
     price: "$24",
     priceUnit: "/workspace",
@@ -268,6 +264,20 @@ export function Pricing() {
       "Feature name here",
     ],
     buttonText: "Get started",
+  };
+
+  const enterprisePlan: Plan = {
+    title: "Enterprise",
+    features: [
+      "Free to Hobby Usage",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+    ],
+    buttonText: "Contact us",
+    description:
+      "Dedicated support, full migrations and custom integrations, custom usage needs, and more.",
   };
 
   return (
@@ -290,7 +300,7 @@ export function Pricing() {
           </div>
 
           {/* Enterprise plan */}
-          <EnterprisePlan />
+          <EnterprisePlan {...enterprisePlan} />
         </div>
       </div>
     </Section>
