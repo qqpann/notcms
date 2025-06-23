@@ -224,34 +224,51 @@ const EnterprisePlan = () => {
 };
 
 export function Pricing() {
-  const hobbyFeatures = [
-    "Free to Hobby Usage",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-  ];
+  const hobbyPlan: PricingCardProps = {
+    title: "Hobby",
+    features: [
+      "Free to Hobby Usage",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+    ],
+    buttonText: "Start for free",
+  };
 
-  const basicFeatures = [
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-  ];
+  const basicPlan: PricingCardProps = {
+    title: "Basic",
+    price: "$9",
+    priceUnit: "/workspace",
+    features: [
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+    ],
+    buttonText: "Get started",
+    isPopular: true,
+  };
 
-  const proFeatures = [
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-    "Feature name here",
-  ];
+  const proPlan: PricingCardProps = {
+    title: "Pro",
+    price: "$24",
+    priceUnit: "/workspace",
+    features: [
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+      "Feature name here",
+    ],
+    buttonText: "Get started",
+  };
 
   return (
     <Section>
@@ -267,26 +284,9 @@ export function Pricing() {
       <div className="w-full max-w-[984px] mx-auto">
         <div className="flex flex-col gap-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <PricingCard
-              title="Hobby"
-              features={hobbyFeatures}
-              buttonText="Start for free"
-            />
-            <PricingCard
-              title="Basic"
-              price="$5"
-              priceUnit="/user"
-              features={basicFeatures}
-              buttonText="Get started"
-              isPopular={true}
-            />
-            <PricingCard
-              title="Pro"
-              price="$9"
-              priceUnit="/user"
-              features={proFeatures}
-              buttonText="Get started"
-            />
+            <PricingCard {...hobbyPlan} />
+            <PricingCard {...basicPlan} />
+            <PricingCard {...proPlan} />
           </div>
 
           {/* Enterprise plan */}
