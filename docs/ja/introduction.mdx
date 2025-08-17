@@ -1,0 +1,133 @@
+---
+title: はじめに
+description: NotionワークスペースをタイプセーフなヘッドレスCMSに変換
+---
+
+## NotCMSとは？
+
+NotCMSは、Notionをコンテンツバックエンドとして使用するヘッドレスCMSです。コンテンツ作成者にはNotionの直感的なエディタを、開発者にはタイプセーフなAPIを提供し、両者にとって最高の体験を実現します。
+
+<CardGroup cols={2}>
+  <Card title="型安全性" icon="shield-check">
+    スキーマからクエリまでエンドツーエンドの型安全性と優れた開発者体験。完全なTypeScriptサポートによりランタイムエラーを防ぎます。
+  </Card>
+  <Card title="使い慣れたエディタ" icon="pen">
+    チームが既に知っているNotionエディタを使用。新しいCMSインターフェースを学ぶ必要はなく、初日から生産的に作業できます。
+  </Card>
+  <Card title="簡単なセットアップ" icon="rocket">
+    CLIツールを使用して数分で開始。複雑な設定やインフラストラクチャのセットアップは不要です。
+  </Card>
+  <Card title="リアルタイム更新" icon="arrows-rotate">
+    Notionでのコンテンツ変更は、APIを通じて即座に利用可能。ビルドステップや手動同期は不要です。
+  </Card>
+</CardGroup>
+
+## なぜ生のNotion APIではなくNotCMSなのか？
+
+Notion APIは強力ですが、コンテンツ管理に直接使用すると大きな課題があります：
+
+### 生のNotion APIの課題
+
+- **複雑なAPIクエリ**: Notionの複雑なクエリ構文とプロパティ構造を学習する必要があります
+- **TypeScriptサポートなし**: クエリ結果に型定義がなく、ランタイムエラーやIDEサポートの欠如につながります
+- **メンテナンスの悪夢**: Notionのプロパティを更新すると、アプリケーション全体でコードを手動で更新する必要があります
+- **コンテンツ変換**: NotionブロックをMarkdownやHTMLに変換するカスタムコードを書く必要があります
+- **画像ホスティングの問題**: Notionの画像URLは期限切れになるため、独自の画像再ホスティングソリューションを実装する必要があります
+
+### NotCMSがこれらの問題を解決する方法
+
+NotCMSはこれらの複雑さをすべて処理します：
+
+```typescript
+// ❌ 生のNotion API - 複雑でエラーが発生しやすい
+const response = await notion.databases.query({
+  database_id: 'abc123',
+  filter: {
+    property: 'Published',
+    checkbox: { equals: true }
+  }
+});
+// TypeScriptサポートなし、手動の型アサーションが必要
+const title = (response.results[0].properties.Title as any).title[0].plain_text;
+
+// ✅ NotCMS - シンプルでタイプセーフ
+const [posts, error] = await nc.query.blog.list();
+// 完全なTypeScriptサポート、IDE自動補完が機能
+posts.forEach(post => console.log(post.title));
+```
+
+NotCMSを使用すると、以下が得られます：
+- Notionデータベースから**自動生成されたTypeScript型**
+- JavaScript開発者にとって自然な**シンプルで直感的なAPI**
+- Markdownへの**自動コンテンツ変換**
+- すぐに使える**永続的な画像ホスティング**
+- Notionスキーマ変更時に**CLIで即座に更新を取得**
+
+## コアコンセプト
+
+### スキーマファーストアプローチ
+
+NotCMSはNotionデータベースからTypeScriptスキーマを生成し、アプリケーション全体で型安全性を保証します：
+
+```typescript
+// 自動生成されたスキーマ
+export const schema = {
+  blog: {
+    id: "your_database_id",
+    properties: {
+      title: "title",
+      published: "checkbox",
+      author: "rich_text"
+    }
+  }
+} satisfies Schema;
+```
+
+### タイプセーフなクエリ
+
+完全なTypeScriptサポートでコンテンツをクエリ：
+
+```typescript
+const nc = new Client({ schema });
+
+// 完全に型付けされたレスポンス
+const [posts, error] = await nc.query.blog.list({
+  filter: {
+    property: "published",
+    checkbox: { equals: true }
+  }
+});
+```
+
+### エラーハンドリング
+
+NotCMSは予測可能なエラー管理のためにタプルベースのエラーハンドリングパターンを使用します：
+
+```typescript
+const [data, error, response] = await nc.query.blog.get(pageId);
+
+if (error) {
+  console.error("取得に失敗しました:", error.message);
+  return;
+}
+
+// データを安全に使用
+console.log(data.title);
+```
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="クイックスタート" icon="play" href="/ja/quickstart">
+    5分以内にNotCMSをプロジェクトに設定
+  </Card>
+  <Card title="インストール" icon="download" href="/ja/getting-started/installation">
+    NotCMSをインストールして環境を設定
+  </Card>
+  <Card title="SDKリファレンス" icon="book" href="/ja/sdk/client">
+    完全なSDKドキュメントを探索
+  </Card>
+  <Card title="実装例" icon="code" href="/ja/examples/nextjs">
+    実際の例でNotCMSの動作を確認
+  </Card>
+</CardGroup>

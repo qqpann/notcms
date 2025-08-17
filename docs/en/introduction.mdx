@@ -1,0 +1,133 @@
+---
+title: Introduction
+description: Turn your Notion workspace into a type-safe headless CMS
+---
+
+## What is NotCMS?
+
+NotCMS is a headless CMS that uses Notion as your content backend, providing the best of both worlds: Notion's intuitive editor for content creators and a type-safe API for developers.
+
+<CardGroup cols={2}>
+  <Card title="Type Safety" icon="shield-check">
+    End-to-end type safety from schema to queries with excellent developer experience. Full TypeScript support ensures no runtime type errors.
+  </Card>
+  <Card title="Familiar Editor" icon="pen">
+    Use Notion's editor your team already knows. No need to learn a new CMS interface - content creators stay productive from day one.
+  </Card>
+  <Card title="Simple Setup" icon="rocket">
+    Get started in minutes with our CLI tool. No complex configuration or infrastructure setup required.
+  </Card>
+  <Card title="Real-time Updates" icon="arrows-rotate">
+    Content changes in Notion are immediately available through the API. No build step or manual sync needed.
+  </Card>
+</CardGroup>
+
+## Why NotCMS, instead of raw Notion API?
+
+While Notion's API is powerful, using it directly for content management comes with significant challenges:
+
+### Challenges with raw Notion API
+
+- **Complex API queries**: You need to learn Notion's intricate query syntax and property structures
+- **No TypeScript support**: Query results lack type definitions, leading to runtime errors and poor IDE support
+- **Maintenance nightmare**: When you update Notion properties, you must manually update code across your entire application
+- **Content transformation**: You need to write custom code to convert Notion blocks to Markdown or HTML
+- **Image hosting issues**: Notion image URLs expire, requiring you to implement your own image re-hosting solution
+
+### How NotCMS solves these problems
+
+NotCMS handles all these complexities for you:
+
+```typescript
+// ❌ Raw Notion API - Complex and error-prone
+const response = await notion.databases.query({
+  database_id: 'abc123',
+  filter: {
+    property: 'Published',
+    checkbox: { equals: true }
+  }
+});
+// No TypeScript support, manual type assertions needed
+const title = (response.results[0].properties.Title as any).title[0].plain_text;
+
+// ✅ NotCMS - Simple and type-safe
+const [posts, error] = await nc.query.blog.list();
+// Full TypeScript support, IDE autocomplete works
+posts.forEach(post => console.log(post.title));
+```
+
+With NotCMS, you get:
+- **Auto-generated TypeScript types** from your Notion databases
+- **Simple, intuitive API** that feels natural to JavaScript developers
+- **Automatic content transformation** to Markdown
+- **Persistent image hosting** that comes out of the box
+- **Instantly pull updates with CLI** when your Notion schema changes
+
+## Core Concepts
+
+### Schema-First Approach
+
+NotCMS generates TypeScript schemas from your Notion databases, ensuring type safety throughout your application:
+
+```typescript
+// Auto-generated schema
+export const schema = {
+  blog: {
+    id: "your_database_id",
+    properties: {
+      title: "title",
+      published: "checkbox",
+      author: "rich_text"
+    }
+  }
+} satisfies Schema;
+```
+
+### Type-Safe Queries
+
+Query your content with full TypeScript support:
+
+```typescript
+const nc = new Client({ schema });
+
+// Fully typed response
+const [posts, error] = await nc.query.blog.list({
+  filter: {
+    property: "published",
+    checkbox: { equals: true }
+  }
+});
+```
+
+### Error Handling
+
+NotCMS uses a tuple-based error handling pattern for predictable error management:
+
+```typescript
+const [data, error, response] = await nc.query.blog.get(pageId);
+
+if (error) {
+  console.error("Failed to fetch:", error.message);
+  return;
+}
+
+// Use data safely
+console.log(data.title);
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="play" href="/en/quickstart">
+    Set up NotCMS in your project in under 5 minutes
+  </Card>
+  <Card title="Installation" icon="download" href="/en/getting-started/installation">
+    Install NotCMS and configure your environment
+  </Card>
+  <Card title="SDK Reference" icon="book" href="/en/sdk/client">
+    Explore the complete SDK documentation
+  </Card>
+  <Card title="Examples" icon="code" href="/en/examples/nextjs">
+    See NotCMS in action with real-world examples
+  </Card>
+</CardGroup>
