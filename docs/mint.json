@@ -1,0 +1,124 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "NotCMS",
+  "logo": {
+    "dark": "/assets/notcms-icon.png",
+    "light": "/assets/notcms-icon.png",
+    "href": "https://notcms.com"
+  },
+  "favicon": "/assets/notcms-icon.png",
+  "colors": {
+    "primary": "#07C983",
+    "light": "#07C983",
+    "dark": "#0D0D0D",
+    "background": {
+      "dark": "#0D0D0D",
+      "light": "#FFFFFF"
+    },
+    "anchors": {
+      "from": "#07C983",
+      "to": "#0D0D0D"
+    }
+  },
+  "modeToggle": {
+    "default": "dark"
+  },
+  "topbarLinks": [
+    {
+      "name": "Homepage",
+      "url": "https://notcms.com"
+    },
+    {
+      "name": "GitHub",
+      "url": "https://github.com/qqpann/notcms"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://dash.notcms.com",
+    "style": "roundedRectangle"
+  },
+  "tabs": [
+    {
+      "name": "SDK Reference",
+      "url": "sdk"
+    },
+    {
+      "name": "CLI",
+      "url": "cli"
+    },
+    {
+      "name": "Examples",
+      "url": "examples"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Templates",
+      "icon": "rectangle-terminal",
+      "url": "https://notcms.com/templates"
+    },
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://notcms.com/blog"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": ["en/introduction", "en/quickstart"]
+    },
+    {
+      "group": "Setup",
+      "pages": [
+        "en/getting-started/installation",
+        "en/getting-started/configuration"
+      ]
+    },
+    {
+      "group": "SDK Reference",
+      "pages": ["en/sdk/client", "en/sdk/queries", "en/sdk/error-handling"]
+    },
+    {
+      "group": "CLI",
+      "pages": ["en/cli/overview", "en/cli/commands"]
+    },
+    {
+      "group": "Examples",
+      "pages": ["en/examples/nextjs", "en/examples/blog-template"]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/notcmsjs",
+    "github": "https://github.com/qqpann/notcms"
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
+  "search": {
+    "prompt": "Search documentation..."
+  },
+  "metadata": {
+    "og:site_name": "NotCMS Documentation",
+    "og:description": "Type-safe headless CMS powered by Notion",
+    "twitter:site": "@notcmsjs"
+  },
+  "analytics": {
+    "plausible": {
+      "domain": "docs.notcms.com"
+    }
+  },
+  "i18n": [
+    {
+      "locale": "en",
+      "name": "English"
+    },
+    {
+      "locale": "ja",
+      "name": "日本語"
+    }
+  ]
+}
