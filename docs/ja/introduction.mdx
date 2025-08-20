@@ -22,47 +22,6 @@ NotCMSは、Notionをコンテンツバックエンドとして使用するヘ�
   </Card>
 </CardGroup>
 
-## なぜ生のNotion APIではなくNotCMSなのか？
-
-Notion APIは強力ですが、コンテンツ管理に直接使用すると大きな課題があります：
-
-### 生のNotion APIの課題
-
-- **複雑なAPIクエリ**: Notionの複雑なクエリ構文とプロパティ構造を学習する必要があります
-- **TypeScriptサポートなし**: クエリ結果に型定義がなく、ランタイムエラーやIDEサポートの欠如につながります
-- **メンテナンスの悪夢**: Notionのプロパティを更新すると、アプリケーション全体でコードを手動で更新する必要があります
-- **コンテンツ変換**: NotionブロックをMarkdownやHTMLに変換するカスタムコードを書く必要があります
-- **画像ホスティングの問題**: Notionの画像URLは期限切れになるため、独自の画像再ホスティングソリューションを実装する必要があります
-
-### NotCMSがこれらの問題を解決する方法
-
-NotCMSはこれらの複雑さをすべて処理します：
-
-```typescript
-// ❌ 生のNotion API - 複雑でエラーが発生しやすい
-const response = await notion.databases.query({
-  database_id: 'abc123',
-  filter: {
-    property: 'Published',
-    checkbox: { equals: true }
-  }
-});
-// TypeScriptサポートなし、手動の型アサーションが必要
-const title = (response.results[0].properties.Title as any).title[0].plain_text;
-
-// ✅ NotCMS - シンプルでタイプセーフ
-const [posts, error] = await nc.query.blog.list();
-// 完全なTypeScriptサポート、IDE自動補完が機能
-posts.forEach(post => console.log(post.title));
-```
-
-NotCMSを使用すると、以下が得られます：
-- Notionデータベースから**自動生成されたTypeScript型**
-- JavaScript開発者にとって自然な**シンプルで直感的なAPI**
-- Markdownへの**自動コンテンツ変換**
-- すぐに使える**永続的な画像ホスティング**
-- Notionスキーマ変更時に**CLIで即座に更新を取得**
-
 ## コアコンセプト
 
 ### スキーマファーストアプローチ
@@ -114,6 +73,48 @@ if (error) {
 // データを安全に使用
 console.log(data.title);
 ```
+
+## なぜ生のNotion APIではなくNotCMSなのか？
+
+Notion APIは強力ですが、コンテンツ管理に直接使用すると大きな課題があります：
+
+### 生のNotion APIの課題
+
+- **複雑なAPIクエリ**: Notionの複雑なクエリ構文とプロパティ構造を学習する必要があります
+- **TypeScriptサポートなし**: クエリ結果に型定義がなく、ランタイムエラーやIDEサポートの欠如につながります
+- **メンテナンスの悪夢**: Notionのプロパティを更新すると、アプリケーション全体でコードを手動で更新する必要があります
+- **コンテンツ変換**: NotionブロックをMarkdownやHTMLに変換するカスタムコードを書く必要があります
+- **画像ホスティングの問題**: Notionの画像URLは期限切れになるため、独自の画像再ホスティングソリューションを実装する必要があります
+
+### NotCMSがこれらの問題を解決する方法
+
+NotCMSはこれらの複雑さをすべて処理します：
+
+```typescript
+// ❌ 生のNotion API - 複雑でエラーが発生しやすい
+const response = await notion.databases.query({
+  database_id: 'abc123',
+  filter: {
+    property: 'Published',
+    checkbox: { equals: true }
+  }
+});
+// TypeScriptサポートなし、手動の型アサーションが必要
+const title = (response.results[0].properties.Title as any).title[0].plain_text;
+
+// ✅ NotCMS - シンプルでタイプセーフ
+const [posts, error] = await nc.query.blog.list();
+// 完全なTypeScriptサポート、IDE自動補完が機能
+posts.forEach(post => console.log(post.title));
+```
+
+NotCMSを使用すると、以下が得られます：
+- Notionデータベースから**自動生成されたTypeScript型**
+- JavaScript開発者にとって自然な**シンプルで直感的なAPI**
+- Markdownへの**自動コンテンツ変換**
+- すぐに使える**永続的な画像ホスティング**
+- Notionスキーマ変更時に**CLIで即座に更新を取得**
+
 
 ## 次のステップ
 
