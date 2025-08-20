@@ -24,6 +24,28 @@ NotCMSは、Notionをコンテンツバックエンドとして使用するヘ�
 
 ## コアコンセプト
 
+### タイプセーフなクエリ
+
+完全なTypeScriptサポートでコンテンツをクエリ：
+
+```typescript
+import { Client } from "notcms";
+import { schema } from "./schema";
+
+const nc = new Client({ schema });
+
+// 完全に型付けされたレスポンス
+const [posts, error] = await nc.query.blog.list();
+// posts: Array<{
+//   title: string,
+//   content: string,
+//   properties: {
+//     published: boolean,
+//     author: string
+//   }
+// }>
+```
+
 ### スキーマファーストアプローチ
 
 NotCMSはNotionデータベースからTypeScriptスキーマを生成し、アプリケーション全体で型安全性を保証します：
@@ -42,21 +64,6 @@ export const schema = {
 } satisfies Schema;
 ```
 
-### タイプセーフなクエリ
-
-完全なTypeScriptサポートでコンテンツをクエリ：
-
-```typescript
-const nc = new Client({ schema });
-
-// 完全に型付けされたレスポンス
-const [posts, error] = await nc.query.blog.list({
-  filter: {
-    property: "published",
-    checkbox: { equals: true }
-  }
-});
-```
 
 ### エラーハンドリング
 

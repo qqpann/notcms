@@ -28,6 +28,28 @@ NotCMS is a headless CMS that uses Notion as your content backend, providing the
 
 ## Core Concepts
 
+### Type-Safe Queries
+
+Query your content with full TypeScript support:
+
+```typescript
+import { Client } from "notcms";
+import { schema } from "./schema";
+
+const nc = new Client({ schema });
+
+// Fully typed response
+const [posts, error] = await nc.query.blog.list();
+// posts: Array<{
+//   title: string,
+//   content: string,
+//   properties: {
+//     published: boolean,
+//     author: string
+//   }
+// }>
+```
+
 ### Schema-First Approach
 
 NotCMS generates TypeScript schemas from your Notion databases, ensuring type safety throughout your application:
@@ -44,22 +66,6 @@ export const schema = {
     },
   },
 } satisfies Schema;
-```
-
-### Type-Safe Queries
-
-Query your content with full TypeScript support:
-
-```typescript
-const nc = new Client({ schema });
-
-// Fully typed response
-const [posts, error] = await nc.query.blog.list({
-  filter: {
-    property: "published",
-    checkbox: { equals: true },
-  },
-});
 ```
 
 ### Error Handling
