@@ -1,0 +1,138 @@
+---
+title: クイックスタート
+description: 5分でNotCMSを始めよう
+---
+
+NotCMSをプロジェクトに設定し、数分でNotionからコンテンツの取得を開始しましょう。
+
+## 前提条件
+
+始める前に、以下を確認してください：
+
+- Node.js 12以上がインストールされていること
+- 少なくとも1つのデータベースを持つNotionアカウント
+- TypeScriptの基本的な知識（推奨）
+
+## ステップ1: NotCMSをインストール
+
+<CodeGroup>
+```bash npm
+npm install notcms
+```
+
+```bash yarn
+yarn add notcms
+```
+
+```bash pnpm
+pnpm add notcms
+```
+
+```bash bun
+bun add notcms
+```
+</CodeGroup>
+
+## ステップ2: プロジェクトを初期化
+
+NotCMS CLIを使用してプロジェクトをセットアップ：
+
+```bash
+npx notcms-kit init
+```
+
+このコマンドは以下を実行します：
+1. 環境変数を確認
+2. `notcms.config.json`設定ファイルを作成
+
+## ステップ3: 環境変数を設定
+
+`.env`ファイルにNotCMS認証情報を追加：
+
+```env
+NOTCMS_SECRET_KEY=your-secret-key
+NOTCMS_WORKSPACE_ID=your-workspace-id
+```
+
+<Note>
+  認証情報は[NotCMSダッシュボード](https://dash.notcms.com)から取得してください
+</Note>
+
+## ステップ4: スキーマを取得
+
+NotionデータベースからTypeScript型を生成：
+
+```bash
+npx notcms-kit pull
+```
+
+これにより、`src/notcms/schema.ts`にタイプセーフなスキーマファイルが作成されます：
+
+```typescript
+export const schema = {
+  blog: {
+    id: "abc123...",
+    properties: {
+      title: "title",
+      published: "checkbox",
+      author: "rich_text",
+      tags: "multi_select"
+    }
+  }
+} satisfies Schema;
+```
+
+## ステップ5: NotCMSを使い始める
+
+クライアントを作成してコンテンツのクエリを開始：
+
+```typescript
+import { Client } from 'notcms';
+import { schema } from './notcms/schema';
+
+const nc = new Client({ schema });
+
+// 公開されたブログ記事をすべて取得
+const [posts, error] = await nc.query.blog.list();
+
+if (error) {
+  console.error("記事の取得に失敗しました:", error);
+} else {
+  posts.forEach(post => {
+    console.log(post.title);
+  });
+}
+```
+
+## 次は何をする？
+
+<CardGroup cols={2}>
+  <Card title="設定" icon="gear" href="/ja/getting-started/configuration">
+    高度な設定オプションについて学ぶ
+  </Card>
+  <Card title="SDKリファレンス" icon="book" href="/ja/sdk/client">
+    完全なSDK APIを探索
+  </Card>
+  <Card title="エラーハンドリング" icon="shield-exclamation" href="/ja/sdk/error-handling">
+    適切なエラー処理方法を学ぶ
+  </Card>
+  <Card title="Next.jsの例" icon="react" href="/ja/examples/nextjs">
+    完全なNext.js統合を見る
+  </Card>
+</CardGroup>
+
+## よくある問題
+
+<AccordionGroup>
+  <Accordion title="環境変数が読み込まれない">
+    `.env`ファイルがプロジェクトルートにあり、`dotenv`や`dotenvx`などのパッケージを使用して読み込んでいることを確認してください。
+  </Accordion>
+  
+  <Accordion title="スキーマ生成が失敗する">
+    Notionデータベースに正しい権限があり、APIキーがアクセスできることを確認してください。
+  </Accordion>
+  
+  <Accordion title="TypeScriptエラー">
+    Notionデータベースに変更を加えた場合は、`npx notcms-kit pull`を再度実行してスキーマを再生成してください。
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,138 @@
+---
+title: Quick Start
+description: Get up and running with NotCMS in under 5 minutes
+---
+
+Set up NotCMS in your project and start fetching content from Notion in minutes.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- Node.js 12 or higher installed
+- A Notion account with at least one database
+- Basic knowledge of TypeScript (recommended)
+
+## Step 1: Install NotCMS
+
+<CodeGroup>
+```bash npm
+npm install notcms
+```
+
+```bash yarn
+yarn add notcms
+```
+
+```bash pnpm
+pnpm add notcms
+```
+
+```bash bun
+bun add notcms
+```
+</CodeGroup>
+
+## Step 2: Initialize Your Project
+
+Use the NotCMS CLI to set up your project:
+
+```bash
+npx notcms-kit init
+```
+
+This command will:
+1. Check environment variables
+2. Create a `notcms.config.json` configuration file
+
+## Step 3: Configure Environment Variables
+
+Add your NotCMS credentials to your `.env` file:
+
+```env
+NOTCMS_SECRET_KEY=your-secret-key
+NOTCMS_WORKSPACE_ID=your-workspace-id
+```
+
+<Note>
+  Get your credentials from the [NotCMS Dashboard](https://dash.notcms.com)
+</Note>
+
+## Step 4: Pull Your Schema
+
+Generate TypeScript types from your Notion databases:
+
+```bash
+npx notcms-kit pull
+```
+
+This creates a type-safe schema file at `src/notcms/schema.ts`:
+
+```typescript
+export const schema = {
+  blog: {
+    id: "abc123...",
+    properties: {
+      title: "title",
+      published: "checkbox",
+      author: "rich_text",
+      tags: "multi_select"
+    }
+  }
+} satisfies Schema;
+```
+
+## Step 5: Start Using NotCMS
+
+Create a client and start querying your content:
+
+```typescript
+import { Client } from 'notcms';
+import { schema } from './notcms/schema';
+
+const nc = new Client({ schema });
+
+// Fetch all published blog posts
+const [posts, error] = await nc.query.blog.list();
+
+if (error) {
+  console.error("Failed to fetch posts:", error);
+} else {
+  posts.forEach(post => {
+    console.log(post.title);
+  });
+}
+```
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="gear" href="/en/getting-started/configuration">
+    Learn about advanced configuration options
+  </Card>
+  <Card title="SDK Reference" icon="book" href="/en/sdk/client">
+    Explore the complete SDK API
+  </Card>
+  <Card title="Error Handling" icon="shield-exclamation" href="/en/sdk/error-handling">
+    Learn how to handle errors properly
+  </Card>
+  <Card title="Next.js Example" icon="react" href="/en/examples/nextjs">
+    See a complete Next.js integration
+  </Card>
+</CardGroup>
+
+## Common Issues
+
+<AccordionGroup>
+  <Accordion title="Environment variables not loading">
+    Make sure your `.env` file is in the project root and you're using a package like `dotenv` or `dotenvx` to load them.
+  </Accordion>
+  
+  <Accordion title="Schema generation fails">
+    Ensure your Notion databases have the correct permissions and your API key has access to them.
+  </Accordion>
+  
+  <Accordion title="TypeScript errors">
+    Run `npx notcms-kit pull` again to regenerate the schema if you've made changes to your Notion databases.
+  </Accordion>
+</AccordionGroup>
