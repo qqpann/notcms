@@ -1,5 +1,5 @@
 {
-  "$schema": "https://mintlify.com/schema.json",
+  "$schema": "https://mintlify.com/docs.json",
   "name": "NotCMS",
   "logo": {
     "dark": "/assets/notcms-icon.png",
@@ -7,19 +7,7 @@
     "href": "https://notcms.com"
   },
   "favicon": "/assets/notcms-icon.png",
-  "colors": {
-    "primary": "#07C983",
-    "light": "#07C983",
-    "dark": "#0D0D0D",
-    "background": {
-      "dark": "#0D0D0D",
-      "light": "#FFFFFF"
-    },
-    "anchors": {
-      "from": "#07C983",
-      "to": "#0D0D0D"
-    }
-  },
+  "theme": "mint",
   "modeToggle": {
     "default": "dark"
   },
@@ -38,20 +26,7 @@
     "url": "https://dash.notcms.com",
     "style": "roundedRectangle"
   },
-  "tabs": [
-    {
-      "name": "SDK Reference",
-      "url": "sdk"
-    },
-    {
-      "name": "CLI",
-      "url": "cli"
-    },
-    {
-      "name": "Examples",
-      "url": "examples"
-    }
-  ],
+  "tabs": [],
   "anchors": [
     {
       "name": "Templates",
@@ -64,31 +39,60 @@
       "url": "https://notcms.com/blog"
     }
   ],
-  "navigation": [
-    {
-      "group": "Getting Started",
-      "pages": ["en/introduction", "en/quickstart"]
-    },
-    {
-      "group": "Setup",
-      "pages": [
-        "en/getting-started/installation",
-        "en/getting-started/configuration"
-      ]
-    },
-    {
-      "group": "SDK Reference",
-      "pages": ["en/sdk/client", "en/sdk/queries", "en/sdk/error-handling"]
-    },
-    {
-      "group": "CLI",
-      "pages": ["en/cli/overview", "en/cli/commands"]
-    },
-    {
-      "group": "Examples",
-      "pages": ["en/examples/nextjs", "en/examples/blog-template"]
-    }
-  ],
+  "navigation": {
+    "languages": [
+      {
+        "language": "en",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["en/introduction", "en/quickstart"]
+          },
+          {
+            "group": "Usage",
+            "pages": [
+              "en/usage/initializing-client",
+              "en/usage/list",
+              "en/usage/get"
+            ]
+          },
+          {
+            "group": "CLI Commands",
+            "pages": ["en/cli-commands/init", "en/cli-commands/pull"]
+          },
+          {
+            "group": "Examples",
+            "pages": ["en/examples/nextjs"]
+          }
+        ]
+      },
+      {
+        "language": "ja",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["ja/introduction", "ja/quickstart"]
+          },
+          {
+            "group": "Usage",
+            "pages": [
+              "ja/usage/initializing-client",
+              "ja/usage/list",
+              "ja/usage/get"
+            ]
+          },
+          {
+            "group": "CLI Commands",
+            "pages": ["ja/cli-commands/init", "ja/cli-commands/pull"]
+          },
+          {
+            "group": "Examples",
+            "pages": ["ja/examples/nextjs"]
+          }
+        ]
+      }
+    ]
+  },
   "footerSocials": {
     "x": "https://x.com/notcmsjs",
     "github": "https://github.com/qqpann/notcms"
