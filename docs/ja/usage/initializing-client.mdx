@@ -1,0 +1,159 @@
+---
+title: クライアントの初期化
+description: NotCMSクライアントのセットアップと設定方法
+---
+
+## 基本的なセットアップ
+
+NotCMSを使用するには、スキーマと認証情報を使用してクライアントを初期化する必要があります：
+
+```typescript
+import { Client } from 'notcms';
+import { schema } from './notcms/schema';
+
+const nc = new Client({
+  schema,
+  apiKey: process.env.NOTCMS_SECRET_KEY,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID
+});
+```
+
+## 前提条件
+
+クライアントを初期化する前に、以下を確認してください：
+
+1. **スキーマの生成** - 初回は `npx notcms-kit init` を実行、更新は `npx notcms-kit pull` を実行
+2. **環境変数** - API認証情報の設定
+3. **NotCMSのインストール** - プロジェクトの依存関係に `notcms` を追加
+
+## 環境変数
+
+### 必須変数
+
+```env
+NOTCMS_SECRET_KEY=your-secret-key
+NOTCMS_WORKSPACE_ID=your-workspace-id
+```
+
+### 環境変数の読み込み
+
+<Tabs>
+  <Tab title="Next.js">
+    ```typescript
+    // Next.jsは.envを自動的に読み込みます
+    import { Client } from 'notcms';
+    ```
+  </Tab>
+  
+  <Tab title="Node.js">
+    ```typescript
+    import dotenv from 'dotenv';
+    dotenv.config();
+    
+    import { Client } from 'notcms';
+    ```
+  </Tab>
+  
+  <Tab title="Vite">
+    ```typescript
+    const nc = new Client({
+      schema,
+      apiKey: import.meta.env.VITE_NOTCMS_SECRET_KEY,
+      workspaceId: import.meta.env.VITE_NOTCMS_WORKSPACE_ID
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## フレームワーク別のセットアップ
+
+### Next.js App Router
+
+```typescript
+// app/lib/notcms.ts
+import { Client } from 'notcms';
+import { schema } from '@/notcms/schema';
+
+// サーバー専用クライアント
+export const nc = new Client({
+  schema,
+  apiKey: process.env.NOTCMS_SECRET_KEY!,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID!
+});
+```
+
+### Remix
+
+```typescript
+// app/lib/notcms.server.ts
+import { Client } from 'notcms';
+import { schema } from '~/notcms/schema';
+
+// .server.ts拡張子でサーバー専用を明示
+export const nc = new Client({
+  schema,
+  apiKey: process.env.NOTCMS_SECRET_KEY!,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID!
+});
+```
+
+### SvelteKit
+
+```typescript
+// src/lib/notcms.ts
+import { Client } from 'notcms';
+import { schema } from '../notcms/schema';
+import { 
+  NOTCMS_SECRET_KEY, 
+  NOTCMS_WORKSPACE_ID 
+} from '$env/static/private';
+
+export const nc = new Client({
+  schema,
+  apiKey: NOTCMS_SECRET_KEY,
+  workspaceId: NOTCMS_WORKSPACE_ID
+});
+```
+
+## トラブルシューティング
+
+### よくある問題
+
+<AccordionGroup>
+  <Accordion title="環境変数が読み込まれない">
+    - プロジェクトルートに `.env` ファイルが存在することを確認
+    - `dotenv` などのローダーを使用していることを確認
+    - 変数名が正確に一致していることを確認
+  </Accordion>
+  
+  <Accordion title="認証に失敗">
+    - `NOTCMS_SECRET_KEY` が正しいことを確認
+    - `NOTCMS_WORKSPACE_ID` がワークスペースと一致することを確認
+    - APIキーに必要な権限があることを確認
+  </Accordion>
+  
+  <Accordion title="スキーマが見つからない">
+    - `npx notcms-kit pull` を実行してスキーマを生成
+    - インポートパスが正しいことを確認
+    - スキーマファイルが正しくエクスポートされていることを確認
+  </Accordion>
+  
+  <Accordion title="TypeScriptエラー">
+    - NotCMSを最新バージョンに更新
+    - `npx notcms-kit pull` でスキーマを再生成
+    - TypeScriptバージョンの互換性を確認
+  </Accordion>
+</AccordionGroup>
+
+## 次のステップ
+
+クライアントを初期化したら、以下の操作ができます：
+
+<CardGroup cols={2}>
+  <Card title="アイテムの一覧取得" icon="list" href="/ja/usage/list">
+    データベースから複数のアイテムをクエリ
+  </Card>
+  <Card title="単一アイテムの取得" icon="file" href="/ja/usage/get">
+    IDによる個別アイテムの取得
+  </Card>
+</CardGroup>

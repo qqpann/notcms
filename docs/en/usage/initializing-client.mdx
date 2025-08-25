@@ -1,0 +1,159 @@
+---
+title: Initializing Client
+description: Learn how to set up and configure the NotCMS client
+---
+
+## Basic Setup
+
+To start using NotCMS, you need to initialize a client with your schema and credentials:
+
+```typescript
+import { Client } from 'notcms';
+import { schema } from './notcms/schema';
+
+const nc = new Client({
+  schema,
+  apiKey: process.env.NOTCMS_SECRET_KEY,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID
+});
+```
+
+## Prerequisites
+
+Before initializing the client, ensure you have:
+
+1. **Generated schema** - Run `npx notcms-kit init` to generate for the first time or `npx notcms-kit pull` to update your schema
+2. **Environment variables** - Set up your API credentials
+3. **Installed NotCMS** - Add `notcms` to your project dependencies
+
+## Environment Variables
+
+### Required Variables
+
+```env
+NOTCMS_SECRET_KEY=your-secret-key
+NOTCMS_WORKSPACE_ID=your-workspace-id
+```
+
+### Loading Environment Variables
+
+<Tabs>
+  <Tab title="Next.js">
+    ```typescript
+    // Next.js loads .env automatically
+    import { Client } from 'notcms';
+    ```
+  </Tab>
+  
+  <Tab title="Node.js">
+    ```typescript
+    import dotenv from 'dotenv';
+    dotenv.config();
+    
+    import { Client } from 'notcms';
+    ```
+  </Tab>
+  
+  <Tab title="Vite">
+    ```typescript
+    const nc = new Client({
+      schema,
+      apiKey: import.meta.env.VITE_NOTCMS_SECRET_KEY,
+      workspaceId: import.meta.env.VITE_NOTCMS_WORKSPACE_ID
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Framework-Specific Setup
+
+### Next.js App Router
+
+```typescript
+// app/lib/notcms.ts
+import { Client } from 'notcms';
+import { schema } from '@/notcms/schema';
+
+// Server-only client
+export const nc = new Client({
+  schema,
+  apiKey: process.env.NOTCMS_SECRET_KEY!,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID!
+});
+```
+
+### Remix
+
+```typescript
+// app/lib/notcms.server.ts
+import { Client } from 'notcms';
+import { schema } from '~/notcms/schema';
+
+// Mark as server-only with .server.ts extension
+export const nc = new Client({
+  schema,
+  apiKey: process.env.NOTCMS_SECRET_KEY!,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID!
+});
+```
+
+### SvelteKit
+
+```typescript
+// src/lib/notcms.ts
+import { Client } from 'notcms';
+import { schema } from '../notcms/schema';
+import { 
+  NOTCMS_SECRET_KEY, 
+  NOTCMS_WORKSPACE_ID 
+} from '$env/static/private';
+
+export const nc = new Client({
+  schema,
+  apiKey: NOTCMS_SECRET_KEY,
+  workspaceId: NOTCMS_WORKSPACE_ID
+});
+```
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Environment variables not loading">
+    - Check `.env` file exists in project root
+    - Ensure you're using a loader like `dotenv`
+    - Verify variable names match exactly
+  </Accordion>
+  
+  <Accordion title="Authentication failed">
+    - Verify `NOTCMS_SECRET_KEY` is correct
+    - Check `NOTCMS_WORKSPACE_ID` matches your workspace
+    - Ensure API key has necessary permissions
+  </Accordion>
+  
+  <Accordion title="Schema not found">
+    - Run `npx notcms-kit pull` to generate schema
+    - Check import path is correct
+    - Ensure schema file exports correctly
+  </Accordion>
+  
+  <Accordion title="TypeScript errors">
+    - Update to latest NotCMS version
+    - Regenerate schema with `npx notcms-kit pull`
+    - Check TypeScript version compatibility
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+Once your client is initialized, you can:
+
+<CardGroup cols={2}>
+  <Card title="List Items" icon="list" href="/en/usage/list">
+    Query multiple items from your databases
+  </Card>
+  <Card title="Get Single Item" icon="file" href="/en/usage/get">
+    Fetch individual items by ID
+  </Card>
+</CardGroup>

@@ -1,0 +1,65 @@
+---
+title: Get Single Item
+description: Fetch individual items from your Notion databases
+---
+
+## Basic Usage
+
+Fetch a single item by its ID:
+
+```typescript
+const [post, error] = await nc.query.blog.get('page-id-123');
+
+if (!error) {
+  console.log(post.title, post.content);
+}
+```
+
+## Type Safety
+
+NotCMS provides full type inference for fetched items:
+
+```typescript
+// Infer single page type
+type BlogPost = typeof nc.query.blog.$inferPage;
+
+// Use in your functions
+function processBlogPost(post: BlogPost) {
+  // Full type safety and IDE autocomplete
+  console.log(post.title);
+  console.log(post.published);
+  console.log(post.author);
+}
+```
+
+## Related Items
+
+Fetch related items using multiple queries:
+
+```typescript
+async function getPostWithAuthor(postId: string) {
+  // Get the post
+  const [post, postError] = await nc.query.blog.get(postId);
+  if (postError) throw postError;
+  
+  // Get the author
+  const [author, authorError] = await nc.query.authors.get(post.properties.authors[0]);
+  if (authorError) throw authorError;
+  
+  return {
+    ...post,
+    author
+  };
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="List Items" icon="list" href="/en/usage/list">
+    Learn to query multiple items
+  </Card>
+  <Card title="Client API" icon="code" href="/en/usage/client">
+    Explore the complete Client API
+  </Card>
+</CardGroup>

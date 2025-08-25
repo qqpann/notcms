@@ -1,0 +1,73 @@
+---
+title: pull
+description: NotionデータベースからTypeScriptスキーマを生成
+---
+
+## 概要
+
+`pull`コマンドは、NotionデータベースからTypeScriptスキーマを生成または更新します。
+
+```bash
+npx notcms-kit pull
+```
+
+## 実行内容
+
+1. データベースの構造とプロパティを取得
+2. TypeScript型を生成
+3. スキーマファイルを更新
+
+## オプション
+
+| オプション | 説明 | デフォルト |
+|--------|-------------|---------|
+| `--env` | 環境ファイルのパス | `[".env", ".env.local", ".dev.vars"]` |
+
+## 例
+
+### 基本的なプル
+
+```bash
+npx notcms-kit pull
+```
+
+### 環境ファイルパスの指定
+
+```bash
+npx notcms-kit pull --env .env.development
+```
+
+## 生成されるスキーマ
+
+このコマンドは完全に型付けされたスキーマを生成します：
+
+```typescript
+import { Schema } from 'notcms';
+
+export const schema = {
+  // 例
+  blog: {
+    id: "abc123...",
+    properties: {
+      title: "title",
+      content: "rich_text",
+      published: "checkbox",
+      publishDate: "date",
+      author: "relation",
+      tags: "multi_select"
+    }
+  }
+} satisfies Schema;
+```
+
+## スキーマの更新
+
+Notionデータベースを更新すると、pullコマンドがスキーマを更新します。
+
+```json
+{
+  "scripts": {
+    "schema:pull": "notcms-kit pull",
+  }
+}
+```

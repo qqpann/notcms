@@ -1,0 +1,65 @@
+---
+title: 単一アイテムの取得
+description: Notionデータベースから個別のアイテムを取得
+---
+
+## 基本的な使用方法
+
+IDで単一のアイテムを取得：
+
+```typescript
+const [post, error] = await nc.query.blog.get('page-id-123');
+
+if (!error) {
+  console.log(post.title, post.content);
+}
+```
+
+## 型安全性
+
+NotCMSは取得したアイテムに対して完全な型推論を提供します：
+
+```typescript
+// 単一ページ型を推論
+type BlogPost = typeof nc.query.blog.$inferPage;
+
+// 関数で使用
+function processBlogPost(post: BlogPost) {
+  // 完全な型安全性とIDEの自動補完
+  console.log(post.title);
+  console.log(post.published);
+  console.log(post.author);
+}
+```
+
+## 関連アイテム
+
+複数のクエリを使用して関連アイテムを取得：
+
+```typescript
+async function getPostWithAuthor(postId: string) {
+  // 記事を取得
+  const [post, postError] = await nc.query.blog.get(postId);
+  if (postError) throw postError;
+  
+  // 著者を取得
+  const [author, authorError] = await nc.query.authors.get(post.properties.authors[0]);
+  if (authorError) throw authorError;
+  
+  return {
+    ...post,
+    author
+  };
+}
+```
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="アイテムの一覧取得" icon="list" href="/ja/usage/list">
+    複数アイテムのクエリ方法を学ぶ
+  </Card>
+  <Card title="クライアントAPI" icon="code" href="/ja/usage/client">
+    完全なクライアントAPIを探索
+  </Card>
+</CardGroup>

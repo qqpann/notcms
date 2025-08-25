@@ -1,0 +1,433 @@
+---
+title: Next.js統合
+description: Next.jsとNotCMSでブログを構築
+---
+
+# Next.js統合
+
+Next.js App RouterとNotCMSを統合して、フル機能のブログを構築する方法を学びます。
+
+## セットアップ
+
+### 1. Next.jsプロジェクトを作成
+
+```bash
+npx create-next-app@latest my-blog --typescript --app
+cd my-blog
+```
+
+### 2. NotCMSをインストール
+
+```bash
+npm install notcms
+npm install -D notcms-kit
+```
+
+### 3. NotCMSを初期化
+
+```bash
+npx notcms-kit init
+```
+
+### 4. Next.jsを設定
+
+`next.config.js`を更新：
+
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.notcms.com',
+      }
+    ]
+  }
+}
+
+module.exports = nextConfig
+```
+
+## プロジェクト構造
+
+```
+my-blog/
+├── app/
+│   ├── page.tsx           # ブログ一覧
+│   └── [id]/
+│       └── page.tsx       # ブログ記事
+├── components/
+│   ├── BlogCard.tsx
+│   ├── BlogPost.tsx
+│   └── Pagination.tsx
+└── src/
+    └── notcms/
+        └── schema.ts      # 生成されたスキーマ
+```
+
+## ブログ一覧ページ
+
+### `app/page.tsx`
+
+```typescript
+import { Client } from 'notcms';
+import { schema } from '@/notcms/schema';
+import BlogCard from '@/components/BlogCard';
+
+const nc = new Client({
+  secretKey: process.env.NOTCMS_SECRET_KEY,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID,
+});
+
+export default async function BlogPage() {
+  const [posts] = await nc.query.blog.list();
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold mb-8">ブログ</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {posts.map((post) => (
+          <BlogCard key={post.id} post={post} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 10分ごとに再検証
+export const revalidate = 600;
+```
+
+## ブログ記事ページ
+
+### `app/[id]/page.tsx`
+
+```typescript
+import { notFound } from 'next/navigation';
+import { Client } from 'notcms';
+import { schema } from '@/notcms/schema';
+import BlogPost from '@/components/BlogPost';
+import type { Metadata } from 'next';
+
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+const nc = new Client({
+  secretKey: process.env.NOTCMS_SECRET_KEY,
+  workspaceId: process.env.NOTCMS_WORKSPACE_ID,
+});
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const [post] = await nc.query.blog.get(params.id);
+  
+  if (!post) {
+    return {
+      title: '記事が見つかりません',
+    };
+  }
+  
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: post.coverImage ? [post.coverImage] : [],
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: PageProps) {
+  const [post] = await nc.query.blog.get(params.id);
+  
+  if (!post) {
+    notFound();
+  }
+  
+  return <BlogPost post={post} />;
+}
+
+// 10分ごとに再検証
+export const revalidate = 600;
+```
+
+## コンポーネント
+
+### `components/BlogCard.tsx`
+
+```typescript
+import Link from 'next/link';
+import Image from 'next/image';
+import { Client } from 'notcms';
+import { schema } from '@/notcms/schema';
+
+const nc = new Client({
+  schema,
+});
+
+type BlogPosts = typeof schema.blog.pages.$inferPages;
+type BlogPost = BlogPosts[number];
+// BlogPost: {
+//   id: string;
+//   title: string;
+//   properties: {
+//     coverImage: string;
+//     publishDate: string;
+//     authors: string[];
+//     tags: string[];
+//   }
+// }
+// 注: 上記は例です。実際のスキーマはあなたのデータベーススキーマを反映します。
+
+interface BlogCardProps {
+  post: BlogPost;
+}
+
+export default function BlogCard({ post }: BlogCardProps) {
+  return (
+    <article className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      {post.properties.coverImage && (
+        <Link href={`/blog/${post.id}`}>
+          <Image
+            src={post.properties.coverImage}
+            alt={post.properties.title}
+            width={400}
+            height={250}
+            className="w-full h-48 object-cover"
+          />
+        </Link>
+      )}
+      
+      <div className="p-4">
+        <Link href={`/blog/${post.id}`}>
+          <h2 className="text-xl font-semibold mb-2 hover:text-blue-600">
+            {post.properties.title}
+          </h2>
+        </Link>
+        
+        <div className="flex items-center justify-between text-sm text-gray-500">
+          <span>{post.properties.publishDate}</span>
+        </div>
+        
+        {post.properties.tags.length > 0 && (
+          <div className="mt-3 flex gap-2 flex-wrap">
+            {post.properties.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-1 bg-gray-100 rounded-md text-xs"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+```
+
+### `components/BlogPost.tsx`
+
+```typescript
+import Image from 'next/image';
+import { RichText } from '@/components/RichText';
+import { Client } from 'notcms';
+import { schema } from '@/notcms/schema';
+
+const nc = new Client({
+  schema,
+});
+
+type BlogPost = typeof schema.blog.pages.$inferPage;
+// BlogPost: {
+//   id: string;
+//   title: string;
+//   properties: {
+//     coverImage: string;
+//     publishDate: string;
+//     authors: string[];
+//     tags: string[];
+//   }
+//   content: string; // Markdown
+// }
+// 注: 上記は例です。実際のスキーマはあなたのデータベーススキーマを反映します。
+
+interface BlogPostProps {
+  post: BlogPost;
+}
+
+export default function BlogPost({ post }: BlogPostProps) {
+  return (
+    <article className="max-w-4xl mx-auto px-4 py-8">
+      {post.properties.coverImage && (
+        <Image
+          src={post.properties.coverImage}
+          alt={post.properties.title}
+          width={1200}
+          height={600}
+          className="w-full h-96 object-cover rounded-lg mb-8"
+        />
+      )}
+      
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold mb-4">{post.properties.title}</h1>
+        
+        <div className="flex items-center gap-4 text-gray-600">
+          <time>{post.properties.publishDate}</time>
+        </div>
+        
+        {post.properties.tags.length > 0 && (
+          <div className="mt-4 flex gap-2 flex-wrap">
+            {post.properties.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </header>
+      
+      <div className="prose prose-lg max-w-none">
+        <RichText content={post.properties.content} />
+      </div>
+    </article>
+  );
+}
+```
+
+## リッチテキストレンダリング
+
+### `components/RichText.tsx`
+
+お好みのmarkdownパーサーを使用してコンテンツをHTMLに変換します。
+
+```typescript
+import { marked } from 'marked';
+
+interface RichTextProps {
+  content: string;
+}
+
+export function RichText({ content }: RichTextProps) {
+  if (!content) return null;
+  return <div dangerouslySetInnerHTML={{ __html: marked(content) }} />;
+}
+```
+
+## パフォーマンス最適化
+
+### 静的生成
+
+```typescript
+// ビルド時に静的ページを生成
+export async function generateStaticParams() {
+  const [posts] = await nc.query.blog.list();
+
+  return posts.map((post) => ({
+    id: post.id,
+  }));
+}
+```
+
+### 画像最適化
+
+```typescript
+import Image from 'next/image';
+
+// Next.js Imageコンポーネントを使用
+<Image
+  src={post.properties.coverImage}
+  alt={post.properties.title}
+  width={1200}
+  height={600}
+  priority={isAboveFold}
+  placeholder="blur"
+  blurDataURL={post.properties.coverImage}
+/>
+```
+
+`next.config.js`ファイルにドメインを追加することを忘れないでください。
+
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.notcms.com',
+      }
+    ]
+  }
+}
+
+module.exports = nextConfig
+```
+
+## SEO最適化
+
+### メタデータAPI
+
+```typescript
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const [post] = await nc.query.blog.get(params.id);
+  
+  return {
+    title: post.title,
+    description: post.properties.excerpt,
+    authors: [{ name: post.properties.authors.join(', ') }],
+    openGraph: {
+      title: post.title,
+      description: post.properties.excerpt,
+      type: 'article',
+      publishedTime: post.properties.publishDate,
+      authors: [post.properties.authors.join(', ')],
+      images: [
+        {
+          url: post.properties.coverImage,
+          width: 1200,
+          height: 600,
+          alt: post.properties.title,
+        }
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.properties.excerpt,
+      images: [post.properties.coverImage],
+    },
+  };
+}
+```
+
+## デプロイメント
+
+### 環境変数
+
+デプロイメントプラットフォームで設定：
+
+```env
+NOTCMS_SECRET_KEY=your-secret-key
+NOTCMS_WORKSPACE_ID=your-workspace-id
+```
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="ブログテンプレート" icon="template" href="/ja/examples/blog-template">
+    既製のブログテンプレートを使用
+  </Card>
+  <Card title="使い方を探る" icon="gear" href="/ja/usage/list">
+    NotCMSの使い方を探る
+  </Card>
+</CardGroup>

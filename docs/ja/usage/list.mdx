@@ -1,0 +1,47 @@
+---
+title: アイテムの一覧取得
+description: Notionデータベースから複数のアイテムをクエリして一覧取得
+---
+
+## 基本的な使用方法
+
+データベースからすべてのアイテムを取得：
+
+```typescript
+const [posts, error] = await nc.query.blog.list();
+
+if (!error) {
+  posts.forEach(post => {
+    console.log(post.title);
+  });
+}
+```
+
+## 型安全性
+
+NotCMSはリスト結果に対して完全な型推論を提供します：
+
+```typescript
+// 配列型を推論
+type BlogPosts = typeof nc.query.blog.$inferPages;
+
+// 関数で使用
+function processPosts(posts: BlogPosts) {
+  posts.forEach(post => {
+    // 完全な型安全性とIDEの自動補完
+    console.log(post.title);
+    console.log(post.published);
+  });
+}
+```
+
+## 次のステップ
+
+<CardGroup cols={2}>
+  <Card title="単一アイテムの取得" icon="file" href="/ja/usage/get">
+    個別アイテムの取得方法を学ぶ
+  </Card>
+  <Card title="クライアントAPI" icon="code" href="/ja/usage/client">
+    完全なクライアントAPIを探索
+  </Card>
+</CardGroup>

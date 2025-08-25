@@ -1,0 +1,58 @@
+---
+title: init
+description: 新しいNotCMSプロジェクトの初期化
+---
+
+## 概要
+
+`init`コマンドは、対話型の設定でプロジェクトにNotCMSをセットアップします。
+
+```bash
+npx notcms-kit init
+```
+
+## 実行内容
+
+1. `notcms.config.json` 設定ファイルを作成
+2. `.env`内の環境変数をチェック
+
+## オプション
+
+| オプション | 説明 | デフォルト |
+|--------|-------------|---------|
+| `--env` | 環境ファイルのパス | `[".env", ".env.local", ".dev.vars"]` |
+
+## 対話型セットアップ
+
+コマンドが以下をガイドします：
+
+### 1. 設定
+
+```
+? Schema file path: ./src/notcms/schema.ts
+```
+
+## 例
+
+### 基本的な初期化
+
+```bash
+npx notcms-kit init
+```
+
+### 環境ファイルパスの指定
+
+すでに`.env`が設定されている場合に使用：
+
+```bash
+npx notcms-kit init --env .env.development
+```
+
+## トラブルシューティング
+
+## 次のステップ
+
+初期化後、以下を実行できます：
+
+1. コード内でNotCMSクライアントの使用を開始
+2. `npx notcms-kit pull`を実行してスキーマを更新

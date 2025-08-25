@@ -1,0 +1,47 @@
+---
+title: List Items
+description: Query and list multiple items from your Notion databases
+---
+
+## Basic Usage
+
+Fetch all items from a database:
+
+```typescript
+const [posts, error] = await nc.query.blog.list();
+
+if (!error) {
+  posts.forEach(post => {
+    console.log(post.title);
+  });
+}
+```
+
+## Type Safety
+
+NotCMS provides full type inference for list results:
+
+```typescript
+// Infer array type
+type BlogPosts = typeof nc.query.blog.$inferPages;
+
+// Use in your functions
+function processPosts(posts: BlogPosts) {
+  posts.forEach(post => {
+    // Full type safety and IDE autocomplete
+    console.log(post.title);
+    console.log(post.published);
+  });
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Get Single Item" icon="file" href="/en/usage/get">
+    Learn to fetch individual items
+  </Card>
+  <Card title="Client API" icon="code" href="/en/usage/client">
+    Explore the complete Client API
+  </Card>
+</CardGroup>

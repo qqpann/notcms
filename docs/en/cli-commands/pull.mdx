@@ -1,0 +1,73 @@
+---
+title: pull
+description: Generate TypeScript schema from Notion databases
+---
+
+## Overview
+
+The `pull` command generates or updates your TypeScript schema from Notion databases.
+
+```bash
+npx notcms-kit pull
+```
+
+## What it does
+
+1. Fetches database structure and properties
+2. Generates TypeScript types
+3. Updates your schema file
+
+## Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--env` | Environment file path | `[".env", ".env.local", ".dev.vars"]` |
+
+## Examples
+
+### Basic pull
+
+```bash
+npx notcms-kit pull
+```
+
+### Specify environment file path
+
+```bash
+npx notcms-kit pull --env .env.development
+```
+
+## Generated Schema
+
+The command generates a fully typed schema:
+
+```typescript
+import { Schema } from 'notcms';
+
+export const schema = {
+  // example
+  blog: {
+    id: "abc123...",
+    properties: {
+      title: "title",
+      content: "rich_text",
+      published: "checkbox",
+      publishDate: "date",
+      author: "relation",
+      tags: "multi_select"
+    }
+  }
+} satisfies Schema;
+```
+
+## Schema Updates
+
+When you update Notion databases, the pull command will update your schema.
+
+```json
+{
+  "scripts": {
+    "schema:pull": "notcms-kit pull",
+  }
+}
+```
