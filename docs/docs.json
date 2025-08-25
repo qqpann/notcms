@@ -8,6 +8,9 @@
   },
   "favicon": "/assets/notcms-icon.png",
   "theme": "mint",
+  "colors": {
+    "primary": "#000000"
+  },
   "modeToggle": {
     "default": "dark"
   },
