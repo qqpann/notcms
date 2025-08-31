@@ -26,7 +26,7 @@
     "hast-util-to-jsx-runtime": "^2.3.2",
     "lucide-react": "^0.454.0",
     "marked": "^14.1.3",
-    "next": "14.2.30",
+    "next": "14.2.32",
     "next-intl": "^3.26.1",
     "notcms": "0.0.12-development",
     "react": "^18.3.1",
