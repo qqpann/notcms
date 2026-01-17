@@ -4,10 +4,12 @@
     "format": "biome format --write .",
     "lint-biome": "biome lint --write .",
     "check": "biome check --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "pnpm --filter notcms build && changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@changesets/cli": "^2.29.8",
     "husky": "^9.1.4",
     "turbo": "^2.0.11"
   },
