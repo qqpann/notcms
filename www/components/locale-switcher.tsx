@@ -3,6 +3,13 @@
 import { ChevronDown, Globe } from "lucide-react";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "~/src/i18n/routing";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 const locales = [
   { code: "en", label: "English" },
@@ -21,36 +28,41 @@ export function LocaleSwitcher() {
   };
 
   return (
-    <div className="relative group">
-      <button
-        type="button"
-        className="flex items-center gap-2 bg-white/10 rounded-lg px-2 py-1 h-7 hover:bg-white/15 transition-colors"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="flex items-center gap-2 bg-white/10 rounded-lg px-2 py-1 h-7 hover:bg-white/15 transition-colors outline-none"
+        >
+          <div className="flex items-center gap-1.5">
+            <Globe className="w-4 h-4 text-white" />
+            <span className="text-sm text-white tracking-[-0.14px]">
+              {currentLocale.label}
+            </span>
+          </div>
+          <ChevronDown className="w-4 h-4 text-white" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="start"
+        side="top"
+        className="min-w-[140px] border-white/10"
       >
-        <div className="flex items-center gap-1.5">
-          <Globe className="w-4 h-4 text-white" />
-          <span className="text-sm text-white tracking-[-0.14px]">
-            {currentLocale.label}
-          </span>
-        </div>
-        <ChevronDown className="w-4 h-4 text-white" />
-      </button>
-      {/* Dropdown */}
-      <div className="absolute bottom-full left-0 mb-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-        <div className="bg-zinc-900 border border-white/10 rounded-lg py-1 min-w-[140px]">
+        <DropdownMenuRadioGroup
+          value={locale}
+          onValueChange={handleLocaleChange}
+        >
           {locales.map((l) => (
-            <button
+            <DropdownMenuRadioItem
               key={l.code}
-              type="button"
-              onClick={() => handleLocaleChange(l.code)}
-              className={`w-full text-left px-3 py-1.5 text-sm tracking-[-0.14px] hover:bg-white/10 transition-colors ${
-                l.code === locale ? "text-white" : "text-white/70"
-              }`}
+              value={l.code}
+              className="cursor-pointer"
             >
               {l.label}
-            </button>
+            </DropdownMenuRadioItem>
           ))}
-        </div>
-      </div>
-    </div>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
