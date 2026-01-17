@@ -9,7 +9,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "husky": "^9.1.4",
-    "lint-staged": "^15.2.8",
+    "lint-staged": "^16.2.7",
     "turbo": "^2.0.11"
   },
   "engines": {
