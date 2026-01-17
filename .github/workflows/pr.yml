@@ -1,9 +1,30 @@
-# Reusable workflow for PRs; to eject, you can replace this file with
-# https://github.com/ryansonshine/ryansonshine/blob/main/.github/workflows/pr.yml
+# Ejected from ryansonshine/ryansonshine/.github/workflows/pr.yml
+# to fix pnpm version compatibility
 name: Pull Request
 
 on: [pull_request]
 
 jobs:
   build:
-    uses: ryansonshine/ryansonshine/.github/workflows/pr.yml@main
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm i
+      - name: Build
+        run: pnpm build
+        working-directory: packages/notcms
+      - name: Test
+        run: pnpm test
+        working-directory: packages/notcms
