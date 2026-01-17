@@ -1,6 +1,6 @@
 {
   "name": "notcms-kit",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "DEPRECATED: Use 'npx notcms' instead. CLI is now included in notcms package.",
   "type": "module",
   "bin": {
