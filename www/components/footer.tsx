@@ -114,8 +114,13 @@ export function Footer() {
       {/* Large NotCMS Text */}
       <div className="relative w-full overflow-hidden">
         <p
-          className="text-[120px] md:text-[256px] font-semibold font-Roobert text-white/[0.08] text-center tracking-[-2.56px] leading-none select-none"
+          className="text-[120px] md:text-[256px] font-semibold font-Roobert text-center tracking-[-2.56px] leading-none select-none"
           style={{
+            background:
+              "linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
             WebkitTextStroke: "0.5px rgba(255, 255, 255, 0.2)",
             maskImage:
               "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
