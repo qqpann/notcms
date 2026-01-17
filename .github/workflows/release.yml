@@ -1,32 +1,25 @@
-# Reusable workflow for releases; to eject, you can replace this file with
-# https://github.com/ryansonshine/ryansonshine/blob/main/.github/workflows/release.yml
 name: Release
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 jobs:
   release:
     permissions:
       contents: write
-      issues: write
-      pull-requests: write
     name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-          run_install: false
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: pnpm i
       - name: Build
@@ -35,11 +28,12 @@ jobs:
       - name: Test
         run: pnpm test
         working-directory: packages/notcms
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm semantic-release
+      - name: Publish to npm
+        run: pnpm publish --no-git-checks
         working-directory: packages/notcms
-      - name: Upload Code Coverage
-        uses: codecov/codecov-action@v3.1.0
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

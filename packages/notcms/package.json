@@ -1,6 +1,6 @@
 {
   "name": "notcms",
-  "version": "0.0.13-development",
+  "version": "0.0.13",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -21,12 +21,10 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf ./dist/",
-    "cm": "cz",
     "lint": "eslint ./src/ --fix",
     "format": "biome format --write .",
     "lint-biome": "biome lint --write .",
     "check": "biome check --write .",
-    "semantic-release": "semantic-release",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "typecheck": "tsc --noEmit"
@@ -61,66 +59,14 @@
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.22.0",
     "@inquirer/prompts": "^7.0.1",
-    "@ryansonshine/commitizen": "^4.2.8",
-    "@ryansonshine/cz-conventional-changelog": "^3.3.4",
     "@types/node": "^22.1.0",
     "boxen": "^8.0.1",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
-    "conventional-changelog-conventionalcommits": "^8.0.0",
     "dedent": "^1.5.3",
-    "semantic-release": "^24.0.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.0.0",
     "typescript": "^5.5.4",
     "vitest": "^3.0.9"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/@ryansonshine/cz-conventional-changelog"
-    }
-  },
-  "release": {
-    "branches": ["main"],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "conventionalcommits",
-          "releaseRules": [
-            {
-              "type": "build",
-              "scope": "deps",
-              "release": "patch"
-            }
-          ]
-        }
-      ],
-      [
-        "@semantic-release/release-notes-generator",
-        {
-          "preset": "conventionalcommits",
-          "presetConfig": {
-            "types": [
-              {
-                "type": "feat",
-                "section": "Features"
-              },
-              {
-                "type": "fix",
-                "section": "Bug Fixes"
-              },
-              {
-                "type": "build",
-                "section": "Dependencies and Other Build Updates",
-                "hidden": false
-              }
-            ]
-          }
-        }
-      ],
-      "@semantic-release/npm",
-      "@semantic-release/github"
-    ]
   }
 }

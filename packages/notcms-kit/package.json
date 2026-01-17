@@ -12,12 +12,10 @@
     "postbuild": "node add-shebang.cjs",
     "watch": "tsc --project tsconfig.build.json --watch",
     "clean": "rm -rf ./dist/",
-    "cm": "cz",
     "lint": "eslint ./src/ --fix",
     "format": "biome format --write .",
     "lint-biome": "biome lint --write .",
     "check": "biome check --write .",
-    "semantic-release": "semantic-release",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
     "typecheck": "tsc --noEmit"
@@ -57,63 +55,11 @@
     "dedent": "^1.5.3"
   },
   "devDependencies": {
-    "@ryansonshine/commitizen": "^4.2.8",
-    "@ryansonshine/cz-conventional-changelog": "^3.3.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.1.0",
-    "conventional-changelog-conventionalcommits": "^8.0.0",
     "jest": "^29.7.0",
-    "semantic-release": "^24.0.0",
     "ts-jest": "^29.2.4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/@ryansonshine/cz-conventional-changelog"
-    }
-  },
-  "release": {
-    "branches": ["main"],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "conventionalcommits",
-          "releaseRules": [
-            {
-              "type": "build",
-              "scope": "deps",
-              "release": "patch"
-            }
-          ]
-        }
-      ],
-      [
-        "@semantic-release/release-notes-generator",
-        {
-          "preset": "conventionalcommits",
-          "presetConfig": {
-            "types": [
-              {
-                "type": "feat",
-                "section": "Features"
-              },
-              {
-                "type": "fix",
-                "section": "Bug Fixes"
-              },
-              {
-                "type": "build",
-                "section": "Dependencies and Other Build Updates",
-                "hidden": false
-              }
-            ]
-          }
-        }
-      ],
-      "@semantic-release/npm",
-      "@semantic-release/github"
-    ]
   }
 }
