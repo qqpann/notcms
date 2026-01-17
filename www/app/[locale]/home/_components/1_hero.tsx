@@ -44,7 +44,7 @@ export function Hero() {
         </p>
 
         <Link href={routes.dashboard}>
-          <CandyButton className="w-[191px]" extraGlow>
+          <CandyButton className="w-[192px]" extraGlow>
             {t("get-started")}
           </CandyButton>
         </Link>

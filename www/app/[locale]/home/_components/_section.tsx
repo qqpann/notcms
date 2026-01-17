@@ -22,7 +22,7 @@ const SectionHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-center space-y-8 mb-16", className)}
+    className={cn("text-center space-y-7 mb-16", className)}
     {...props}
   />
 ));

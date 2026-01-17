@@ -75,7 +75,7 @@ function HighlightSpan({ children }: { children: React.ReactNode }) {
 }
 function WritingCard() {
   return (
-    <Card className="col-span-1 lg:col-span-23">
+    <Card className="col-span-1 lg:col-span-23 rounded-tl-[20px] rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px]">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <HighlightSpan>Writing is effortless.</HighlightSpan> With Notion's
@@ -98,7 +98,7 @@ function WritingCard() {
 }
 function DevelopmentCard() {
   return (
-    <Card className="col-span-1 lg:col-span-23">
+    <Card className="col-span-1 lg:col-span-23 rounded-tl-[12px] rounded-tr-[20px] rounded-bl-[12px] rounded-br-[12px]">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <HighlightSpan>Faster development.</HighlightSpan> Deploy within
@@ -121,7 +121,7 @@ function DevelopmentCard() {
 }
 function ScaleCard() {
   return (
-    <Card className="col-span-1 lg:col-span-18">
+    <Card className="col-span-1 lg:col-span-18 rounded-tl-[12px] rounded-tr-[12px] rounded-bl-[20px] rounded-br-[12px]">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <HighlightSpan>Built for scale.</HighlightSpan> Accelerate your
@@ -144,7 +144,7 @@ function ScaleCard() {
 }
 function CollaborationCard() {
   return (
-    <Card className="col-span-1 lg:col-span-28 flex flex-col justify-between">
+    <Card className="col-span-1 lg:col-span-28 flex flex-col justify-between rounded-tl-[12px] rounded-tr-[12px] rounded-bl-[12px] rounded-br-[20px]">
       <CardHeader>
         <CardTitle className="font-550 text-2xl">
           <HighlightSpan>Seamless collaboration.</HighlightSpan> From ideation
