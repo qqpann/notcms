@@ -82,8 +82,8 @@ function WritingCard() {
           user-friendly editor.
         </CardTitle>
         <CardDescription>
-          Most CMS' have editors with high learning curves. NotCMS uses the
-          user-friendly Notion editor to write.
+          Most CMSs have complex editors with steep learning curves, but NotCMS
+          uses the user-friendly Notion editor.
         </CardDescription>
       </CardHeader>
       <Image
