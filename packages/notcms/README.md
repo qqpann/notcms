@@ -29,13 +29,28 @@ NotCMS makes it easy to create a CMS, from Notion.
 
 ## Getting Started
 
-## Install
+### Install
 
 ```bash
 npm install notcms
 ```
 
-## Usage
+### CLI Usage
+
+Pull your schema from NotCMS:
+
+```bash
+# Initialize config
+npx notcms init
+
+# Pull schema from NotCMS
+npx notcms pull
+```
+
+> **Migration from notcms-kit**: The CLI is now included in the `notcms` package.
+> Use `npx notcms` instead of `npx notcms-kit`.
+
+### SDK Usage
 
 ```ts
 import { Client } from "notcms";
