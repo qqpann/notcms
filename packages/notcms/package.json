@@ -51,9 +51,7 @@
     "url": "https://github.com/qqpann/notcms/issues"
   },
   "homepage": "https://github.com/qqpann/notcms#readme",
-  "dependencies": {
-    "@inquirer/prompts": "^5.3.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@ryansonshine/commitizen": "^4.2.8",
     "@ryansonshine/cz-conventional-changelog": "^3.3.4",

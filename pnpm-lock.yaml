@@ -59,10 +59,6 @@ importers:
         version: 5.5.4
 
   packages/notcms:
-    dependencies:
-      '@inquirer/prompts':
-        specifier: ^5.3.6
-        version: 5.3.6
     devDependencies:
       '@ryansonshine/commitizen':
         specifier: ^4.2.8
