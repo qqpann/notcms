@@ -47,32 +47,32 @@ export function WhoNeeds() {
       icon: <IconPeople className="size-4" />,
       title: "Independent bloggers",
       description:
-        "Focus on writing and growing your audience. No more worrying, with the quickstart templates.",
+        "Focus on writing, not on tools. Notion is your editor—no CMS to learn.",
     },
     {
       icon: <IconWrite1 className="size-4" />,
       title: "Content writers",
       description:
-        "Write content in a familiar interface and see it go live instantly. No more waiting or back-and-forth.",
+        "Write in Notion, see it live in seconds. No more back-and-forth with developers.",
     },
     {
       icon: <IconCodeInsert className="size-4" />,
       title: "Developers & engineers",
       description:
-        "Write code faster and confidently with a type safe SDK. No more hassle syncing types.",
+        "Type-safe SDK with auto-generated types. Ship faster with confidence.",
     },
     // 2nd row
     {
       icon: <IconChart2 className="size-4" />,
       title: "Business managers",
       description:
-        "Get a bird's eye view of your content and make data-driven decisions. No more guesswork.",
+        "Track content status and team progress. Make data-driven publishing decisions.",
     },
     {
       icon: <IconGroup2 className="size-4" />,
       title: "Small teams",
       description:
-        "Manage your content and collaborate with your team effortlessly. No more silos.",
+        "One workspace for writing, reviewing, and publishing. No more context switching.",
     },
   ];
   return (
