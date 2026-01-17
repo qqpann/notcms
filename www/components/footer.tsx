@@ -1,8 +1,8 @@
-import { ChevronDown, Globe } from "lucide-react";
 import Image from "next/image";
 import { Link } from "~/src/i18n/routing";
 import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
+import { LocaleSwitcher } from "./locale-switcher";
 import { CandyButton } from "./ui/button";
 import { GradientSeparator } from "./ui/separator";
 
@@ -104,15 +104,7 @@ export function Footer() {
       {/* Bottom Section */}
       <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
         {/* Language Selector */}
-        <div className="flex items-center gap-2 bg-white/10 rounded-lg px-2 py-1 h-7">
-          <div className="flex items-center gap-1.5">
-            <Globe className="w-4 h-4 text-white" />
-            <span className="text-sm text-white tracking-[-0.14px]">
-              English (US)
-            </span>
-          </div>
-          <ChevronDown className="w-4 h-4 text-white" />
-        </div>
+        <LocaleSwitcher />
         {/* Copyright */}
         <p className="text-sm text-white/50 tracking-[-0.14px]">
           © {new Date().getFullYear()} NotCMS. All rights reserved.
