@@ -33,7 +33,7 @@ export async function fetchSchema(): Promise<Schema> {
           ${chalk.blue("$ source .env")}
 
         3. Run the command again.
-          ${chalk.blue("$ npx notcms-kit pull")}
+          ${chalk.blue("$ npx notcms pull")}
       `
     );
   }

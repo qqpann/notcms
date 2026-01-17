@@ -6,8 +6,8 @@ import boxen from "boxen";
 import chalk from "chalk";
 import { Command } from "commander";
 import dedent from "dedent";
-import { dumpConfig, loadConfig } from "./features/config.js";
-import type { Config } from "./types.js";
+import { dumpConfig, loadConfig } from "./cli/features/config.js";
+import type { Config } from "./cli/types.js";
 
 /**
  * Initialize NotCMS
@@ -86,7 +86,7 @@ function isNextProject() {
  */
 async function pull() {
   // NOTE: fetchSchema depends on the process.env, so it must be imported here
-  const { fetchSchema } = await import("./features/schema.js");
+  const { fetchSchema } = await import("./cli/features/schema.js");
   const config = await loadConfig("notcms.config.json");
   const schemaPath = config.schema;
   // schemaPath: 'src/notcms/schema.ts'
@@ -125,10 +125,9 @@ export const nc = new Client({ schema });
 }
 
 async function main() {
-  const program = new Command("notcms-kit");
+  const program = new Command("notcms");
   // TODO: show version from package.json
   program.version("0.0.1", "-v, --version");
-  // FIXME: help for commands doesn't show up when hitting -h
   program.showHelpAfterError();
   program.configureOutput({
     outputError: (str, write) => write(chalk.red(str)),
@@ -141,12 +140,14 @@ async function main() {
     (o) => o.split(","),
     DEFAULT_ENV_PATH
   );
-  program.parseAsync();
-  const options = program.opts<{ env: string[] }>();
-  const path = options.env;
-  config({
-    path: path,
-    logLevel: "error",
+
+  // Load env before any command action
+  program.hook("preAction", (thisCommand) => {
+    const options = thisCommand.opts<{ env: string[] }>();
+    config({
+      path: options.env,
+      logLevel: "error",
+    });
   });
 
   program.command("init").description("Initialize NotCMS").action(init);
