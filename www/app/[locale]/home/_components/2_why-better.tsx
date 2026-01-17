@@ -37,7 +37,11 @@ export function WhyBetter() {
           <SparkleIcon />
           Why NotCMS?
         </SectionPreTitle>
-        <SectionTitle>A superior headless CMS</SectionTitle>
+        <SectionTitle>
+          The simplest and most effective
+          <br />
+          headless CMS for you
+        </SectionTitle>
       </SectionHeader>
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-[20px] lg:grid-cols-46">
         <WritingCard />

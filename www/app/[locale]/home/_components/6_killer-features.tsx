@@ -37,7 +37,7 @@ export function KillerFeatures() {
       <SectionHeader>
         <SectionPreTitle>
           <MagnifyingGlassIcon />
-          Core features
+          Features
         </SectionPreTitle>
         <SectionTitle>What's inside NotCMS?</SectionTitle>
       </SectionHeader>

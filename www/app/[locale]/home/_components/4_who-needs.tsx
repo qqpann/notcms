@@ -85,7 +85,7 @@ export function WhoNeeds() {
         <SectionTitle>
           Designed for every
           <br />
-          type of collaboration and team
+          type of collaborator and team
         </SectionTitle>
       </SectionHeader>
       <div className="flex flex-col relative w-full">
