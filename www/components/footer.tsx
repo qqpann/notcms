@@ -1,129 +1,137 @@
+import { ChevronDown, Globe } from "lucide-react";
 import Image from "next/image";
 import { Link } from "~/src/i18n/routing";
 import { routes } from "~/src/routes";
 import { siteConfig } from "~/src/site-config";
-import { Separator } from "./ui/separator";
+import { CandyButton } from "./ui/button";
+import { GradientSeparator } from "./ui/separator";
 
 type Item = {
   title: string;
   href: string;
 };
-const links: Item[] = [
+
+const resourcesLinks: Item[] = [
   { title: "Home", href: routes.home },
   { title: "Templates", href: routes.templates },
   { title: "Blog", href: routes.blog },
-  // { title: "About", href: routes.about },
-];
-const socials: Item[] = [
-  { title: "X", href: siteConfig.author.x },
-  // { title: "Notion template", href: "/" },
-];
-const resources: Item[] = [
-  // { title: "Docs", href: routes.docs },
-  { title: "GitHub", href: siteConfig.github },
+  { title: "Docs", href: routes.docs },
 ];
 
-export function Footer() {
-  const legal: Item[] = [
-    { title: "Terms of use", href: routes.terms },
-    { title: "Privacy policy", href: routes.privacy },
-    { title: "Tokushoho", href: routes.tokushoho },
-  ];
+const resourcesLinks2: Item[] = [
+  { title: "Github", href: siteConfig.github },
+  // { title: "Notion", href: "https://notion.so" },
+  { title: "About", href: routes.about },
+];
+
+const socialsLinks: Item[] = [
+  { title: "Twitter", href: siteConfig.author.x },
+  // { title: "LinkedIn", href: "https://linkedin.com" },
+];
+
+const othersLinks: Item[] = [
+  { title: "Terms of service", href: routes.terms },
+  { title: "Privacy policy", href: routes.privacy },
+];
+
+function LinkColumn({ title, links }: { title: string; links: Item[] }) {
   return (
-    <footer
-      className="h-auto mt-16"
-      style={{
-        background:
-          "linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0))",
-      }}
-    >
-      <div className="container max-w-[1440px] mx-auto px-4 pt-16 md:px-32 md:pt-16 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-5 md:gap-0">
-          <div className="col-span-1 md:col-span-3 flex-col justify-start items-start gap-6 inline-flex">
-            <div className="flex flex-col">
-              <Image
-                src="/img/icon-192x192.png"
-                alt="logo"
-                width={64}
-                height={64}
-                className="mb-6"
-              />
-              <span className="text-2xl font-semibold font-Roobert tracking-[-0.01em] mb-3">
-                NotCMS
-              </span>
-              <p className="text-sm text-white text-opacity-70">
-                Instantly publish your website content from Notion.
-              </p>
-            </div>
+    <div className="flex flex-1 flex-col gap-8 items-start">
+      <p className="text-sm font-semibold text-white tracking-[-0.14px]">
+        {title}
+      </p>
+      <div className="flex flex-col gap-4 items-start">
+        {links.map((link) => (
+          <Link
+            key={link.title}
+            className="text-sm text-white/70 tracking-[-0.14px] hover:text-white transition-colors"
+            href={link.href}
+          >
+            {link.title}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer className="border-t border-white/10 flex flex-col gap-12 items-center pt-16 px-8 md:px-32">
+      {/* CTA Section */}
+      <div className="flex flex-col gap-10 items-center w-full">
+        <div className="flex flex-col gap-6 items-center w-full">
+          {/* Logo Mark */}
+          <div className="relative w-9 h-9 rounded-[10px] overflow-hidden shadow-[0px_0.205px_0.205px_0px_rgba(0,0,0,0.1),0px_8.182px_8.182px_0px_rgba(0,0,0,0.2)]">
+            <Image
+              src="/img/icon-192x192.png"
+              alt="NotCMS Logo"
+              width={36}
+              height={36}
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div className="col-span-1 md:min-h-[200px] flex-col justify-start items-start gap-3 inline-flex">
-            <div className="flex-col justify-start items-start gap-2.5 flex">
-              <div className="self-stretch justify-start items-start inline-flex">
-                <div className="text-white text-sm font-semibold leading-snug">
-                  Links
-                </div>
-              </div>
-            </div>
-            {links.map((link) => (
-              <Link
-                key={link.title}
-                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal leading-snug"
-                href={link.href}
-              >
-                {link.title}
-              </Link>
-            ))}
-          </div>
-          <div className="col-span-1 md:min-h-[200px] flex-col justify-start items-start gap-3 inline-flex">
-            <div className="flex-col justify-start items-start gap-2.5 flex">
-              <div className="self-stretch justify-start items-start inline-flex">
-                <div className="text-white text-sm font-semibold leading-snug">
-                  Socials
-                </div>
-              </div>
-            </div>
-            {socials.map((link) => (
-              <Link
-                key={link.title}
-                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal leading-snug"
-                href={link.href}
-              >
-                {link.title}
-              </Link>
-            ))}
-          </div>
-          <div className="col-span-1 md:min-h-[200px] flex-col justify-start items-start gap-3 inline-flex">
-            <div className="flex-col justify-start items-start gap-2.5 flex">
-              <div className="self-stretch justify-start items-start inline-flex">
-                <div className="text-white text-sm font-semibold leading-snug">
-                  Resources
-                </div>
-              </div>
-            </div>
-            {resources.map((link) => (
-              <Link
-                key={link.title}
-                className="w-full h-[22px] justify-start items-center inline-flex text-white text-opacity-70 text-sm font-normal leading-snug"
-                href={link.href}
-              >
-                {link.title}
-              </Link>
-            ))}
+          {/* Title */}
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-2xl md:text-[32px] font-semibold font-Roobert text-white tracking-[-0.32px] leading-[1.28]">
+              Create & publish your
+            </h2>
+            <h2 className="text-2xl md:text-[32px] font-semibold font-Roobert text-white tracking-[-0.32px] leading-[1.28]">
+              website content from Notion
+            </h2>
           </div>
         </div>
-        <Separator className="my-8 opacity-[0.12]" />
-        {/* link to terms and policy */}
-        <div className="w-full flex text-sm gap-8 lg:flex">
-          {legal.map((link) => (
-            <Link
-              key={link.title}
-              className="text-white text-opacity-50"
-              href={link.href}
-            >
-              {link.title}
-            </Link>
-          ))}
+        {/* CTA Button */}
+        <Link href={routes.dashboard}>
+          <CandyButton extraGlow>Start publishing</CandyButton>
+        </Link>
+      </div>
+
+      {/* Separator */}
+      <GradientSeparator className="w-full" />
+
+      {/* Links Section */}
+      <div className="flex flex-col md:flex-row gap-8 md:gap-0 items-start px-0 md:px-32 w-full">
+        <LinkColumn title="Resources" links={resourcesLinks} />
+        <LinkColumn title="Resources" links={resourcesLinks2} />
+        <LinkColumn title="Socials" links={socialsLinks} />
+        <LinkColumn title="Others" links={othersLinks} />
+      </div>
+
+      {/* Separator */}
+      <GradientSeparator className="w-full" />
+
+      {/* Bottom Section */}
+      <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+        {/* Language Selector */}
+        <div className="flex items-center gap-2 bg-white/10 rounded-lg px-2 py-1 h-7">
+          <div className="flex items-center gap-1.5">
+            <Globe className="w-4 h-4 text-white" />
+            <span className="text-sm text-white tracking-[-0.14px]">
+              English (US)
+            </span>
+          </div>
+          <ChevronDown className="w-4 h-4 text-white" />
         </div>
+        {/* Copyright */}
+        <p className="text-sm text-white/50 tracking-[-0.14px]">
+          © {new Date().getFullYear()} NotCMS. All rights reserved.
+        </p>
+      </div>
+
+      {/* Large NotCMS Text */}
+      <div className="relative w-full overflow-hidden">
+        <p
+          className="text-[120px] md:text-[256px] font-semibold font-Roobert text-white/[0.04] text-center tracking-[-2.56px] leading-none select-none"
+          style={{
+            maskImage:
+              "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+          }}
+        >
+          NotCMS
+        </p>
       </div>
     </footer>
   );
