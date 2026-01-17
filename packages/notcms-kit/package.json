@@ -73,9 +73,6 @@
       "path": "./node_modules/@ryansonshine/cz-conventional-changelog"
     }
   },
-  "lint-staged": {
-    "*.ts": "biome ci ."
-  },
   "release": {
     "branches": ["main"],
     "plugins": [
