@@ -1,6 +1,6 @@
 {
   "name": "notcms",
-  "version": "0.0.13",
+  "version": "0.1.0",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,7 +16,9 @@
   "bin": {
     "notcms": "./dist/cli.cjs"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
