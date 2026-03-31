@@ -35083,25 +35083,19 @@ function wrappy (fn, cb) {
 /***/ }),
 
 /***/ 9360:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sanitizeFilename = sanitizeFilename;
-exports.parseDatabasesParam = parseDatabasesParam;
-exports.resolveDbDir = resolveDbDir;
-exports.buildFilePath = buildFilePath;
-const node_path_1 = __importDefault(__nccwpck_require__(6760));
+exports.sanitizeSegment = sanitizeSegment;
+exports.resolveFilePath = resolveFilePath;
 /**
- * Minimal filename sanitization that preserves CJK characters.
- * Only removes filesystem-forbidden characters.
+ * Sanitize a path segment (directory name or filename).
+ * Preserves CJK characters, removes filesystem-forbidden chars.
  */
-function sanitizeFilename(title) {
-    const result = title
+function sanitizeSegment(value) {
+    const result = value
         .replace(/[<>:"/\\|?*\x00-\x1f]/g, "") // FS forbidden chars
         .replace(/\s+/g, "-") // spaces → hyphens
         .replace(/^[-.]+/, "") // leading dots/hyphens
@@ -35110,50 +35104,45 @@ function sanitizeFilename(title) {
     return result || "untitled";
 }
 /**
- * Parse the `databases` input parameter.
- * Format: "dbName:dirPath" lines, newline-separated.
- * Returns a Map of dbName → dirPath.
+ * Resolve a file_path template like "content/{category}/{locale}/{filename}.md"
+ * by substituting {var} placeholders with page data.
+ *
+ * Special variables:
+ *   {title} — page title
+ *   {db}    — database name
+ *   {id}    — notcms page ID
+ *
+ * All other {var} are looked up in page.properties.
+ * Each substituted value is sanitized for filesystem safety.
+ *
+ * Returns { path, missingKeys }. When missingKeys is non-empty, path is unreliable.
  */
-function parseDatabasesParam(input) {
-    const map = new Map();
-    if (!input?.trim())
-        return map;
-    for (const line of input.split("\n")) {
-        const trimmed = line.trim();
-        if (!trimmed)
-            continue;
-        const colonIndex = trimmed.indexOf(":");
-        if (colonIndex === -1)
-            continue;
-        const dbName = trimmed.slice(0, colonIndex).trim();
-        const dirPath = trimmed.slice(colonIndex + 1).trim();
-        if (dbName && dirPath) {
-            map.set(dbName, dirPath);
+function resolveFilePath(template, page, dbName) {
+    const missingKeys = [];
+    const resolved = template.replace(/\{([^}]+)\}/g, (_match, key) => {
+        let value;
+        if (key === "title") {
+            value = page.title ?? undefined;
         }
-    }
-    return map;
-}
-/**
- * Resolve the directory for a database.
- * If databasesMap is non-empty, only mapped databases are included (returns null for unmapped).
- * If databasesMap is empty, uses the DB name as directory.
- */
-function resolveDbDir(dbName, databasesMap) {
-    if (databasesMap.size === 0)
-        return dbName;
-    return databasesMap.get(dbName) ?? null;
-}
-/**
- * Build the full file path for a page.
- */
-function buildFilePath(contentDir, dbDir, pathPropertyValue, filename) {
-    const sanitized = sanitizeFilename(filename);
-    const parts = [contentDir, dbDir];
-    if (pathPropertyValue?.trim()) {
-        parts.push(pathPropertyValue.trim());
-    }
-    parts.push(`${sanitized}.md`);
-    return node_path_1.default.join(...parts);
+        else if (key === "db") {
+            value = dbName;
+        }
+        else if (key === "id") {
+            value = page.id;
+        }
+        else {
+            const prop = page.properties?.[key];
+            if (prop != null) {
+                value = Array.isArray(prop) ? prop.join(",") : String(prop);
+            }
+        }
+        if (value === undefined || value === "") {
+            missingKeys.push(key);
+            return "";
+        }
+        return sanitizeSegment(value);
+    });
+    return { path: resolved, missingKeys };
 }
 
 
@@ -35225,8 +35214,8 @@ async function hasChanges() {
     });
     return output.trim().length > 0;
 }
-async function commitChanges(contentDir, message) {
-    await exec.exec("git", ["add", contentDir]);
+async function commitChanges(files, message) {
+    await exec.exec("git", ["add", ...files]);
     await exec.exec("git", ["commit", "-m", message]);
 }
 async function pushToBranch(branch) {
@@ -35271,13 +35260,13 @@ async function enableAutoMerge(token, prUrl) {
         core.warning(`Failed to enable auto-merge (is it enabled in repo settings?): ${error}`);
     }
 }
-async function handleOnChange(mode, token, contentDir, filesChanged) {
-    if (filesChanged === 0) {
+async function handleOnChange(mode, token, filesWritten) {
+    if (filesWritten.length === 0) {
         core.info("No changes detected, skipping git operations");
         return {};
     }
     await configureGit();
-    await commitChanges(contentDir, "chore: sync content from NotCMS");
+    await commitChanges(filesWritten, "chore: sync content from NotCMS");
     if (mode === "commit") {
         await exec.exec("git", ["push"]);
         core.info("Changes committed and pushed directly");
@@ -35290,7 +35279,7 @@ async function handleOnChange(mode, token, contentDir, filesChanged) {
     const prUrl = await createPr(token, branch, "chore: sync content from NotCMS", [
         "## Summary",
         "",
-        `Synced ${filesChanged} file(s) from NotCMS.`,
+        `Synced ${filesWritten.length} file(s) from NotCMS.`,
         "",
         "This PR was automatically created by the [NotCMS Sync Action](https://github.com/qqpann/notcms/tree/main/sync-action).",
     ].join("\n"));
@@ -35355,10 +35344,7 @@ async function run() {
         }
         const workspaceId = core.getInput("workspace_id", { required: true });
         const secretKey = core.getInput("secret_key", { required: true });
-        const contentDir = core.getInput("content_dir") || "content";
-        const databases = core.getInput("databases") || undefined;
-        const pathProperty = core.getInput("path_property") || undefined;
-        const filenameProperty = core.getInput("filename_property") || undefined;
+        const filePath = core.getInput("file_path") || "content/{db}/{title}.md";
         const onChange = core.getInput("on_change") || "pr";
         const apiHost = core.getInput("api_host") || "https://api.notcms.com/v1";
         const validOnChange = ["commit", "pr", "pr-auto-merge"];
@@ -35370,15 +35356,12 @@ async function run() {
             apiHost,
             workspaceId,
             secretKey,
-            contentDir,
-            databases,
-            pathProperty,
-            filenameProperty,
+            filePath,
         });
         core.setOutput("files_changed", result.filesChanged);
         // Handle git operations
         const token = core.getInput("github_token");
-        const onChangeResult = await (0, git_js_1.handleOnChange)(onChange, token, contentDir, result.filesChanged);
+        const onChangeResult = await (0, git_js_1.handleOnChange)(onChange, token, result.filesWritten);
         if (onChangeResult.pullRequestUrl) {
             core.setOutput("pull_request_url", onChangeResult.pullRequestUrl);
         }
@@ -35574,8 +35557,7 @@ function hasContentChanged(existingContent, newContent) {
     }
 }
 async function pull(options) {
-    const { apiHost, workspaceId, secretKey, contentDir, databases: databasesParam, pathProperty, filenameProperty, } = options;
-    const databasesMap = (0, file_mapper_js_1.parseDatabasesParam)(databasesParam);
+    const { apiHost, workspaceId, secretKey, filePath: filePathTemplate, } = options;
     const filesWritten = [];
     let filesSkipped = 0;
     // 1. Fetch schema
@@ -35585,11 +35567,6 @@ async function pull(options) {
     core.info(`Found ${dbNames.length} database(s): ${dbNames.join(", ")}`);
     // 2. Process each database
     for (const dbName of dbNames) {
-        const dbDir = (0, file_mapper_js_1.resolveDbDir)(dbName, databasesMap);
-        if (dbDir === null) {
-            core.info(`Skipping database "${dbName}" (not in databases filter)`);
-            continue;
-        }
         const db = schema[dbName];
         core.info(`Fetching pages for "${dbName}" (${db.id})...`);
         const pages = await (0, notcms_client_js_1.fetchPages)(apiHost, workspaceId, db.id, secretKey);
@@ -35600,15 +35577,13 @@ async function pull(options) {
                 filesSkipped++;
                 continue;
             }
-            // Determine filename
-            const filename = (filenameProperty && page.properties?.[filenameProperty]?.toString()) ||
-                page.title ||
-                "untitled";
-            // Determine path property value
-            const pathValue = pathProperty
-                ? page.properties?.[pathProperty]?.toString()
-                : undefined;
-            const filePath = (0, file_mapper_js_1.buildFilePath)(contentDir, dbDir, pathValue, filename);
+            // Resolve file path from template
+            const { path: filePath, missingKeys } = (0, file_mapper_js_1.resolveFilePath)(filePathTemplate, page, dbName);
+            if (missingKeys.length > 0) {
+                core.warning(`Skipping page "${page.title ?? page.id}" — missing values for: ${missingKeys.join(", ")}`);
+                filesSkipped++;
+                continue;
+            }
             const markdown = (0, frontmatter_js_1.generateMarkdown)(page, dbName);
             // Check if file already exists with same content
             const absPath = node_path_1.default.resolve(filePath);

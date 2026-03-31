@@ -2,11 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import * as core from "@actions/core";
 import matter from "gray-matter";
-import {
-  buildFilePath,
-  parseDatabasesParam,
-  resolveDbDir,
-} from "./file-mapper.js";
+import { resolveFilePath } from "./file-mapper.js";
 import { generateMarkdown } from "./markdown/frontmatter.js";
 import { fetchPages, fetchSchema } from "./notcms-client.js";
 
@@ -14,10 +10,7 @@ export interface PullOptions {
   apiHost: string;
   workspaceId: string;
   secretKey: string;
-  contentDir: string;
-  databases?: string;
-  pathProperty?: string;
-  filenameProperty?: string;
+  filePath: string;
 }
 
 export interface PullResult {
@@ -85,13 +78,9 @@ export async function pull(options: PullOptions): Promise<PullResult> {
     apiHost,
     workspaceId,
     secretKey,
-    contentDir,
-    databases: databasesParam,
-    pathProperty,
-    filenameProperty,
+    filePath: filePathTemplate,
   } = options;
 
-  const databasesMap = parseDatabasesParam(databasesParam);
   const filesWritten: string[] = [];
   let filesSkipped = 0;
 
@@ -103,12 +92,6 @@ export async function pull(options: PullOptions): Promise<PullResult> {
 
   // 2. Process each database
   for (const dbName of dbNames) {
-    const dbDir = resolveDbDir(dbName, databasesMap);
-    if (dbDir === null) {
-      core.info(`Skipping database "${dbName}" (not in databases filter)`);
-      continue;
-    }
-
     const db = schema[dbName];
     core.info(`Fetching pages for "${dbName}" (${db.id})...`);
     const pages = await fetchPages(apiHost, workspaceId, db.id, secretKey);
@@ -123,18 +106,20 @@ export async function pull(options: PullOptions): Promise<PullResult> {
         continue;
       }
 
-      // Determine filename
-      const filename =
-        (filenameProperty && page.properties?.[filenameProperty]?.toString()) ||
-        page.title ||
-        "untitled";
+      // Resolve file path from template
+      const { path: filePath, missingKeys } = resolveFilePath(
+        filePathTemplate,
+        page,
+        dbName
+      );
+      if (missingKeys.length > 0) {
+        core.warning(
+          `Skipping page "${page.title ?? page.id}" — missing values for: ${missingKeys.join(", ")}`
+        );
+        filesSkipped++;
+        continue;
+      }
 
-      // Determine path property value
-      const pathValue = pathProperty
-        ? page.properties?.[pathProperty]?.toString()
-        : undefined;
-
-      const filePath = buildFilePath(contentDir, dbDir, pathValue, filename);
       const markdown = generateMarkdown(page, dbName);
 
       // Check if file already exists with same content

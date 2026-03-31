@@ -1,11 +1,11 @@
-import path from "node:path";
+import type { PageData } from "./notcms-client.js";
 
 /**
- * Minimal filename sanitization that preserves CJK characters.
- * Only removes filesystem-forbidden characters.
+ * Sanitize a path segment (directory name or filename).
+ * Preserves CJK characters, removes filesystem-forbidden chars.
  */
-export function sanitizeFilename(title: string): string {
-  const result = title
+export function sanitizeSegment(value: string): string {
+  const result = value
     .replace(/[<>:"/\\|?*\x00-\x1f]/g, "") // FS forbidden chars
     .replace(/\s+/g, "-") // spaces → hyphens
     .replace(/^[-.]+/, "") // leading dots/hyphens
@@ -15,57 +15,52 @@ export function sanitizeFilename(title: string): string {
 }
 
 /**
- * Parse the `databases` input parameter.
- * Format: "dbName:dirPath" lines, newline-separated.
- * Returns a Map of dbName → dirPath.
+ * Resolve a file_path template like "content/{category}/{locale}/{filename}.md"
+ * by substituting {var} placeholders with page data.
+ *
+ * Special variables:
+ *   {title} — page title
+ *   {db}    — database name
+ *   {id}    — notcms page ID
+ *
+ * All other {var} are looked up in page.properties.
+ * Each substituted value is sanitized for filesystem safety.
+ *
+ * Returns { path, missingKeys }. When missingKeys is non-empty, path is unreliable.
  */
-export function parseDatabasesParam(
-  input: string | undefined
-): Map<string, string> {
-  const map = new Map<string, string>();
-  if (!input?.trim()) return map;
+export function resolveFilePath(
+  template: string,
+  page: PageData,
+  dbName: string
+): { path: string; missingKeys: string[] } {
+  const missingKeys: string[] = [];
 
-  for (const line of input.split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    const colonIndex = trimmed.indexOf(":");
-    if (colonIndex === -1) continue;
-    const dbName = trimmed.slice(0, colonIndex).trim();
-    const dirPath = trimmed.slice(colonIndex + 1).trim();
-    if (dbName && dirPath) {
-      map.set(dbName, dirPath);
+  const resolved = template.replace(
+    /\{([^}]+)\}/g,
+    (_match, key: string) => {
+      let value: string | undefined;
+
+      if (key === "title") {
+        value = page.title ?? undefined;
+      } else if (key === "db") {
+        value = dbName;
+      } else if (key === "id") {
+        value = page.id;
+      } else {
+        const prop = page.properties?.[key];
+        if (prop != null) {
+          value = Array.isArray(prop) ? prop.join(",") : String(prop);
+        }
+      }
+
+      if (value === undefined || value === "") {
+        missingKeys.push(key);
+        return "";
+      }
+
+      return sanitizeSegment(value);
     }
-  }
-  return map;
-}
+  );
 
-/**
- * Resolve the directory for a database.
- * If databasesMap is non-empty, only mapped databases are included (returns null for unmapped).
- * If databasesMap is empty, uses the DB name as directory.
- */
-export function resolveDbDir(
-  dbName: string,
-  databasesMap: Map<string, string>
-): string | null {
-  if (databasesMap.size === 0) return dbName;
-  return databasesMap.get(dbName) ?? null;
-}
-
-/**
- * Build the full file path for a page.
- */
-export function buildFilePath(
-  contentDir: string,
-  dbDir: string,
-  pathPropertyValue: string | undefined,
-  filename: string
-): string {
-  const sanitized = sanitizeFilename(filename);
-  const parts = [contentDir, dbDir];
-  if (pathPropertyValue?.trim()) {
-    parts.push(pathPropertyValue.trim());
-  }
-  parts.push(`${sanitized}.md`);
-  return path.join(...parts);
+  return { path: resolved, missingKeys };
 }

@@ -1,142 +1,197 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildFilePath,
-  parseDatabasesParam,
-  resolveDbDir,
-  sanitizeFilename,
-} from "../src/file-mapper.js";
+import { resolveFilePath, sanitizeSegment } from "../src/file-mapper.js";
+import type { PageData } from "../src/notcms-client.js";
 
-describe("sanitizeFilename", () => {
+describe("sanitizeSegment", () => {
   it("replaces spaces with hyphens", () => {
-    expect(sanitizeFilename("Privacy Policy")).toBe("Privacy-Policy");
+    expect(sanitizeSegment("Privacy Policy")).toBe("Privacy-Policy");
   });
 
   it("removes filesystem forbidden characters", () => {
-    expect(sanitizeFilename('file<>:"/\\|?*name')).toBe("filename");
+    expect(sanitizeSegment('file<>:"/\\|?*name')).toBe("filename");
   });
 
   it("removes control characters", () => {
-    expect(sanitizeFilename("file\x00\x1fname")).toBe("filename");
+    expect(sanitizeSegment("file\x00\x1fname")).toBe("filename");
   });
 
-  it("removes leading dots", () => {
-    expect(sanitizeFilename("...hidden")).toBe("hidden");
+  it("removes leading dots and hyphens", () => {
+    expect(sanitizeSegment("...hidden")).toBe("hidden");
   });
 
   it("returns 'untitled' for empty string", () => {
-    expect(sanitizeFilename("")).toBe("untitled");
+    expect(sanitizeSegment("")).toBe("untitled");
   });
 
   it("returns 'untitled' for whitespace only", () => {
-    expect(sanitizeFilename("   ")).toBe("untitled");
+    expect(sanitizeSegment("   ")).toBe("untitled");
   });
 
   it("preserves CJK characters", () => {
-    expect(sanitizeFilename("プライバシーポリシー")).toBe(
+    expect(sanitizeSegment("プライバシーポリシー")).toBe(
       "プライバシーポリシー"
     );
   });
 
   it("preserves Korean characters", () => {
-    expect(sanitizeFilename("개인정보 처리방침")).toBe("개인정보-처리방침");
+    expect(sanitizeSegment("개인정보 처리방침")).toBe("개인정보-처리방침");
   });
 
   it("handles mixed CJK and ASCII", () => {
-    expect(sanitizeFilename("Blog 記事 01")).toBe("Blog-記事-01");
+    expect(sanitizeSegment("Blog 記事 01")).toBe("Blog-記事-01");
   });
 
   it("collapses multiple spaces", () => {
-    expect(sanitizeFilename("a   b   c")).toBe("a-b-c");
+    expect(sanitizeSegment("a   b   c")).toBe("a-b-c");
   });
 });
 
-describe("parseDatabasesParam", () => {
-  it("returns empty map for undefined", () => {
-    expect(parseDatabasesParam(undefined).size).toBe(0);
+describe("resolveFilePath", () => {
+  const basePage: PageData = {
+    id: "page-001",
+    title: "Privacy Policy",
+    properties: {
+      category: "legal",
+      locale: "en",
+      filename: "privacy",
+      slug: "privacy-policy",
+    },
+    content: "# Privacy Policy",
+  };
+
+  it("resolves basic template with {db} and {title}", () => {
+    const result = resolveFilePath("content/{db}/{title}.md", basePage, "docs");
+    expect(result.path).toBe("content/docs/Privacy-Policy.md");
+    expect(result.missingKeys).toEqual([]);
   });
 
-  it("returns empty map for empty string", () => {
-    expect(parseDatabasesParam("").size).toBe(0);
-  });
-
-  it("parses single mapping", () => {
-    const map = parseDatabasesParam("blog:content/posts");
-    expect(map.get("blog")).toBe("content/posts");
-  });
-
-  it("parses multiple mappings", () => {
-    const map = parseDatabasesParam("legal:docs/legal\nblog:content/posts");
-    expect(map.size).toBe(2);
-    expect(map.get("legal")).toBe("docs/legal");
-    expect(map.get("blog")).toBe("content/posts");
-  });
-
-  it("skips blank lines", () => {
-    const map = parseDatabasesParam("blog:posts\n\nlegal:docs");
-    expect(map.size).toBe(2);
-  });
-
-  it("skips lines without colon", () => {
-    const map = parseDatabasesParam("invalid\nblog:posts");
-    expect(map.size).toBe(1);
-  });
-
-  it("trims whitespace", () => {
-    const map = parseDatabasesParam("  blog : posts  ");
-    expect(map.get("blog")).toBe("posts");
-  });
-});
-
-describe("resolveDbDir", () => {
-  it("returns db name when map is empty", () => {
-    expect(resolveDbDir("blog", new Map())).toBe("blog");
-  });
-
-  it("returns mapped dir when present", () => {
-    const map = new Map([["blog", "content/posts"]]);
-    expect(resolveDbDir("blog", map)).toBe("content/posts");
-  });
-
-  it("returns null for unmapped db when map is non-empty", () => {
-    const map = new Map([["blog", "posts"]]);
-    expect(resolveDbDir("legal", map)).toBeNull();
-  });
-});
-
-describe("buildFilePath", () => {
-  it("builds basic path", () => {
-    expect(buildFilePath("content", "blog", undefined, "My Post")).toBe(
-      "content/blog/My-Post.md"
+  it("resolves template with property placeholders", () => {
+    const result = resolveFilePath(
+      "content/{category}/{locale}/{filename}.md",
+      basePage,
+      "content"
     );
+    expect(result.path).toBe("content/legal/en/privacy.md");
+    expect(result.missingKeys).toEqual([]);
   });
 
-  it("includes path property value", () => {
-    expect(buildFilePath("content", "legal", "en", "Privacy Policy")).toBe(
-      "content/legal/en/Privacy-Policy.md"
-    );
+  it("resolves {id} placeholder", () => {
+    const result = resolveFilePath("pages/{id}.md", basePage, "db");
+    expect(result.path).toBe("pages/page-001.md");
+    expect(result.missingKeys).toEqual([]);
   });
 
-  it("handles nested path property", () => {
-    expect(buildFilePath("content", "legal", "en/policies", "privacy")).toBe(
-      "content/legal/en/policies/privacy.md"
+  it("returns missingKeys when a placeholder has no value", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { locale: "en" },
+    };
+    const result = resolveFilePath(
+      "content/{category}/{locale}/{filename}.md",
+      page,
+      "db"
     );
+    expect(result.missingKeys).toEqual(["category", "filename"]);
   });
 
-  it("skips empty path property", () => {
-    expect(buildFilePath("content", "blog", "", "post")).toBe(
-      "content/blog/post.md"
-    );
+  it("returns missingKeys when title is null and {title} is used", () => {
+    const page: PageData = { ...basePage, title: null };
+    const result = resolveFilePath("{title}.md", page, "db");
+    expect(result.missingKeys).toEqual(["title"]);
   });
 
-  it("skips whitespace-only path property", () => {
-    expect(buildFilePath("content", "blog", "   ", "post")).toBe(
-      "content/blog/post.md"
-    );
+  it("sanitizes each segment", () => {
+    const page: PageData = {
+      ...basePage,
+      title: "My <Post>",
+      properties: { category: "blog posts" },
+    };
+    const result = resolveFilePath("{category}/{title}.md", page, "db");
+    expect(result.path).toBe("blog-posts/My-Post.md");
+    expect(result.missingKeys).toEqual([]);
   });
 
-  it("sanitizes filename", () => {
-    expect(buildFilePath("content", "blog", undefined, "My <Post>")).toBe(
-      "content/blog/My-Post.md"
+  it("handles template with no placeholders", () => {
+    const result = resolveFilePath("static/page.md", basePage, "db");
+    expect(result.path).toBe("static/page.md");
+    expect(result.missingKeys).toEqual([]);
+  });
+
+  it("handles array property values", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { tags: ["a", "b"] },
+    };
+    const result = resolveFilePath("{tags}.md", page, "db");
+    expect(result.path).toBe("a,b.md");
+    expect(result.missingKeys).toEqual([]);
+  });
+
+  it("handles boolean property as string", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { published: true },
+    };
+    const result = resolveFilePath(
+      "posts/{published}/{title}.md",
+      page,
+      "db"
     );
+    expect(result.path).toBe("posts/true/Privacy-Policy.md");
+    expect(result.missingKeys).toEqual([]);
+  });
+
+  it("handles boolean false without treating as missing", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { published: false },
+    };
+    const result = resolveFilePath(
+      "posts/{published}/{title}.md",
+      page,
+      "db"
+    );
+    expect(result.path).toBe("posts/false/Privacy-Policy.md");
+    expect(result.missingKeys).toEqual([]);
+  });
+
+  it("handles numeric 0 without treating as missing", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { order: 0 },
+    };
+    const result = resolveFilePath("docs/{order}-{title}.md", page, "db");
+    expect(result.path).toBe("docs/0-Privacy-Policy.md");
+    expect(result.missingKeys).toEqual([]);
+  });
+
+  it("resolves property names with hyphens", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { "seo-title": "my-seo-title" },
+    };
+    const result = resolveFilePath("{seo-title}.md", page, "db");
+    expect(result.path).toBe("my-seo-title.md");
+    expect(result.missingKeys).toEqual([]);
+  });
+
+  it("resolves property names with spaces", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { "content type": "blog" },
+    };
+    const result = resolveFilePath("{content type}/{title}.md", page, "db");
+    expect(result.path).toBe("blog/Privacy-Policy.md");
+    expect(result.missingKeys).toEqual([]);
+  });
+
+  it("resolves non-ASCII property names", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { "名前": "テスト" },
+    };
+    const result = resolveFilePath("{名前}.md", page, "db");
+    expect(result.path).toBe("テスト.md");
+    expect(result.missingKeys).toEqual([]);
   });
 });

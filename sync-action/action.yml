@@ -14,19 +14,10 @@ inputs:
   secret_key:
     description: "NotCMS secret key (Bearer token)"
     required: true
-  content_dir:
-    description: "Root directory for Markdown files"
+  file_path:
+    description: "File path template with {var} placeholders. Special vars: {title}, {db}, {id}. Others map to Notion properties."
     required: false
-    default: "content"
-  databases:
-    description: "Custom database-to-directory mapping (dbName:dirPath), newline-separated"
-    required: false
-  path_property:
-    description: "Notion property name used for subdirectory path"
-    required: false
-  filename_property:
-    description: "Notion property name used for filename"
-    required: false
+    default: "content/{db}/{title}.md"
   on_change:
     description: "How to apply changes: commit, pr, or pr-auto-merge"
     required: false

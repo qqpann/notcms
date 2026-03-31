@@ -26,11 +26,8 @@ export async function hasChanges(): Promise<boolean> {
   return output.trim().length > 0;
 }
 
-async function commitChanges(
-  contentDir: string,
-  message: string
-): Promise<void> {
-  await exec.exec("git", ["add", contentDir]);
+async function commitChanges(files: string[], message: string): Promise<void> {
+  await exec.exec("git", ["add", ...files]);
   await exec.exec("git", ["commit", "-m", message]);
 }
 
@@ -99,16 +96,15 @@ export interface OnChangeResult {
 export async function handleOnChange(
   mode: string,
   token: string,
-  contentDir: string,
-  filesChanged: number
+  filesWritten: string[]
 ): Promise<OnChangeResult> {
-  if (filesChanged === 0) {
+  if (filesWritten.length === 0) {
     core.info("No changes detected, skipping git operations");
     return {};
   }
 
   await configureGit();
-  await commitChanges(contentDir, "chore: sync content from NotCMS");
+  await commitChanges(filesWritten, "chore: sync content from NotCMS");
 
   if (mode === "commit") {
     await exec.exec("git", ["push"]);
@@ -128,7 +124,7 @@ export async function handleOnChange(
     [
       "## Summary",
       "",
-      `Synced ${filesChanged} file(s) from NotCMS.`,
+      `Synced ${filesWritten.length} file(s) from NotCMS.`,
       "",
       "This PR was automatically created by the [NotCMS Sync Action](https://github.com/qqpann/notcms/tree/main/sync-action).",
     ].join("\n")

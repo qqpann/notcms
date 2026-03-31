@@ -14,10 +14,7 @@ async function run(): Promise<void> {
 
     const workspaceId = core.getInput("workspace_id", { required: true });
     const secretKey = core.getInput("secret_key", { required: true });
-    const contentDir = core.getInput("content_dir") || "content";
-    const databases = core.getInput("databases") || undefined;
-    const pathProperty = core.getInput("path_property") || undefined;
-    const filenameProperty = core.getInput("filename_property") || undefined;
+    const filePath = core.getInput("file_path") || "content/{db}/{title}.md";
     const onChange = core.getInput("on_change") || "pr";
     const apiHost = core.getInput("api_host") || "https://api.notcms.com/v1";
 
@@ -33,10 +30,7 @@ async function run(): Promise<void> {
       apiHost,
       workspaceId,
       secretKey,
-      contentDir,
-      databases,
-      pathProperty,
-      filenameProperty,
+      filePath,
     });
 
     core.setOutput("files_changed", result.filesChanged);
@@ -47,8 +41,7 @@ async function run(): Promise<void> {
     const onChangeResult = await handleOnChange(
       onChange,
       token,
-      contentDir,
-      result.filesChanged
+      result.filesWritten
     );
 
     if (onChangeResult.pullRequestUrl) {

@@ -37,10 +37,7 @@ This will:
 | `direction` | Yes | — | Sync direction: `pull` |
 | `workspace_id` | Yes | — | NotCMS workspace ID |
 | `secret_key` | Yes | — | NotCMS API key (Bearer token) |
-| `content_dir` | No | `content` | Root directory for Markdown files |
-| `databases` | No | All databases | Custom `dbName:dirPath` mapping (newline-separated) |
-| `path_property` | No | — | Notion property name for subdirectory path |
-| `filename_property` | No | — | Notion property name for filename |
+| `file_path` | No | `content/{db}/{title}.md` | File path template (see below) |
 | `on_change` | No | `pr` | `commit` / `pr` / `pr-auto-merge` |
 | `api_host` | No | `https://api.notcms.com/v1` | API host URL |
 | `github_token` | No | `${{ github.token }}` | GitHub token for PR creation |
@@ -51,6 +48,46 @@ This will:
 |--------|-------------|
 | `files_changed` | Number of files written |
 | `pull_request_url` | URL of the created PR (if `on_change` is `pr` or `pr-auto-merge`) |
+
+## File Path Template
+
+The `file_path` input is a template string that defines where each page is written. Use `{var}` placeholders that get substituted with page data.
+
+### Special Variables
+
+| Variable | Description |
+|----------|-------------|
+| `{title}` | Page title |
+| `{db}` | Database name in NotCMS |
+| `{id}` | NotCMS page ID |
+
+Any other `{var}` is looked up in the page's Notion properties.
+
+### Examples
+
+```yaml
+# Default — organize by database name
+file_path: "content/{db}/{title}.md"
+# → content/blog/Hello-World.md
+
+# Multilingual site with category and locale properties
+file_path: "content/{category}/{locale}/{filename}.md"
+# → content/legal/en/privacy.md
+
+# Simple blog with slug property
+file_path: "posts/{slug}.md"
+# → posts/hello-world.md
+
+# Flat structure with page ID for uniqueness
+file_path: "docs/{title}-{id}.md"
+# → docs/Privacy-Policy-abc123.md
+```
+
+### Behavior
+
+- Each `{var}` value is sanitized for filesystem safety (CJK characters preserved)
+- If any placeholder resolves to an empty value, the page is skipped with a warning
+- Files are only written when content has actually changed
 
 ## Generated File Format
 
@@ -73,22 +110,10 @@ We respect your privacy...
 
 - All Notion properties are included in frontmatter
 - `notcms_id` and `notcms_db` are added for sync tracking
-- File names are derived from page titles (CJK characters preserved)
-
-## File Path Structure
-
-```
-${content_dir}/${db_dir}/${path_property}/${filename}.md
-```
-
-- **`content_dir`** — Root directory (default: `content`)
-- **`db_dir`** — Database name, or custom mapping via `databases` input
-- **`path_property`** — Optional subdirectory from a Notion property
-- **`filename`** — From `filename_property`, or sanitized page title
 
 ## Examples
 
-### Custom Database Mapping
+### Multilingual Content
 
 ```yaml
 - uses: qqpann/notcms/sync-action@v1
@@ -96,25 +121,8 @@ ${content_dir}/${db_dir}/${path_property}/${filename}.md
     direction: pull
     workspace_id: ${{ secrets.NOTCMS_WORKSPACE_ID }}
     secret_key: ${{ secrets.NOTCMS_SECRET_KEY }}
-    databases: |
-      legal:docs/legal
-      blog:content/posts
+    file_path: "content/{category}/{locale}/{filename}.md"
 ```
-
-### Multilingual Content with Path Property
-
-Use a Notion property (e.g., `path`) to create locale subdirectories:
-
-```yaml
-- uses: qqpann/notcms/sync-action@v1
-  with:
-    direction: pull
-    workspace_id: ${{ secrets.NOTCMS_WORKSPACE_ID }}
-    secret_key: ${{ secrets.NOTCMS_SECRET_KEY }}
-    path_property: path
-```
-
-This generates paths like `content/legal/en/Privacy-Policy.md`.
 
 ### Direct Commit (No PR)
 
