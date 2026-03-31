@@ -1,0 +1,102 @@
+name: Sync Action Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "sync-action/src/**"
+      - "sync-action/action.yml"
+      - "sync-action/package.json"
+      - "sync-action/tsconfig.json"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-action-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Determine version
+        id: version
+        working-directory: sync-action
+        run: |
+          CURRENT=$(node -p "require('./package.json').version")
+
+          # If current version is already tagged, bump patch
+          if git tag -l "sync-action@${CURRENT}" | grep -q .; then
+            IFS='.' read -r major minor patch <<< "$CURRENT"
+            NEW_VERSION="${major}.${minor}.$((patch + 1))"
+            node -e "
+              const fs = require('fs');
+              const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+              pkg.version = '${NEW_VERSION}';
+              fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+            "
+          else
+            NEW_VERSION="$CURRENT"
+          fi
+
+          IFS='.' read -r major _ _ <<< "$NEW_VERSION"
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=sync-action@${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "major_tag=v${major}" >> "$GITHUB_OUTPUT"
+
+      - name: Build dist
+        working-directory: sync-action
+        run: pnpm run build
+
+      - name: Commit changes
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add sync-action/package.json sync-action/dist/
+
+          if git diff --staged --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore(sync-action): release ${{ steps.version.outputs.version_tag }}"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and update tags
+        env:
+          VERSION_TAG: ${{ steps.version.outputs.version_tag }}
+          MAJOR_TAG: ${{ steps.version.outputs.major_tag }}
+        run: |
+          git tag "$VERSION_TAG"
+          git push origin "$VERSION_TAG"
+
+          git tag -f "$MAJOR_TAG"
+          git push -f origin "$MAJOR_TAG"
+
+      - name: Summary
+        if: always()
+        env:
+          VERSION_TAG: ${{ steps.version.outputs.version_tag }}
+          MAJOR_TAG: ${{ steps.version.outputs.major_tag }}
+        run: |
+          echo "### Sync Action Released" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Version: \`${VERSION_TAG}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Major tag: \`${MAJOR_TAG}\` (updated)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Usage: \`uses: qqpann/notcms/sync-action@${MAJOR_TAG}\`" >> "$GITHUB_STEP_SUMMARY"
