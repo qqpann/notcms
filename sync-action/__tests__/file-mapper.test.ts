@@ -132,11 +132,7 @@ describe("resolveFilePath", () => {
       ...basePage,
       properties: { published: true },
     };
-    const result = resolveFilePath(
-      "posts/{published}/{title}.md",
-      page,
-      "db"
-    );
+    const result = resolveFilePath("posts/{published}/{title}.md", page, "db");
     expect(result.path).toBe("posts/true/Privacy-Policy.md");
     expect(result.missingKeys).toEqual([]);
   });
@@ -146,11 +142,7 @@ describe("resolveFilePath", () => {
       ...basePage,
       properties: { published: false },
     };
-    const result = resolveFilePath(
-      "posts/{published}/{title}.md",
-      page,
-      "db"
-    );
+    const result = resolveFilePath("posts/{published}/{title}.md", page, "db");
     expect(result.path).toBe("posts/false/Privacy-Policy.md");
     expect(result.missingKeys).toEqual([]);
   });
@@ -188,10 +180,38 @@ describe("resolveFilePath", () => {
   it("resolves non-ASCII property names", () => {
     const page: PageData = {
       ...basePage,
-      properties: { "名前": "テスト" },
+      properties: { 名前: "テスト" },
     };
     const result = resolveFilePath("{名前}.md", page, "db");
     expect(result.path).toBe("テスト.md");
     expect(result.missingKeys).toEqual([]);
+  });
+
+  it("property takes priority over built-in {title}", () => {
+    const page: PageData = {
+      ...basePage,
+      title: "Page Title",
+      properties: { title: "Property Title" },
+    };
+    const result = resolveFilePath("{title}.md", page, "db");
+    expect(result.path).toBe("Property-Title.md");
+  });
+
+  it("property takes priority over built-in {db}", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { db: "my-custom-db" },
+    };
+    const result = resolveFilePath("{db}/{title}.md", page, "actual-db-name");
+    expect(result.path).toBe("my-custom-db/Privacy-Policy.md");
+  });
+
+  it("falls back to built-in when property does not exist", () => {
+    const page: PageData = {
+      ...basePage,
+      properties: { category: "legal" },
+    };
+    const result = resolveFilePath("{db}/{category}/{title}.md", page, "docs");
+    expect(result.path).toBe("docs/legal/Privacy-Policy.md");
   });
 });

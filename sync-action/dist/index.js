@@ -35107,12 +35107,10 @@ function sanitizeSegment(value) {
  * Resolve a file_path template like "content/{category}/{locale}/{filename}.md"
  * by substituting {var} placeholders with page data.
  *
- * Special variables:
- *   {title} — page title
- *   {db}    — database name
- *   {id}    — notcms page ID
+ * Placeholders are resolved in this order:
+ *   1. page.properties[key] — Notion property (takes priority)
+ *   2. Built-in fallbacks: {title} → page title, {db} → DB name, {id} → page ID
  *
- * All other {var} are looked up in page.properties.
  * Each substituted value is sanitized for filesystem safety.
  *
  * Returns { path, missingKeys }. When missingKeys is non-empty, path is unreliable.
@@ -35121,7 +35119,12 @@ function resolveFilePath(template, page, dbName) {
     const missingKeys = [];
     const resolved = template.replace(/\{([^}]+)\}/g, (_match, key) => {
         let value;
-        if (key === "title") {
+        // Properties take priority over built-in variables
+        const prop = page.properties?.[key];
+        if (prop != null) {
+            value = Array.isArray(prop) ? prop.join(",") : String(prop);
+        }
+        else if (key === "title") {
             value = page.title ?? undefined;
         }
         else if (key === "db") {
@@ -35129,12 +35132,6 @@ function resolveFilePath(template, page, dbName) {
         }
         else if (key === "id") {
             value = page.id;
-        }
-        else {
-            const prop = page.properties?.[key];
-            if (prop != null) {
-                value = Array.isArray(prop) ? prop.join(",") : String(prop);
-            }
         }
         if (value === undefined || value === "") {
             missingKeys.push(key);
