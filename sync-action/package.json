@@ -2,6 +2,7 @@
   "name": "notcms-sync-action",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "GitHub Action to sync NotCMS (Notion) content with repository Markdown files",
   "main": "dist/index.js",
   "scripts": {
