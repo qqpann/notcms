@@ -1,0 +1,25 @@
+{
+  "name": "notcms-sync-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitHub Action to sync NotCMS (Notion) content with repository Markdown files",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/index.ts -o dist --source-map --license licenses.txt",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^6.0.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@vercel/ncc": "^0.38.3",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

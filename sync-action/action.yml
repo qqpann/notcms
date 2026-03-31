@@ -1,0 +1,51 @@
+name: "NotCMS Sync"
+description: "Sync content between NotCMS (Notion) and your repository as Markdown files"
+branding:
+  icon: "refresh-cw"
+  color: "blue"
+
+inputs:
+  direction:
+    description: "Sync direction: pull"
+    required: true
+  workspace_id:
+    description: "NotCMS workspace ID"
+    required: true
+  secret_key:
+    description: "NotCMS secret key (Bearer token)"
+    required: true
+  content_dir:
+    description: "Root directory for Markdown files"
+    required: false
+    default: "content"
+  databases:
+    description: "Custom database-to-directory mapping (dbName:dirPath), newline-separated"
+    required: false
+  path_property:
+    description: "Notion property name used for subdirectory path"
+    required: false
+  filename_property:
+    description: "Notion property name used for filename"
+    required: false
+  on_change:
+    description: "How to apply changes: commit, pr, or pr-auto-merge"
+    required: false
+    default: "pr"
+  api_host:
+    description: "NotCMS API host URL"
+    required: false
+    default: "https://api.notcms.com/v1"
+  github_token:
+    description: "GitHub token for creating PRs (defaults to GITHUB_TOKEN)"
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  files_changed:
+    description: "Number of files changed"
+  pull_request_url:
+    description: "URL of the created pull request (if on_change is pr or pr-auto-merge)"
+
+runs:
+  using: "node20"
+  main: "dist/index.js"

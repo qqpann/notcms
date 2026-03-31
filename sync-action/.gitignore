@@ -1,0 +1,4 @@
+node_modules/
+
+# Override root .gitignore — dist/ must be committed for GitHub Actions
+!dist/
