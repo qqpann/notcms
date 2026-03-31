@@ -53,15 +53,20 @@ This will:
 
 The `file_path` input is a template string that defines where each page is written. Use `{var}` placeholders that get substituted with page data.
 
-### Special Variables
+### Placeholder Resolution
 
-| Variable | Description |
-|----------|-------------|
+Each `{var}` is resolved in this order:
+
+1. **Notion property** — If the page has a property matching the name, its value is used
+2. **Built-in fallback** — If no property matches, these built-in values apply:
+
+| Variable | Fallback |
+|----------|----------|
 | `{title}` | Page title |
 | `{db}` | Database name in NotCMS |
 | `{id}` | NotCMS page ID |
 
-Any other `{var}` is looked up in the page's Notion properties.
+This means if your database has a property named `title`, the property value is used (not the built-in page title). In practice, these are usually identical.
 
 ### Examples
 
