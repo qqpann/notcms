@@ -13,12 +13,16 @@ on:
     - cron: "0 */6 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   pull:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: qqpann/notcms/sync-action@v1
+      - uses: qqpann/notcms/sync-action@v0
         with:
           direction: pull
           workspace_id: ${{ secrets.NOTCMS_WORKSPACE_ID }}
@@ -121,7 +125,7 @@ We respect your privacy...
 ### Multilingual Content
 
 ```yaml
-- uses: qqpann/notcms/sync-action@v1
+- uses: qqpann/notcms/sync-action@v0
   with:
     direction: pull
     workspace_id: ${{ secrets.NOTCMS_WORKSPACE_ID }}
@@ -132,7 +136,7 @@ We respect your privacy...
 ### Direct Commit (No PR)
 
 ```yaml
-- uses: qqpann/notcms/sync-action@v1
+- uses: qqpann/notcms/sync-action@v0
   with:
     direction: pull
     workspace_id: ${{ secrets.NOTCMS_WORKSPACE_ID }}
@@ -143,7 +147,7 @@ We respect your privacy...
 ### PR with Auto-Merge
 
 ```yaml
-- uses: qqpann/notcms/sync-action@v1
+- uses: qqpann/notcms/sync-action@v0
   with:
     direction: pull
     workspace_id: ${{ secrets.NOTCMS_WORKSPACE_ID }}
@@ -160,6 +164,10 @@ We respect your privacy...
    - `NOTCMS_WORKSPACE_ID`
    - `NOTCMS_SECRET_KEY`
 3. Create a workflow file (see Quick Start above)
+4. Ensure the workflow has the required permissions:
+   - `contents: write` — to push branches and commits
+   - `pull-requests: write` — to create PRs (when `on_change` is `pr` or `pr-auto-merge`)
+5. Enable "Allow GitHub Actions to create and approve pull requests" in **Settings → Actions → General** (required for PR creation)
 
 ## License
 
