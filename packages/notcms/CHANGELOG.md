@@ -1,5 +1,11 @@
 # notcms
 
+## 0.2.1
+
+### Patch Changes
+
+- 561a6ae: Update the Next.js blog example to Next.js 16 and React 19.
+
 ## 0.2.0
 
 ### Minor Changes

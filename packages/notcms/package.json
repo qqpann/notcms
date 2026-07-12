@@ -1,6 +1,6 @@
 {
   "name": "notcms",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "NotCMS makes it easy to build a CMS for your website.",
   "type": "module",
   "main": "./dist/index.cjs",
