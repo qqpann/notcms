@@ -38,37 +38,27 @@ bun add notcms
 Use the NotCMS CLI to set up your project:
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 This command will:
-1. Check environment variables
-2. Create a `notcms.config.json` configuration file
+1. Create a `notcms.config.json` configuration file
+2. Open browser login when credentials are missing and save them to `.env.local`
+3. Pull a type-safe schema to `src/notcms/schema.ts`
+4. Print a first query example
 
-## Step 3: Configure Environment Variables
-
-Add your NotCMS credentials to your `.env` file:
-
-```env
-NOTCMS_SECRET_KEY=your-secret-key
-NOTCMS_WORKSPACE_ID=your-workspace-id
-```
-
-<Note>
-  Get your credentials from the [NotCMS Dashboard](https://dash.notcms.com)
-</Note>
-
-## Step 4: Pull Your Schema
-
-Generate TypeScript types from your Notion databases:
+Run the standalone pull command later whenever your Notion database schema changes:
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
-This creates a type-safe schema file at `src/notcms/schema.ts`:
+The generated schema looks like this:
 
 ```typescript
+import { Client } from "notcms";
+import type { Schema } from "notcms";
+
 export const schema = {
   blog: {
     id: "abc123...",
@@ -80,17 +70,16 @@ export const schema = {
     }
   }
 } satisfies Schema;
+
+export const nc = new Client({ schema });
 ```
 
-## Step 5: Start Using NotCMS
+## Step 3: Start Using NotCMS
 
-Create a client and start querying your content:
+Import the generated client and start querying your content:
 
 ```typescript
-import { Client } from 'notcms';
-import { schema } from './notcms/schema';
-
-const nc = new Client({ schema });
+import { nc } from './notcms/schema';
 
 // Fetch all published blog posts
 const [posts, error] = await nc.query.blog.list();
@@ -133,6 +122,6 @@ if (error) {
   </Accordion>
   
   <Accordion title="TypeScript errors">
-    Run `npx notcms-kit pull` again to regenerate the schema if you've made changes to your Notion databases.
+    Run `npx notcms pull` again to regenerate the schema if you've made changes to your Notion databases.
   </Accordion>
 </AccordionGroup>
