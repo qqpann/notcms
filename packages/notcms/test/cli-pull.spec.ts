@@ -80,6 +80,53 @@ export const nc = new Client({ schema });`);
     });
   });
 
+  it("uses the server-selected onboarding database for query guidance", async () => {
+    const schema = {
+      "Older Blog": { id: "db_old", properties: { Title: "title" } },
+      Blog: { id: "db_selected", properties: { Title: "title" } },
+    } satisfies Schema;
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(
+            JSON.stringify({ onboardingDatabaseName: "Blog", schema }),
+            { status: 200 }
+          )
+        )
+    );
+    await writeConfig("schema.ts");
+
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      firstDatabaseName: "Blog",
+      status: "written",
+    });
+  });
+
+  it("does not invent guidance when the server cannot persist a target", async () => {
+    const schema = {
+      Blog: { id: "db_unresolved", properties: { Title: "title" } },
+    } satisfies Schema;
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(
+            JSON.stringify({ onboardingDatabaseName: null, schema }),
+            { status: 200 }
+          )
+        )
+    );
+    await writeConfig("schema.ts");
+
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      firstDatabaseName: null,
+      status: "written",
+    });
+  });
+
   it("reports a missing schema without writing in check mode", async () => {
     stubSchema({
       Blog: { id: "db_blog", properties: { Title: "title" } },

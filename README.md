@@ -56,7 +56,10 @@ npx notcms init
 
 This creates `notcms.config.json`. If credentials are missing, it opens browser
 login and saves `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID` to `.env.local`.
-It then pulls the schema and prints a first query example.
+It ensures `notcms` is both a direct dependency and available to the project,
+offering either the detected package manager's install command or an add
+command without replacing an existing dependency spec. It then pulls the
+schema and prints a runnable first query example.
 
 #### 2. Refresh Your Schema
 

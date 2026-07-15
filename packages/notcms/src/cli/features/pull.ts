@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Schema } from "../../types.js";
 import type { Credentials } from "../types.js";
 import { loadConfig } from "./config.js";
-import { fetchSchema } from "./schema.js";
+import { fetchSchemaResponse } from "./schema.js";
 
 export type PullSchemaOptions = {
   check?: boolean;
@@ -44,9 +44,13 @@ export async function pullSchema(
   const config = await loadConfig("notcms.config.json");
   const schemaPath = config.schema;
   const absoluteSchemaPath = path.resolve(schemaPath);
-  const schema = await fetchSchema(options.credentials);
+  const schemaResponse = await fetchSchemaResponse(options.credentials);
+  const schema = schemaResponse.schema;
   const content = createSchemaModule(schema);
-  const firstDatabaseName = Object.keys(schema)[0] ?? null;
+  const firstDatabaseName =
+    schemaResponse.onboardingDatabaseName === undefined
+      ? (Object.keys(schema)[0] ?? null)
+      : schemaResponse.onboardingDatabaseName;
 
   if (options.check) {
     const existing = await fs

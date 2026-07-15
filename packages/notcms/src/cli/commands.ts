@@ -5,6 +5,7 @@ import boxen from "boxen";
 import chalk from "chalk";
 import dedent from "dedent";
 import { dumpConfig } from "./features/config.js";
+import type { DependencySetupResult } from "./features/dependency.js";
 import type { PullSchemaOptions, PullSchemaResult } from "./features/pull.js";
 import type { Config, Credentials } from "./types.js";
 
@@ -79,7 +80,12 @@ export async function init() {
   }
 
   if (credentials) {
+    const { ensureNotcmsDependency } = await import("./features/dependency.js");
+    const dependencySetup = await ensureNotcmsDependency();
     await runPull({ credentials });
+    if (dependencySetup.status === "manual") {
+      printManualDependencyGuidance(dependencySetup);
+    }
   }
 }
 
@@ -177,6 +183,64 @@ function printLoginSuccess(result: LoginResult, showPullHint: boolean) {
       borderColor: "green",
       borderStyle: "round",
     })
+  );
+}
+
+function printManualDependencyGuidance(
+  result: Extract<DependencySetupResult, { status: "manual" }>
+) {
+  if (!("command" in result)) {
+    console.log(
+      boxen(
+        dedent`
+          The schema was generated, but NotCMS could not safely choose a package manager.
+
+          ${result.error}
+
+          Fix the package manager configuration, then install ${chalk.yellow("notcms")} as a direct project dependency.
+        `,
+        {
+          padding: 1,
+          title: "[ Action required ]",
+          borderColor: "yellow",
+          borderStyle: "round",
+        }
+      )
+    );
+    return;
+  }
+
+  const reason =
+    result.reason === "failed"
+      ? dedent`
+          Automatic installation failed:
+          ${result.error ?? "Unknown package manager error"}
+        `
+      : result.reason === "declined"
+        ? "Automatic installation was declined."
+        : "Automatic installation was skipped in this non-interactive session.";
+  const dependencyState =
+    result.verificationRequired === "target-pnp"
+      ? `The schema was generated, but this Yarn PnP project's ${chalk.yellow("notcms")} resolution has not been verified.`
+      : `The schema was generated, but the project still needs the ${chalk.yellow("notcms")} package before it can run the first query.`;
+  console.log(
+    boxen(
+      dedent`
+        ${dependencyState}
+
+        ${reason}
+
+        Install it manually with:
+
+          ${chalk.blue(`$ ${result.command}`)}
+      `,
+      {
+        padding: 1,
+        title: "[ Action required ]",
+        borderColor: "yellow",
+        borderStyle: "round",
+      }
+    )
   );
 }
 

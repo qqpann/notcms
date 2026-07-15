@@ -1,4 +1,4 @@
-import { fetchSchema } from "../src/cli/features/schema";
+import { fetchSchema, fetchSchemaResponse } from "../src/cli/features/schema";
 import { PROPERTY_TYPES } from "../src/types";
 
 describe("fetchSchema", () => {
@@ -44,6 +44,29 @@ describe("fetchSchema", () => {
         },
       }
     );
+  });
+
+  it("returns the server-selected onboarding database metadata", async () => {
+    stubCredentials();
+    const schema = {
+      Blog: { id: "db_1", properties: { slug: "rich_text" } },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(
+            JSON.stringify({ onboardingDatabaseName: "Blog", schema }),
+            { status: 200 }
+          )
+        )
+    );
+
+    await expect(fetchSchemaResponse()).resolves.toEqual({
+      onboardingDatabaseName: "Blog",
+      schema,
+    });
   });
 
   it("uses explicitly supplied credentials when the environment is empty", async () => {

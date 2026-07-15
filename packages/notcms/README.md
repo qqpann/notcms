@@ -44,8 +44,10 @@ npx notcms init
 ```
 
 When credentials are missing, `init` opens browser login, saves them to
-`.env.local`, pulls the schema, and prints a first query example. Use the
-standalone commands when you need to log in or refresh the schema later:
+`.env.local`, ensures `notcms` is a direct and installed project dependency,
+pulls the schema, and prints a runnable first query example. Existing dependency
+specs are preserved by running the package manager's plain install command.
+Use the standalone commands when you need to log in or refresh the schema later:
 
 ```bash
 npx notcms login

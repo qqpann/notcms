@@ -32,7 +32,19 @@ function isSchemaEntry(entry: unknown): entry is Schema[string] {
 function isSchema(value: unknown): value is Schema {
   return isPlainObject(value) && Object.values(value).every(isSchemaEntry);
 }
+
+export type FetchedSchemaResponse = {
+  onboardingDatabaseName?: string | null;
+  schema: Schema;
+};
+
 export async function fetchSchema(credentials?: Credentials): Promise<Schema> {
+  return (await fetchSchemaResponse(credentials)).schema;
+}
+
+export async function fetchSchemaResponse(
+  credentials?: Credentials
+): Promise<FetchedSchemaResponse> {
   const secretKey = credentials?.secretKey ?? process.env.NOTCMS_SECRET_KEY;
   const workspaceId =
     credentials?.workspaceId ?? process.env.NOTCMS_WORKSPACE_ID;
@@ -71,11 +83,33 @@ export async function fetchSchema(credentials?: Credentials): Promise<Schema> {
     if (!res.ok) {
       throw new Error(`Unexpected status ${res.status}`);
     }
-    const data = (await res.json()) as { schema?: unknown };
-    if (!isSchema(data.schema)) {
+    const data: unknown = await res.json();
+    if (!isPlainObject(data) || !isSchema(data.schema)) {
       throw new Error("Invalid schema payload.");
     }
-    return data.schema;
+    const hasOnboardingDatabaseName = Object.prototype.hasOwnProperty.call(
+      data,
+      "onboardingDatabaseName"
+    );
+    const onboardingDatabaseName = data.onboardingDatabaseName;
+    if (
+      hasOnboardingDatabaseName &&
+      onboardingDatabaseName !== null &&
+      typeof onboardingDatabaseName !== "string"
+    ) {
+      throw new Error("Invalid onboarding database name.");
+    }
+    return {
+      schema: data.schema,
+      ...(hasOnboardingDatabaseName
+        ? {
+            onboardingDatabaseName:
+              typeof onboardingDatabaseName === "string"
+                ? onboardingDatabaseName
+                : null,
+          }
+        : {}),
+    };
   } catch (error) {
     throw new Error(
       dedent`

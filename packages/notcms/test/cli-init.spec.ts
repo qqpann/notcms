@@ -14,8 +14,12 @@ const loginMocks = vi.hoisted(() => ({
 const pullMocks = vi.hoisted(() => ({
   pullSchema: vi.fn(),
 }));
+const dependencyMocks = vi.hoisted(() => ({
+  ensureNotcmsDependency: vi.fn(),
+}));
 
 vi.mock("@inquirer/prompts", () => promptMocks);
+vi.mock("../src/cli/features/dependency.js", () => dependencyMocks);
 vi.mock("../src/cli/features/login.js", () => loginMocks);
 vi.mock("../src/cli/features/pull.js", () => pullMocks);
 
@@ -31,6 +35,9 @@ describe("init command", () => {
     cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(dir);
     logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     promptMocks.input.mockResolvedValue("src/notcms/schema.ts");
+    dependencyMocks.ensureNotcmsDependency.mockResolvedValue({
+      status: "already-installed",
+    });
   });
 
   afterEach(async () => {
@@ -57,6 +64,7 @@ describe("init command", () => {
 
     expect(promptMocks.confirm).not.toHaveBeenCalled();
     expect(loginMocks.loginViaBrowser).not.toHaveBeenCalled();
+    expect(dependencyMocks.ensureNotcmsDependency).toHaveBeenCalledOnce();
     expect(pullMocks.pullSchema).toHaveBeenCalledWith({ credentials });
     expect(output()).toContain('nc.query["Blog posts"].list()');
   });
@@ -97,6 +105,7 @@ describe("init command", () => {
     await init();
 
     expect(loginMocks.loginViaBrowser).not.toHaveBeenCalled();
+    expect(dependencyMocks.ensureNotcmsDependency).not.toHaveBeenCalled();
     expect(pullMocks.pullSchema).not.toHaveBeenCalled();
     expect(output()).toContain("npx notcms login");
     await expect(
@@ -119,6 +128,111 @@ describe("init command", () => {
 
     expect(output()).toContain("No databases are available");
     expect(output()).not.toContain("nc.query[");
+  });
+
+  it("prints a declined dependency install command after schema generation", async () => {
+    loginMocks.getCredentialsFromEnv.mockReturnValue({
+      secretKey: "ncsec_existing",
+      workspaceId: "ws_existing",
+    });
+    dependencyMocks.ensureNotcmsDependency.mockResolvedValue({
+      status: "manual",
+      reason: "declined",
+      packageManager: "pnpm",
+      command: "pnpm add notcms",
+    });
+    pullMocks.pullSchema.mockResolvedValue({
+      status: "written",
+      schemaPath: "src/notcms/schema.ts",
+      firstDatabaseName: "Blog",
+    });
+
+    await init();
+
+    expect(pullMocks.pullSchema).toHaveBeenCalled();
+    expect(output()).toContain('nc.query["Blog"].list()');
+    const lastLog = logSpy.mock.calls[logSpy.mock.calls.length - 1]?.[0];
+    expect(String(lastLog)).toContain("$ pnpm add notcms");
+  });
+
+  it("prints a failed dependency install command and error after schema generation", async () => {
+    loginMocks.getCredentialsFromEnv.mockReturnValue({
+      secretKey: "ncsec_existing",
+      workspaceId: "ws_existing",
+    });
+    dependencyMocks.ensureNotcmsDependency.mockResolvedValue({
+      status: "manual",
+      reason: "failed",
+      packageManager: "npm",
+      command: "npm install notcms",
+      error: "npm install failed with exit code 1.",
+    });
+    pullMocks.pullSchema.mockResolvedValue({
+      status: "written",
+      schemaPath: "src/notcms/schema.ts",
+      firstDatabaseName: "Blog",
+    });
+
+    await init();
+
+    expect(output()).toContain('nc.query["Blog"].list()');
+    const lastLog = logSpy.mock.calls[logSpy.mock.calls.length - 1]?.[0];
+    expect(String(lastLog)).toContain("npm install failed with exit code 1.");
+    expect(String(lastLog)).toContain("$ npm install notcms");
+  });
+
+  it("reports an unverified Yarn PnP resolution without claiming the package is missing", async () => {
+    loginMocks.getCredentialsFromEnv.mockReturnValue({
+      secretKey: "ncsec_existing",
+      workspaceId: "ws_existing",
+    });
+    dependencyMocks.ensureNotcmsDependency.mockResolvedValue({
+      status: "manual",
+      reason: "non-interactive",
+      packageManager: "yarn",
+      command: "yarn install",
+      verificationRequired: "target-pnp",
+    });
+    pullMocks.pullSchema.mockResolvedValue({
+      status: "written",
+      schemaPath: "src/notcms/schema.ts",
+      firstDatabaseName: "Blog",
+    });
+
+    await init();
+
+    const lastLog = logSpy.mock.calls[logSpy.mock.calls.length - 1]?.[0];
+    expect(String(lastLog)).toContain("Yarn PnP project's notcms resolution");
+    expect(String(lastLog)).toContain("has not been verified");
+    expect(String(lastLog)).not.toContain("project still needs the notcms");
+    expect(String(lastLog)).toContain("$ yarn install");
+  });
+
+  it("prints package-manager configuration guidance after schema generation", async () => {
+    loginMocks.getCredentialsFromEnv.mockReturnValue({
+      secretKey: "ncsec_existing",
+      workspaceId: "ws_existing",
+    });
+    dependencyMocks.ensureNotcmsDependency.mockResolvedValue({
+      status: "manual",
+      reason: "ambiguous-lockfiles",
+      error: "Multiple package-manager lockfiles were found.",
+    });
+    pullMocks.pullSchema.mockResolvedValue({
+      status: "written",
+      schemaPath: "src/notcms/schema.ts",
+      firstDatabaseName: "Blog",
+    });
+
+    await init();
+
+    expect(output()).toContain('nc.query["Blog"].list()');
+    const lastLog = logSpy.mock.calls[logSpy.mock.calls.length - 1]?.[0];
+    expect(String(lastLog)).toContain(
+      "Multiple package-manager lockfiles were found."
+    );
+    expect(String(lastLog)).toContain("then install notcms as a direct");
+    expect(String(lastLog)).toContain("project dependency");
   });
 
   it.each([
