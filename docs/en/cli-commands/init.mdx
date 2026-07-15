@@ -1,58 +1,73 @@
 ---
 title: init
-description: Initialize a new NotCMS project
+description: Initialize NotCMS through browser login and the first schema pull
 ---
 
 ## Overview
 
-The `init` command sets up NotCMS in your project with interactive configuration.
+The `init` command takes a project from configuration through its first schema
+pull in one interactive flow.
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 ## What it does
 
-1. Creates `notcms.config.json` configuration file
-2. Checks environment variables in `.env`
+1. Prompts for the generated schema path
+2. Creates `notcms.config.json`
+3. Loads existing credentials from `.env`, `.env.local`, or `.dev.vars`
+4. If credentials are missing, offers browser login and saves them to `.env.local`
+5. Pulls the schema automatically
+6. Prints a first query using the generated `nc` client
+
+If you decline browser login, the config file remains available and the command
+shows how to run `notcms login` later. It does not attempt to pull without
+credentials.
 
 ## Options
 
 | Option | Description | Default |
-|--------|-------------|---------|
-| `--env` | Environment file path | `[".env", ".env.local", ".dev.vars"]` |
+| --- | --- | --- |
+| `-e, --env <PATH>` | Comma-separated environment file paths | `.env,.env.local,.dev.vars` |
 
-## Interactive Setup
+## Interactive setup
 
-The command will guide you through:
+The command first asks where to save the generated schema:
 
-### 1. Configuration
-
+```text
+? Enter the path to save the schema (src/notcms/schema.ts)
 ```
-? Schema file path: ./src/notcms/schema.ts
+
+When credentials are missing, it asks before starting browser login:
+
+```text
+? No NotCMS credentials found. Log in via browser to set them up now? (Y/n)
 ```
+
+The browser flow displays a device code, lets you select a workspace, and
+returns credentials to the CLI. The same credentials are used immediately for
+the automatic schema pull.
 
 ## Examples
 
 ### Basic initialization
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
-### Specify environment file path
-
-Use this if you already have `.env` configured:
+### Load credentials from a custom env file
 
 ```bash
-npx notcms-kit init --env .env.development
+npx notcms --env .env.development init
 ```
 
-## Troubleshooting
+## Next steps
 
-## Next Steps
+Import the `nc` client from the generated schema file and run the query printed
+by the command. When the Notion database structure changes, refresh it with:
 
-After initialization, you can:
-
-1. Start using the NotCMS client in your code
-2. Run `npx notcms-kit pull` to update your schema
+```bash
+npx notcms pull
+```

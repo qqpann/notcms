@@ -1,51 +1,66 @@
 ---
 title: pull
-description: Generate TypeScript schema from Notion databases
+description: Generate a TypeScript schema from registered Notion databases
 ---
 
 ## Overview
 
-The `pull` command generates or updates your TypeScript schema from Notion databases.
+The `pull` command generates or updates the configured TypeScript schema from
+the databases registered in your NotCMS workspace.
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
+
+`init` already performs the first pull. Run this standalone command after a
+database or its properties change.
 
 ## What it does
 
-1. Fetches database structure and properties
-2. Generates TypeScript types
-3. Updates your schema file
+1. Loads `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID`
+2. Fetches the current workspace schema from NotCMS
+3. Generates the configured schema module and its `nc` client
+4. Prints a query for the first database
 
 ## Options
 
 | Option | Description | Default |
-|--------|-------------|---------|
-| `--env` | Environment file path | `[".env", ".env.local", ".dev.vars"]` |
+| --- | --- | --- |
+| `-e, --env <PATH>` | Comma-separated environment file paths | `.env,.env.local,.dev.vars` |
+| `--check` | Check whether the schema is current without writing | `false` |
+
+`--check` exits with code 1 when the generated file is missing or out of date,
+which makes it suitable for CI/CD.
 
 ## Examples
 
-### Basic pull
+### Update the schema
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
-### Specify environment file path
+### Load credentials from a custom env file
 
 ```bash
-npx notcms-kit pull --env .env.development
+npx notcms --env .env.development pull
 ```
 
-## Generated Schema
+### Check without writing
 
-The command generates a fully typed schema:
+```bash
+npx notcms pull --check
+```
+
+## Generated schema
+
+The command generates both the typed schema and a ready-to-use client:
 
 ```typescript
-import { Schema } from 'notcms';
+import { Client } from "notcms";
+import type { Schema } from "notcms";
 
 export const schema = {
-  // example
   blog: {
     id: "abc123...",
     properties: {
@@ -54,20 +69,20 @@ export const schema = {
       published: "checkbox",
       publishDate: "date",
       author: "relation",
-      tags: "multi_select"
-    }
-  }
+      tags: "multi_select",
+    },
+  },
 } satisfies Schema;
+
+export const nc = new Client({ schema });
 ```
 
-## Schema Updates
-
-When you update Notion databases, the pull command will update your schema.
+You can add a package script for later updates:
 
 ```json
 {
   "scripts": {
-    "schema:pull": "notcms-kit pull",
+    "schema:pull": "notcms pull"
   }
 }
 ```

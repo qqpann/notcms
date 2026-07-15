@@ -1,51 +1,66 @@
 ---
 title: pull
-description: NotionデータベースからTypeScriptスキーマを生成
+description: 登録済みNotionデータベースからTypeScriptスキーマを生成
 ---
 
 ## 概要
 
-`pull`コマンドは、NotionデータベースからTypeScriptスキーマを生成または更新します。
+`pull`コマンドは、NotCMSワークスペースへ登録されたデータベースから、設定済みの
+TypeScriptスキーマを生成または更新します。
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
+
+最初のpullは`init`が自動で実行します。データベースまたはプロパティを変更した後に、
+この単独コマンドを実行してください。
 
 ## 実行内容
 
-1. データベースの構造とプロパティを取得
-2. TypeScript型を生成
-3. スキーマファイルを更新
+1. `NOTCMS_SECRET_KEY`と`NOTCMS_WORKSPACE_ID`を読み込み
+2. NotCMSから現在のワークスペーススキーマを取得
+3. 設定されたスキーマmoduleと`nc`クライアントを生成
+4. 最初のデータベース用クエリを表示
 
 ## オプション
 
 | オプション | 説明 | デフォルト |
-|--------|-------------|---------|
-| `--env` | 環境ファイルのパス | `[".env", ".env.local", ".dev.vars"]` |
+| --- | --- | --- |
+| `-e, --env <PATH>` | カンマ区切りの環境ファイルパス | `.env,.env.local,.dev.vars` |
+| `--check` | ファイルを書き込まずスキーマが最新か確認 | `false` |
+
+`--check`は生成ファイルが存在しない、または古い場合に終了コード1を返すため、
+CI/CDで利用できます。
 
 ## 例
 
-### 基本的なプル
+### スキーマを更新
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
-### 環境ファイルパスの指定
+### 独自の環境ファイルから認証情報を読み込む
 
 ```bash
-npx notcms-kit pull --env .env.development
+npx notcms --env .env.development pull
+```
+
+### ファイルを書き込まず確認
+
+```bash
+npx notcms pull --check
 ```
 
 ## 生成されるスキーマ
 
-このコマンドは完全に型付けされたスキーマを生成します：
+型付きスキーマと、すぐ利用できるクライアントの両方を生成します：
 
 ```typescript
-import { Schema } from 'notcms';
+import { Client } from "notcms";
+import type { Schema } from "notcms";
 
 export const schema = {
-  // 例
   blog: {
     id: "abc123...",
     properties: {
@@ -54,20 +69,20 @@ export const schema = {
       published: "checkbox",
       publishDate: "date",
       author: "relation",
-      tags: "multi_select"
-    }
-  }
+      tags: "multi_select",
+    },
+  },
 } satisfies Schema;
+
+export const nc = new Client({ schema });
 ```
 
-## スキーマの更新
-
-Notionデータベースを更新すると、pullコマンドがスキーマを更新します。
+後から更新するためのpackage scriptも追加できます：
 
 ```json
 {
   "scripts": {
-    "schema:pull": "notcms-kit pull",
+    "schema:pull": "notcms pull"
   }
 }
 ```

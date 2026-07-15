@@ -22,7 +22,7 @@ const nc = new Client({
 
 Before initializing the client, ensure you have:
 
-1. **Generated schema** - Run `npx notcms-kit init` to generate for the first time or `npx notcms-kit pull` to update your schema
+1. **Generated schema** - Run `npx notcms init` to generate for the first time or `npx notcms pull` to update your schema
 2. **Environment variables** - Set up your API credentials
 3. **Installed NotCMS** - Add `notcms` to your project dependencies
 
@@ -133,14 +133,14 @@ export const nc = new Client({
   </Accordion>
   
   <Accordion title="Schema not found">
-    - Run `npx notcms-kit pull` to generate schema
+    - Run `npx notcms pull` to generate schema
     - Check import path is correct
     - Ensure schema file exports correctly
   </Accordion>
   
   <Accordion title="TypeScript errors">
     - Update to latest NotCMS version
-    - Regenerate schema with `npx notcms-kit pull`
+    - Regenerate schema with `npx notcms pull`
     - Check TypeScript version compatibility
   </Accordion>
 </AccordionGroup>

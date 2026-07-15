@@ -46,6 +46,32 @@ describe("fetchSchema", () => {
     );
   });
 
+  it("uses explicitly supplied credentials when the environment is empty", async () => {
+    vi.stubEnv("NOTCMS_SECRET_KEY", undefined);
+    vi.stubEnv("NOTCMS_WORKSPACE_ID", undefined);
+    const schema = {
+      blog: { id: "db_1", properties: { slug: "rich_text" } },
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ schema }), { status: 200 })
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      fetchSchema({ secretKey: "ncsec_login", workspaceId: "ws_login" })
+    ).resolves.toEqual(schema);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.notcms.com/v1/ws/ws_login/schema",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer ncsec_login",
+        }),
+      })
+    );
+  });
+
   it("accepts every supported property type", async () => {
     stubCredentials();
     const properties = Object.fromEntries(

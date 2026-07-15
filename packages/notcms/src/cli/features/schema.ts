@@ -2,6 +2,7 @@ import chalk from "chalk";
 import dedent from "dedent";
 import { PROPERTY_TYPES, type Properties, type Schema } from "../../types.js";
 import { routes } from "../routes.js";
+import type { Credentials } from "../types.js";
 
 const DASHBOARD_URL = "https://dash.notcms.com/";
 
@@ -31,16 +32,18 @@ function isSchemaEntry(entry: unknown): entry is Schema[string] {
 function isSchema(value: unknown): value is Schema {
   return isPlainObject(value) && Object.values(value).every(isSchemaEntry);
 }
-export async function fetchSchema(): Promise<Schema> {
-  const { NOTCMS_SECRET_KEY, NOTCMS_WORKSPACE_ID } = process.env;
-  if (!NOTCMS_SECRET_KEY || !NOTCMS_WORKSPACE_ID) {
+export async function fetchSchema(credentials?: Credentials): Promise<Schema> {
+  const secretKey = credentials?.secretKey ?? process.env.NOTCMS_SECRET_KEY;
+  const workspaceId =
+    credentials?.workspaceId ?? process.env.NOTCMS_WORKSPACE_ID;
+  if (!secretKey || !workspaceId) {
     throw new Error(
       dedent`
       Both ${chalk.yellow("NOTCMS_SECRET_KEY")} and ${chalk.yellow("NOTCMS_WORKSPACE_ID")} must be set.
 
       ${chalk.bold("Got:")}
-        NOTCMS_WORKSPACE_ID: ${NOTCMS_WORKSPACE_ID ? chalk.green(NOTCMS_WORKSPACE_ID) : chalk.red(NOTCMS_WORKSPACE_ID)}
-        NOTCMS_SECRET_KEY:   ${NOTCMS_SECRET_KEY ? chalk.green("(set)") : chalk.red(NOTCMS_SECRET_KEY)}
+        NOTCMS_WORKSPACE_ID: ${workspaceId ? chalk.green(workspaceId) : chalk.red(workspaceId)}
+        NOTCMS_SECRET_KEY:   ${secretKey ? chalk.green("(set)") : chalk.red(secretKey)}
 
       ${chalk.bold("Suggested action:")}
         1. Get your key and id from the dashboard.
@@ -48,7 +51,7 @@ export async function fetchSchema(): Promise<Schema> {
 
         2. Set them in your environment variables, and make sure they are loaded.
           Example:
-          ${chalk.blue("$ echo 'NOTCMS_SECRET=your_secret_key' >> .env")}
+          ${chalk.blue("$ echo 'NOTCMS_SECRET_KEY=your_secret_key' >> .env")}
           ${chalk.blue("$ echo 'NOTCMS_WORKSPACE_ID=your_workspace_id' >> .env")}
           ${chalk.blue("$ source .env")}
 
@@ -57,11 +60,11 @@ export async function fetchSchema(): Promise<Schema> {
       `
     );
   }
-  const res = await fetch(routes.schema(NOTCMS_WORKSPACE_ID), {
+  const res = await fetch(routes.schema(workspaceId), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${NOTCMS_SECRET_KEY}`,
+      Authorization: `Bearer ${secretKey}`,
     },
   });
   try {

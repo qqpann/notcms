@@ -37,14 +37,20 @@ npm install notcms
 
 ### CLI Usage
 
-Pull your schema from NotCMS:
+Initialize NotCMS from config through the first schema pull:
 
 ```bash
-# Initialize config
 npx notcms init
+```
 
-# Pull schema from NotCMS
+When credentials are missing, `init` opens browser login, saves them to
+`.env.local`, pulls the schema, and prints a first query example. Use the
+standalone commands when you need to log in or refresh the schema later:
+
+```bash
+npx notcms login
 npx notcms pull
+npx notcms pull --check # Check without writing, for CI/CD
 ```
 
 > **Migration from notcms-kit**: The CLI is now included in the `notcms` package.
@@ -53,11 +59,10 @@ npx notcms pull
 ### SDK Usage
 
 ```ts
-import { Client } from "notcms";
+import { nc } from "./notcms/schema";
 
-const nc = Client({ schema });
-
-const [pages] = await nc.query.blog.list();
+const [pages, error] = await nc.query.blog.list();
+if (error) throw error;
 const [page] = await nc.query.blog.get(pages[0].id);
 ```
 

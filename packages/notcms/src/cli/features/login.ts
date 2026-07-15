@@ -3,6 +3,7 @@ import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import chalk from "chalk";
 import dedent from "dedent";
+import type { Credentials } from "../types.js";
 import { getApiHost } from "../variables.js";
 
 const CLI_DEVICE_CLIENT_ID = "notcms-cli";
@@ -18,11 +19,6 @@ type DeviceAuthorization = {
   verificationUriComplete: string;
   expiresIn: number;
   interval: number;
-};
-
-export type Credentials = {
-  secretKey: string;
-  workspaceId: string;
 };
 
 export function getCredentialsFromEnv(): Credentials | null {
