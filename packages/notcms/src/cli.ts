@@ -7,6 +7,11 @@ import chalk from "chalk";
 import { Command } from "commander";
 import dedent from "dedent";
 import { dumpConfig, loadConfig } from "./cli/features/config.js";
+import {
+  diffSchemas,
+  formatSchemaChanges,
+  readGeneratedSchema,
+} from "./cli/features/schema-diff.js";
 import type { Config } from "./cli/types.js";
 
 /**
@@ -204,11 +209,18 @@ export const nc = new Client({ schema });
 
   // schemaPath: 'src/notcms/schema.ts'
   // make directory if it doesn't exist
+  const previousSchema = await readGeneratedSchema(schemaPath);
   await fs.mkdir(schemaPath.split("/").slice(0, -1).join("/"), {
     recursive: true,
   });
 
   await fs.writeFile(schemaPath, content);
+
+  console.log(
+    formatSchemaChanges(
+      previousSchema === null ? null : diffSchemas(previousSchema, schema)
+    )
+  );
 
   console.log(
     boxen(
