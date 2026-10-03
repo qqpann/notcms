@@ -6,7 +6,7 @@
     "lint-biome": "biome lint --write .",
     "check": "biome check --write .",
     "prepare": "husky",
-    "release": "pnpm --filter notcms build && changeset publish"
+    "test:staged-publish": "node --test scripts/staged-publish.test.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

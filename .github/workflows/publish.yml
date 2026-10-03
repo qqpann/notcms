@@ -6,24 +6,73 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions: {}
+
 jobs:
-  publish:
+  version:
+    name: Create version pull request
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
+    outputs:
+      has_changesets: ${{ steps.changesets.outputs.hasChangesets }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: 'pnpm'
-      - run: pnpm install
-      - name: Create Release Pull Request or Publish
+      - run: pnpm install --frozen-lockfile
+      - name: Create Release Pull Request
+        id: changesets
         uses: changesets/action@v1
         with:
-          publish: pnpm run release
+          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  stage:
+    name: Stage notcms package
+    if: needs.version.outputs.has_changesets == 'false'
+    needs: version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Keep this job dependency-free until the pure release decision passes.
+      - name: Decide whether this push contains a version release
+        id: stage-decision
+        env:
+          CHANGESETS_HAS_CHANGESETS: ${{ needs.version.outputs.has_changesets }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: node scripts/staged-publish.mjs decide
+      - uses: pnpm/action-setup@v6
+        if: steps.stage-decision.outputs.should_stage == 'true'
+      - name: Install dependencies without lifecycle scripts
+        if: steps.stage-decision.outputs.should_stage == 'true'
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Install npm staged publishing CLI
+        if: steps.stage-decision.outputs.should_stage == 'true'
+        run: npm install --global npm@11.15.0 --ignore-scripts
+      - name: Build package for staging
+        if: steps.stage-decision.outputs.should_stage == 'true'
+        run: pnpm --filter notcms build
+      - name: Verify package contents before staging
+        if: steps.stage-decision.outputs.should_stage == 'true'
+        run: node scripts/staged-publish.mjs verify-pack
+      - name: Stage notcms for owner approval
+        if: steps.stage-decision.outputs.should_stage == 'true'
+        run: node scripts/staged-publish.mjs stage
