@@ -204,9 +204,7 @@ export const nc = new Client({ schema });
 
   // schemaPath: 'src/notcms/schema.ts'
   // make directory if it doesn't exist
-  await fs.mkdir(schemaPath.split("/").slice(0, -1).join("/"), {
-    recursive: true,
-  });
+  await fs.mkdir(path.dirname(schemaPath), { recursive: true });
 
   await fs.writeFile(schemaPath, content);
 
