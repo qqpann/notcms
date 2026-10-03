@@ -1,0 +1,96 @@
+name: Verify npm registry authentication
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/npm-auth-check.yml"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  verify-npm-auth:
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          github.event.pull_request.user.login != 'dependabot[bot]'
+        )
+      }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Verify npm whoami authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const endpoint = "https://registry.npmjs.org/-/whoami";
+          const timeoutMs = 30_000;
+          const token = process.env.NODE_AUTH_TOKEN;
+
+          const outcome = (ok, code) => ({ ok, code });
+
+          async function probe(fetchImpl, url, authToken) {
+            if (typeof authToken !== "string" || authToken.length === 0) {
+              return outcome(false, "NPM_AUTH_MISSING_SECRET");
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+            try {
+              const response = await fetchImpl(url, {
+                method: "GET",
+                headers: { authorization: `Bearer ${authToken}` },
+                redirect: "error",
+                signal: controller.signal,
+              });
+              const status = response.status;
+
+              if (response.body && typeof response.body.cancel === "function") {
+                await response.body.cancel();
+              }
+
+              if (status === 200) {
+                return outcome(true, `NPM_AUTH_OK:${status}`);
+              }
+              if (status === 401 || status === 403) {
+                return outcome(false, `NPM_AUTH_REJECTED:${status}`);
+              }
+              return outcome(false, `NPM_AUTH_HTTP:${status}`);
+            } catch (error) {
+              const cause =
+                error && typeof error === "object" && "cause" in error
+                  ? error.cause
+                  : undefined;
+              const isRedirect =
+                cause &&
+                typeof cause === "object" &&
+                (cause.message === "unexpected redirect" ||
+                  cause.code === "UND_ERR_REDIRECT");
+
+              if (isRedirect) {
+                return outcome(false, "NPM_AUTH_REDIRECT_REJECTED");
+              }
+              if (error && typeof error === "object" && error.name === "AbortError") {
+                return outcome(false, "NPM_AUTH_TIMEOUT");
+              }
+              return outcome(false, "NPM_AUTH_NETWORK_ERROR");
+            } finally {
+              clearTimeout(timeout);
+            }
+          }
+
+          let result;
+          try {
+            result = await probe(fetch, endpoint, token);
+          } catch {
+            result = outcome(false, "NPM_AUTH_NETWORK_ERROR");
+          }
+
+          process.stdout.write(`${result.code}\n`);
+          process.exitCode = result.ok ? 0 : 1;
+          NODE
