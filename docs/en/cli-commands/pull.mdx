@@ -8,7 +8,7 @@ description: Generate TypeScript schema from Notion databases
 The `pull` command generates or updates your TypeScript schema from Notion databases.
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
 ## What it does
@@ -22,19 +22,20 @@ npx notcms-kit pull
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--env` | Environment file path | `[".env", ".env.local", ".dev.vars"]` |
+| `--check` | Check whether the generated schema is current without writing | `false` |
 
 ## Examples
 
 ### Basic pull
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
 ### Specify environment file path
 
 ```bash
-npx notcms-kit pull --env .env.development
+npx notcms pull --env .env.development
 ```
 
 ## Generated Schema
@@ -67,7 +68,8 @@ When you update Notion databases, the pull command will update your schema.
 ```json
 {
   "scripts": {
-    "schema:pull": "notcms-kit pull",
+    "schema:pull": "notcms pull",
+    "schema:check": "notcms pull --check"
   }
 }
 ```

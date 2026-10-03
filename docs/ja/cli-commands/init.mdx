@@ -8,13 +8,14 @@ description: 新しいNotCMSプロジェクトの初期化
 `init`コマンドは、対話型の設定でプロジェクトにNotCMSをセットアップします。
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 ## 実行内容
 
 1. `notcms.config.json` 設定ファイルを作成
-2. `.env`内の環境変数をチェック
+2. スキーマの保存先を確認（デフォルト: `src/notcms/schema.ts`）
+3. `NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` が未設定の場合はブラウザログインを案内
 
 ## オプション
 
@@ -37,7 +38,7 @@ npx notcms-kit init
 ### 基本的な初期化
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 ### 環境ファイルパスの指定
@@ -45,14 +46,22 @@ npx notcms-kit init
 すでに`.env`が設定されている場合に使用：
 
 ```bash
-npx notcms-kit init --env .env.development
+npx notcms init --env .env.development
 ```
 
 ## トラブルシューティング
+
+初期化時にログインを後回しにした場合は、次を実行します。
+
+```bash
+npx notcms login
+```
+
+`login` はデフォルトで `.env.local` に `NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` を保存します。両方の変数を環境ファイルへ手動で設定することもできます。
 
 ## 次のステップ
 
 初期化後、以下を実行できます：
 
 1. コード内でNotCMSクライアントの使用を開始
-2. `npx notcms-kit pull`を実行してスキーマを更新
+2. `npx notcms pull`を実行してスキーマを更新

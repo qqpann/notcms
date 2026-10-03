@@ -1,0 +1,217 @@
+---
+title: Blog and Release Notes
+description: Build a published, multilingual blog or release notes page with NotCMS
+---
+
+This recipe shows one way to build a public blog or release notes section. The
+publication and language rules are application decisions, so adjust them to
+match your content model.
+
+## 1. Generate a schema
+
+Install NotCMS, initialize the project, and pull the database schema:
+
+```bash
+npm install notcms
+npx notcms init
+npx notcms pull
+```
+
+The example below assumes a `releases` database with these properties:
+
+```typescript
+import { Client } from "notcms";
+import type { Schema } from "notcms";
+
+export const schema = {
+  releases: {
+    id: "your_notion_database_id",
+    properties: {
+      title: "title",
+      language: "select",
+      released_at: "date",
+      slug: "rich_text",
+      version_number: "number",
+      products: "multi_select",
+    },
+  },
+} satisfies Schema;
+
+export const nc = new Client({ schema });
+```
+
+Use the property names and types produced by `npx notcms pull`. If the database
+does not have a `slug` property, remove it from the schema and always use the
+page ID in the URL helper below.
+
+Keep the client on the server. `NOTCMS_SECRET_KEY` and
+`NOTCMS_WORKSPACE_ID` must not be exposed to browser code.
+
+## 2. Define publication and language rules
+
+This example treats a release as public when `released_at` is present, valid,
+and not in the future. It treats a missing language as Japanese and sorts the
+newest release first. Change these policies if your database uses a checkbox or
+another publication field.
+
+The generated `date` property type is `string | null`, so parse the value before
+comparing it with the current time. It is not a JavaScript `Date` object.
+
+```typescript
+type ReleaseSummary = (typeof nc.query.releases.$inferPages)[number];
+
+function releasedAt(release: ReleaseSummary): number | null {
+  const value = release.properties.released_at;
+  if (!value) return null;
+
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function isPublished(release: ReleaseSummary): boolean {
+  const timestamp = releasedAt(release);
+  return timestamp !== null && timestamp <= Date.now();
+}
+
+function languageOf(release: ReleaseSummary): string {
+  const language = release.properties.language?.trim();
+  return language ? language : "ja";
+}
+
+export async function getPublishedReleases(language: string) {
+  const [pages, error] = await nc.query.releases.list();
+  if (error) throw error;
+
+  return (pages ?? [])
+    .filter(isPublished)
+    .filter((release) => languageOf(release) === language)
+    .sort((a, b) => (releasedAt(b) ?? 0) - (releasedAt(a) ?? 0));
+}
+```
+
+An API failure should remain an error. Do not turn a failed request into an
+empty list that can be cached as a successful page.
+
+## 3. Build stable detail URLs
+
+Use a non-empty slug when the database has one. Fall back to the Notion page ID
+when the slug is missing, and do not use `version_number` as the identifier:
+
+```typescript
+export function releaseHref(
+  release: ReleaseSummary,
+  language = languageOf(release)
+): string {
+  const slug = release.properties.slug?.trim();
+  const segment = slug ? slug : release.id;
+  return `/releases/${encodeURIComponent(language)}/${encodeURIComponent(segment)}`;
+}
+```
+
+The locale is part of the URL. A slug may be reused across different locales,
+but it must be unique among published releases within one locale. If a locale
+contains duplicate slugs, this resolver returns `null` so the route can return
+a 404 instead of choosing an arbitrary record. A database without a slug uses
+the page ID, which is always unique.
+
+When a route accepts either a locale-aware slug or an ID, pass the locale into
+the resolver. Apply the publication and language filters before selecting a
+summary, then check them again after fetching the detail page:
+
+```typescript
+export async function getReleaseBySegment(
+  language: string,
+  segment: string
+) {
+  const [pages, listError] = await nc.query.releases.list();
+  if (listError) throw listError;
+
+  const idMatch = (pages ?? []).find((release) => release.id === segment);
+  const slugMatches = (pages ?? []).filter(
+    (release) =>
+      isPublished(release) &&
+      languageOf(release) === language &&
+      release.properties.slug?.trim() === segment
+  );
+  const summary = idMatch
+    ? isPublished(idMatch) && languageOf(idMatch) === language
+      ? idMatch
+      : null
+    : slugMatches.length === 1
+      ? slugMatches[0]
+      : null;
+  if (!summary) return null;
+
+  const [release, detailError] = await nc.query.releases.get(summary.id);
+  if (detailError) throw detailError;
+  if (!release || !isPublished(release) || languageOf(release) !== language) {
+    return null;
+  }
+  return release;
+}
+```
+
+If you prefer not to list before every detail request, use page IDs for detail
+routes and keep slugs as display-only metadata.
+
+## 4. Add language fallback and an empty state
+
+The language filter should be explicit at the route or page boundary:
+
+```typescript
+const language = "en";
+const releases = await getPublishedReleases(language);
+
+if (releases.length === 0) {
+  return <p>No published releases are available in English.</p>;
+}
+
+return (
+  <ul>
+    {releases.map((release) => (
+      <li key={release.id}>
+        <a href={releaseHref(release, language)}>{release.title}</a>
+      </li>
+    ))}
+  </ul>
+);
+```
+
+Decide whether an unavailable translation should show an empty state, fall back
+to another language, or redirect. Document that choice so it is consistent
+between list pages, metadata, and detail routes.
+
+## 5. Fetch the detail content
+
+`list()` returns summaries. Use `get()` for the full page content after resolving
+the page ID:
+
+```typescript
+const release = await getReleaseBySegment("en", "v1-2-0");
+if (!release) {
+  // Return a 404 from your framework.
+  return null;
+}
+
+return (
+  <article>
+    <h1>{release.title}</h1>
+    <div>{release.content}</div>
+  </article>
+);
+```
+
+`version_number` can be absent or duplicated across products, so treat it as
+display data rather than a route key. The same rule applies to any optional
+Notion property.
+
+## Links returned by Notion
+
+If the Notion API returns an absolute URL such as
+`https://app.notion.com/...`, NotCMS, the SDK, and the Sync Action keep that
+URL as returned. They do not guess whether it should be converted to a
+relative link. For a public-site link, enter the complete URL in Notion, for
+example `https://example.com/releases/en/v1-2-0`, then verify the destination
+in the NotCMS API response and the generated Markdown after synchronization.
+Keep ordinary Notion page links unchanged; do not remove or replace every
+`app.notion.com` link.

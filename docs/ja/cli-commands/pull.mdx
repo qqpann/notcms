@@ -8,7 +8,7 @@ description: NotionデータベースからTypeScriptスキーマを生成
 `pull`コマンドは、NotionデータベースからTypeScriptスキーマを生成または更新します。
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
 ## 実行内容
@@ -22,19 +22,20 @@ npx notcms-kit pull
 | オプション | 説明 | デフォルト |
 |--------|-------------|---------|
 | `--env` | 環境ファイルのパス | `[".env", ".env.local", ".dev.vars"]` |
+| `--check` | ファイルを書き換えず、生成結果と一致するか確認 | `false` |
 
 ## 例
 
 ### 基本的なプル
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
 ### 環境ファイルパスの指定
 
 ```bash
-npx notcms-kit pull --env .env.development
+npx notcms pull --env .env.development
 ```
 
 ## 生成されるスキーマ
@@ -67,7 +68,8 @@ Notionデータベースを更新すると、pullコマンドがスキーマを�
 ```json
 {
   "scripts": {
-    "schema:pull": "notcms-kit pull",
+    "schema:pull": "notcms pull",
+    "schema:check": "notcms pull --check"
   }
 }
 ```

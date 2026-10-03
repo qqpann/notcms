@@ -34,7 +34,7 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 - 🎯 **Simple API**: Clean and intuitive API for fetching content
 - 📝 **Notion as Backend**: Use Notion's user-friendly editor for content creation
 - 🔄 **Framework Agnostic**: Works with any JavaScript framework (Next.js, React, Vue, etc.)
-- 🛠️ **CLI Tools**: Includes notcms-kit for easy project setup and schema management
+- 🛠️ **CLI Tools**: The `notcms` package includes the CLI for project setup and schema management
 
 ## Getting Started
 
@@ -43,6 +43,8 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 ```bash
 npm install notcms
 ```
+
+The CLI is included in `notcms`; no separate CLI package is required. For existing projects that use the deprecated `notcms-kit` package, replace `npx notcms-kit <command>` with `npx notcms <command>`.
 
 ### Usage
 
@@ -59,20 +61,22 @@ You can get these values from the NotCMS Dashboard.
 
 #### 1. Initialize a Project
 
-NotCMS Kit provides command-line tools to streamline your workflow. You can use it directly with npx:
+The NotCMS CLI provides commands to streamline your workflow. You can use it directly with npx:
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 This will create a `notcms.config.json` file in your project root.
 
+If credentials are missing, the command offers browser login. You can run `npx notcms login` later to save them to `.env.local`.
+
 #### 2. Define Your Schema
 
-The easiest way to define your schema is to use NotCMS Kit:
+The easiest way to define your schema is to use the NotCMS CLI:
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
 This will automatically fetch your database schema from Notion and generate a TypeScript schema file.
@@ -91,7 +95,7 @@ export const schema = {
       description: "rich_text",
       published: "checkbox",
       thumbnails: "files",
-      // Run notcms-kit pull again when properties are updated
+      // Run notcms pull again when properties are updated
     },
   },
 } satisfies Schema;
@@ -142,7 +146,7 @@ If you encounter schema-related errors:
 
 1. Make sure your Notion database IDs are correct
 2. Verify that the property types match what's in your Notion database
-3. Try running `npx notcms-kit pull` to regenerate your schema
+3. Try running `npx notcms pull` to regenerate your schema
 
 ## Contributing
 
@@ -155,7 +159,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 This project is organized as a monorepo with multiple packages:
 
 - `packages/notcms`: [MIT License](packages/notcms/LICENSE)
-- `packages/notcms-kit`: [MIT License](packages/notcms-kit/LICENSE)
+- `packages/notcms-kit` (deprecated): [MIT License](packages/notcms-kit/LICENSE)
 - `examples/`: [MIT License](examples/LICENSE)
 
 See individual directories for specific license details.

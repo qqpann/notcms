@@ -1,0 +1,193 @@
+---
+title: ブログとリリースノート
+description: NotCMSで公開・多言語対応のブログやリリースノートを構築する
+---
+
+このレシピでは、公開ブログやリリースノートを構築する方法を説明します。
+公開条件と言語の扱いはアプリケーション側の方針なので、自分のコンテンツモデルに合わせて調整してください。
+
+## 1. スキーマを生成する
+
+NotCMSをインストールし、プロジェクトを初期化してデータベースのスキーマを取得します。
+
+```bash
+npm install notcms
+npx notcms init
+npx notcms pull
+```
+
+次の例では、`releases` データベースに以下のプロパティがある前提です。
+
+```typescript
+import { Client } from "notcms";
+import type { Schema } from "notcms";
+
+export const schema = {
+  releases: {
+    id: "your_notion_database_id",
+    properties: {
+      title: "title",
+      language: "select",
+      released_at: "date",
+      slug: "rich_text",
+      version_number: "number",
+      products: "multi_select",
+    },
+  },
+} satisfies Schema;
+
+export const nc = new Client({ schema });
+```
+
+`npx notcms pull` が生成したプロパティ名と型を使ってください。データベースに
+`slug` がなければスキーマから削除し、下のURLヘルパーでは常にページIDを使います。
+
+クライアントはサーバー側に置きます。`NOTCMS_SECRET_KEY` と
+`NOTCMS_WORKSPACE_ID` をブラウザへ公開しないでください。
+
+## 2. 公開条件と言語の方針を定義する
+
+この例では、`released_at` があり、値が有効で未来の日付ではない記事を公開済みとします。
+言語が未設定の場合は日本語として扱い、新しいリリースから並べます。チェックボックスなど別の公開フィールドを使う場合は変更してください。
+
+生成される `date` 型のプロパティは `string | null` です。現在時刻と比較する前に解析してください。JavaScriptの `Date` オブジェクトではありません。
+
+```typescript
+type ReleaseSummary = (typeof nc.query.releases.$inferPages)[number];
+
+function releasedAt(release: ReleaseSummary): number | null {
+  const value = release.properties.released_at;
+  if (!value) return null;
+
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function isPublished(release: ReleaseSummary): boolean {
+  const timestamp = releasedAt(release);
+  return timestamp !== null && timestamp <= Date.now();
+}
+
+function languageOf(release: ReleaseSummary): string {
+  const language = release.properties.language?.trim();
+  return language ? language : "ja";
+}
+
+export async function getPublishedReleases(language: string) {
+  const [pages, error] = await nc.query.releases.list();
+  if (error) throw error;
+
+  return (pages ?? [])
+    .filter(isPublished)
+    .filter((release) => languageOf(release) === language)
+    .sort((a, b) => (releasedAt(b) ?? 0) - (releasedAt(a) ?? 0));
+}
+```
+
+APIエラーはエラーとして扱います。失敗した取得結果を空配列に変換して、成功したページとしてキャッシュしないでください。
+
+## 3. 詳細URLを安定させる
+
+データベースにslugがあり空でない場合はslugを使います。slugがない場合はNotionのページIDへフォールバックし、`version_number` を識別子には使いません。
+
+```typescript
+export function releaseHref(
+  release: ReleaseSummary,
+  language = languageOf(release)
+): string {
+  const slug = release.properties.slug?.trim();
+  const segment = slug ? slug : release.id;
+  return `/releases/${encodeURIComponent(language)}/${encodeURIComponent(segment)}`;
+}
+```
+
+localeをURLに含めます。slugはlocaleが違えば再利用できますが、同じlocaleの公開済みリリース間では一意にしてください。同じlocaleに重複slugがある場合は、このresolverが `null` を返して404にできるようにします。slugがないデータベースでは常に一意なページIDを使います。
+
+slugまたはIDを受け取るlocale-awareなルートでは、localeをresolverへ渡します。一覧から概要を選ぶ前に公開条件と言語を適用し、詳細を取得した後にも同じ条件を再確認します。
+
+```typescript
+export async function getReleaseBySegment(
+  language: string,
+  segment: string
+) {
+  const [pages, listError] = await nc.query.releases.list();
+  if (listError) throw listError;
+
+  const idMatch = (pages ?? []).find((release) => release.id === segment);
+  const slugMatches = (pages ?? []).filter(
+    (release) =>
+      isPublished(release) &&
+      languageOf(release) === language &&
+      release.properties.slug?.trim() === segment
+  );
+  const summary = idMatch
+    ? isPublished(idMatch) && languageOf(idMatch) === language
+      ? idMatch
+      : null
+    : slugMatches.length === 1
+      ? slugMatches[0]
+      : null;
+  if (!summary) return null;
+
+  const [release, detailError] = await nc.query.releases.get(summary.id);
+  if (detailError) throw detailError;
+  if (!release || !isPublished(release) || languageOf(release) !== language) {
+    return null;
+  }
+  return release;
+}
+```
+
+毎回一覧を取得したくない場合は、詳細ルートをページIDに固定し、slugは表示用のメタデータとして扱います。
+
+## 4. 言語フォールバックと空状態を追加する
+
+言語フィルタはルートまたはページ境界で明示します。
+
+```typescript
+const language = "ja";
+const releases = await getPublishedReleases(language);
+
+if (releases.length === 0) {
+  return <p>日本語で公開されたリリースはありません。</p>;
+}
+
+return (
+  <ul>
+    {releases.map((release) => (
+      <li key={release.id}>
+        <a href={releaseHref(release, language)}>{release.title}</a>
+      </li>
+    ))}
+  </ul>
+);
+```
+
+翻訳がない場合に、空状態を表示するか、別言語へフォールバックするか、リダイレクトするかを決めます。一覧、metadata、詳細ルートで同じ方針を使えるように文書化してください。
+
+## 5. 詳細本文を取得する
+
+`list()` は概要を返します。ページIDを解決した後、`get()` で本文を取得します。
+
+```typescript
+const release = await getReleaseBySegment("ja", "v1-2-0");
+if (!release) {
+  // 利用するフレームワークで404を返します。
+  return null;
+}
+
+return (
+  <article>
+    <h1>{release.title}</h1>
+    <div>{release.content}</div>
+  </article>
+);
+```
+
+`version_number` は未設定または製品間で重複する可能性があるため、表示用データとして扱い、ルートキーには使いません。任意のNotionプロパティも同じように扱います。
+
+## Notionから返されるリンク
+
+Notion APIが`https://app.notion.com/...`のような絶対URLを返した場合、
+NotCMS・SDK・Sync Actionは返されたURLを保持します。相対リンクに戻せるかどうかを推測して変換することはありません。公開サイトへのリンクは、Notionに完全なURL（例：
+`https://example.com/releases/ja/v1-2-0`）を入力し、同期後にNotCMS APIの応答と生成されたMarkdownでリンク先を確認してください。通常のNotionページリンクを一律に削除・置換しないでください。

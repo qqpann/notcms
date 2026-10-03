@@ -8,13 +8,14 @@ description: Initialize a new NotCMS project
 The `init` command sets up NotCMS in your project with interactive configuration.
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 ## What it does
 
 1. Creates `notcms.config.json` configuration file
-2. Checks environment variables in `.env`
+2. Prompts for a schema output path (default: `src/notcms/schema.ts`)
+3. Offers browser login when `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID` are not already available
 
 ## Options
 
@@ -37,7 +38,7 @@ The command will guide you through:
 ### Basic initialization
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 ### Specify environment file path
@@ -45,14 +46,22 @@ npx notcms-kit init
 Use this if you already have `.env` configured:
 
 ```bash
-npx notcms-kit init --env .env.development
+npx notcms init --env .env.development
 ```
 
 ## Troubleshooting
+
+If you skip login during initialization, run the following later:
+
+```bash
+npx notcms login
+```
+
+The login command saves `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID` to `.env.local` by default. You can also set both variables in an env file yourself.
 
 ## Next Steps
 
 After initialization, you can:
 
 1. Start using the NotCMS client in your code
-2. Run `npx notcms-kit pull` to update your schema
+2. Run `npx notcms pull` to update your schema

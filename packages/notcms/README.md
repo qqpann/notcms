@@ -55,7 +55,7 @@ npx notcms pull
 ```ts
 import { Client } from "notcms";
 
-const nc = Client({ schema });
+const nc = new Client({ schema });
 
 const [pages] = await nc.query.blog.list();
 const [page] = await nc.query.blog.get(pages[0].id);
