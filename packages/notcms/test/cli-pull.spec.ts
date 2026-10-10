@@ -1,123 +1,285 @@
-import { spawn } from "node:child_process";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { type Server, createServer } from "node:http";
-import { tmpdir } from "node:os";
+import { promises as fs } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { pullSchema } from "../src/cli/features/pull";
+import type { Schema } from "../src/types";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
-const cliPath = path.join(packageRoot, "dist/cli.cjs");
-
-describe("CLI pull output paths", () => {
-  beforeAll(async () => {
-    const result = await runProcess(
-      process.execPath,
-      [path.join(packageRoot, "node_modules/tsup/dist/cli-default.js")],
-      { cwd: packageRoot }
-    );
-    expect(result.code, `${result.stdout}\n${result.stderr}`).toBe(0);
-  });
-
-  it.each(["schema.ts", "src/notcms/schema.ts"])(
-    "writes a schema at %s through the packaged CLI",
-    async (schemaPath) => {
-      const project = await mkdtemp(path.join(tmpdir(), "notcms-cli-pull-"));
-      const server = await startSchemaServer();
-
-      try {
-        await writeFile(
-          path.join(project, "notcms.config.json"),
-          JSON.stringify({ schema: schemaPath })
-        );
-
-        const result = await runProcess(process.execPath, [cliPath, "pull"], {
-          cwd: project,
-          env: {
-            ...process.env,
-            NOTCMS_API_HOST: server.url,
-            NOTCMS_SECRET_KEY: "sk_test",
-            NOTCMS_WORKSPACE_ID: "ws_test",
-          },
-        });
-
-        expect(result.code, `${result.stdout}\n${result.stderr}`).toBe(0);
-        await expect(
-          readFile(path.join(project, schemaPath), "utf-8")
-        ).resolves.toContain("export const schema = {");
-      } finally {
-        await closeServer(server.server);
-        await rm(project, { recursive: true, force: true });
-      }
-    }
-  );
-});
-
-async function startSchemaServer(): Promise<{ server: Server; url: string }> {
-  const server = createServer((request, response) => {
-    if (
-      request.url === "/v1/ws/ws_test/schema" &&
-      request.headers.authorization === "Bearer sk_test"
-    ) {
-      response.writeHead(200, { "content-type": "application/json" });
-      response.end(
-        JSON.stringify({
-          schema: {
-            blog: { id: "db_1", properties: { title: "title" } },
-          },
-        })
-      );
-      return;
-    }
-
-    response.writeHead(404);
-    response.end();
-  });
-
-  await new Promise<void>((resolve) => {
-    server.listen(0, "127.0.0.1", resolve);
-  });
-  const address = server.address();
-  if (address === null || typeof address === "string") {
-    throw new Error("Expected the schema fixture server to have a TCP address");
-  }
-  return { server, url: `http://127.0.0.1:${address.port}/v1` };
-}
-
-async function closeServer(server: Server): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    server.close((error) => (error ? reject(error) : resolve()));
-  });
-}
-
-function runProcess(
-  command: string,
-  args: readonly string[],
-  options: { cwd: string; env?: NodeJS.ProcessEnv }
-): Promise<ProcessResult> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: options.cwd,
-      env: options.env,
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (chunk: Buffer) => {
-      stdout += chunk.toString();
-    });
-    child.stderr.on("data", (chunk: Buffer) => {
-      stderr += chunk.toString();
-    });
-    child.once("error", reject);
-    child.once("close", (code, signal) => {
-      resolve({ code, signal, stdout, stderr });
-    });
-  });
-}
-
-type ProcessResult = {
-  code: number | null;
-  signal: NodeJS.Signals | null;
-  stdout: string;
-  stderr: string;
+const credentials = {
+  secretKey: "ncsec_test",
+  workspaceId: "ws_test",
 };
+
+describe("pullSchema", () => {
+  let dir: string;
+  let cwdSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(async () => {
+    dir = await fs.mkdtemp(path.join(packageRoot, ".notcms-pull-"));
+    cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(dir);
+  });
+
+  afterEach(async () => {
+    cwdSpy.mockRestore();
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    await fs.rm(dir, { recursive: true, force: true });
+  });
+
+  it("writes the configured schema and returns its first database", async () => {
+    const schema = {
+      "Blog posts": {
+        id: "db_blog",
+        properties: { Slug: "rich_text" },
+      },
+    } satisfies Schema;
+    const fetchMock = stubSchema(schema);
+    await writeConfig("schema.ts");
+
+    await expect(pullSchema({ credentials })).resolves.toEqual({
+      status: "written",
+      schemaPath: "schema.ts",
+      firstDatabaseName: "Blog posts",
+      schemaChanges: null,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/ws/ws_test/schema"),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer ncsec_test",
+        }),
+      })
+    );
+    await expect(
+      fs.readFile(path.join(dir, "schema.ts"), "utf-8")
+    ).resolves.toBe(`import { Client } from "notcms";
+import type { Schema } from "notcms";
+
+export const schema = {
+  "Blog posts": {
+    "id": "db_blog",
+    "properties": {
+      "Slug": "rich_text"
+    }
+  }
+} satisfies Schema;
+export const nc = new Client({ schema });`);
+  });
+
+  it("returns up-to-date when check mode matches the generated schema", async () => {
+    const schema = {
+      Blog: { id: "db_blog", properties: { Title: "title" } },
+    } satisfies Schema;
+    stubSchema(schema);
+    await writeConfig("src/notcms/schema.ts");
+    await pullSchema({ credentials });
+
+    await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
+      status: "up-to-date",
+      schemaPath: "src/notcms/schema.ts",
+      firstDatabaseName: "Blog",
+    });
+  });
+
+  it("uses the server-selected onboarding database for query guidance", async () => {
+    const schema = {
+      "Older Blog": { id: "db_old", properties: { Title: "title" } },
+      Blog: { id: "db_selected", properties: { Title: "title" } },
+    } satisfies Schema;
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(
+            JSON.stringify({ onboardingDatabaseName: "Blog", schema }),
+            { status: 200 }
+          )
+        )
+    );
+    await writeConfig("schema.ts");
+
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      firstDatabaseName: "Blog",
+      status: "written",
+    });
+  });
+
+  it("does not invent guidance when the server cannot persist a target", async () => {
+    const schema = {
+      Blog: { id: "db_unresolved", properties: { Title: "title" } },
+    } satisfies Schema;
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(
+            JSON.stringify({ onboardingDatabaseName: null, schema }),
+            { status: 200 }
+          )
+        )
+    );
+    await writeConfig("schema.ts");
+
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      firstDatabaseName: null,
+      status: "written",
+    });
+  });
+
+  it("reports a missing schema without writing in check mode", async () => {
+    stubSchema({
+      Blog: { id: "db_blog", properties: { Title: "title" } },
+    });
+    await writeConfig("src/notcms/schema.ts");
+
+    await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
+      status: "stale",
+      schemaPath: "src/notcms/schema.ts",
+      reason: "missing",
+    });
+    await expect(
+      fs.readFile(path.join(dir, "src/notcms/schema.ts"), "utf-8")
+    ).rejects.toThrow();
+  });
+
+  it("reports an out-of-date schema without replacing it in check mode", async () => {
+    stubSchema({
+      Blog: { id: "db_blog", properties: { Title: "title" } },
+    });
+    await writeConfig("schema.ts");
+    await fs.writeFile(path.join(dir, "schema.ts"), "existing content");
+
+    await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
+      status: "stale",
+      schemaPath: "schema.ts",
+      reason: "out-of-date",
+    });
+    await expect(
+      fs.readFile(path.join(dir, "schema.ts"), "utf-8")
+    ).resolves.toBe("existing content");
+  });
+
+  it("writes an empty schema without inventing a query target", async () => {
+    stubSchema({});
+    await writeConfig("src/notcms/schema.ts");
+
+    await expect(pullSchema({ credentials })).resolves.toEqual({
+      status: "written",
+      schemaPath: "src/notcms/schema.ts",
+      firstDatabaseName: null,
+      schemaChanges: null,
+    });
+  });
+
+  it("imports and queries a generated schema with prototype-like database names", async () => {
+    const schema = {
+      ["__proto__"]: {
+        id: "db_proto",
+        properties: { ["__proto__"]: "rich_text" },
+      },
+      constructor: { id: "db_constructor", properties: {} },
+      prototype: { id: "db_prototype", properties: {} },
+    } satisfies Schema;
+    const pages = [{ id: "page_1", title: "Safe", properties: {} }];
+    const fetchMock = vi.fn((url: string | URL | Request) => {
+      const href = String(url);
+      if (href.endsWith("/schema")) {
+        return Promise.resolve(
+          new Response(JSON.stringify({ schema }), { status: 200 })
+        );
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify({ data: pages }), { status: 200 })
+      );
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubEnv("NOTCMS_SECRET_KEY", "ncsec_generated");
+    vi.stubEnv("NOTCMS_WORKSPACE_ID", "ws_generated");
+    await writeConfig("generated-schema.ts");
+
+    await pullSchema({ credentials });
+    const generatedPath = path.join(dir, "generated-schema.ts");
+    const generated = await import(pathToFileURL(generatedPath).href);
+
+    expect(Object.keys(generated.schema)).toEqual([
+      "__proto__",
+      "constructor",
+      "prototype",
+    ]);
+    expect(
+      Object.prototype.hasOwnProperty.call(
+        generated.schema["__proto__"].properties,
+        "__proto__"
+      )
+    ).toBe(true);
+    for (const databaseName of Object.keys(schema)) {
+      expect(
+        Object.prototype.hasOwnProperty.call(generated.nc.query, databaseName)
+      ).toBe(true);
+      expect(typeof generated.nc.query[databaseName].list).toBe("function");
+    }
+
+    const [data, error] = await generated.nc.query["__proto__"].list();
+
+    expect(error).toBeNull();
+    expect(data).toEqual(pages);
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      "https://api.notcms.com/v1/ws/ws_generated/db/db_proto/pages",
+      expect.objectContaining({ method: "GET" })
+    );
+  });
+
+  it("compares the previously generated schema before overwriting it", async () => {
+    await writeConfig("schema.ts");
+    stubSchema({ Blog: { id: "db_blog", properties: { Title: "title" } } });
+    await pullSchema({ credentials });
+    stubSchema({ Blog: { id: "db_blog", properties: { Title: "rich_text" } } });
+
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      schemaChanges: [
+        {
+          kind: "property-type-changed",
+          database: "Blog",
+          property: "Title",
+          before: "title",
+          after: "rich_text",
+        },
+      ],
+    });
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      schemaChanges: [],
+    });
+  });
+
+  it("compares generated prototype-like keys without executing computed expressions", async () => {
+    await writeConfig("schema.ts");
+    stubSchema({
+      ["__proto__"]: { id: "db_proto", properties: { ["__proto__"]: "title" } },
+    });
+    await pullSchema({ credentials });
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      schemaChanges: [],
+    });
+  });
+
+  function stubSchema(schema: Schema) {
+    const fetchMock = vi.fn().mockImplementation(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ schema }), {
+          status: 200,
+        })
+      )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    return fetchMock;
+  }
+
+  async function writeConfig(schemaPath: string) {
+    await fs.writeFile(
+      path.join(dir, "notcms.config.json"),
+      JSON.stringify({ schema: schemaPath })
+    );
+  }
+});
