@@ -270,7 +270,6 @@ function objectToValue(expression: ObjectExpression): Record<string, unknown> {
       property.type !== "Property" ||
       property.kind !== "init" ||
       property.method ||
-      property.computed ||
       property.shorthand
     ) {
       throw new Error("Unsupported schema property");
@@ -286,7 +285,7 @@ function objectToValue(expression: ObjectExpression): Record<string, unknown> {
 }
 
 function propertyKey(property: Property): string {
-  if (property.key.type === "Identifier") {
+  if (!property.computed && property.key.type === "Identifier") {
     return property.key.name;
   }
   if (

@@ -300,6 +300,8 @@ describe("schema diff", () => {
         "export const schema = { ...getSchema() } satisfies Schema;",
         "export const schema = { get blog() { return {}; } } satisfies Schema;",
         "export const schema = { blog: getSchema() } satisfies Schema;",
+        "export const schema = { [getName()]: {} } satisfies Schema;",
+        "export const schema = { [blog]: {} } satisfies Schema;",
         "export const schema = { blog: {}, blog: {} } satisfies Schema;",
       ];
 

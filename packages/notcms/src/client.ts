@@ -130,7 +130,7 @@ export class Client<TSchema extends Schema> {
     }
     this.secretKey = secretKey;
     this.workspaceId = workspaceId;
-    this.query = {} as {
+    this.query = Object.create(null) as {
       [K in keyof TSchema]: DatabaseHandler<
         InferProperties<TSchema[K]["properties"]>
       >;
@@ -139,12 +139,17 @@ export class Client<TSchema extends Schema> {
     if (!schema) {
       throw new Error("schema is required.");
     }
-    for (const key in schema) {
-      this.query[key as keyof TSchema] = new DatabaseHandler(
-        this.secretKey,
-        this.workspaceId,
-        schema[key].id
-      );
+    for (const key of Object.keys(schema)) {
+      Object.defineProperty(this.query, key, {
+        configurable: true,
+        enumerable: true,
+        value: new DatabaseHandler(
+          this.secretKey,
+          this.workspaceId,
+          schema[key].id
+        ),
+        writable: true,
+      });
     }
   }
 }
