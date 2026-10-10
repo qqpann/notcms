@@ -5,8 +5,10 @@ import type { Credentials } from "../types.js";
 import { loadConfig } from "./config.js";
 import {
   type SchemaChange,
+  type SchemaSummary,
   diffSchemas,
-  readGeneratedSchema,
+  parseGeneratedSchema,
+  summarizeSchema,
 } from "./schema-diff.js";
 import { fetchSchemaResponse } from "./schema.js";
 
@@ -19,6 +21,7 @@ type WrittenSchemaResult = {
   status: "written";
   schemaPath: string;
   firstDatabaseName: string | null;
+  summary: SchemaSummary;
   schemaChanges: SchemaChange[] | null;
 };
 
@@ -32,6 +35,7 @@ type StaleSchemaResult = {
   status: "stale";
   schemaPath: string;
   reason: "missing" | "out-of-date";
+  summary: SchemaSummary;
 };
 
 export type PullSchemaResult =
@@ -58,10 +62,16 @@ export async function pullSchema(
       ? (Object.keys(schema)[0] ?? null)
       : schemaResponse.onboardingDatabaseName;
 
+  const existing = await fs
+    .readFile(absoluteSchemaPath, "utf-8")
+    .catch((error: unknown) => {
+      if (error instanceof Error && "code" in error && error.code === "ENOENT")
+        return null;
+      throw error;
+    });
+  const summary = summarizeSchema(existing, schema);
+
   if (options.check) {
-    const existing = await fs
-      .readFile(absoluteSchemaPath, "utf-8")
-      .catch(() => null);
     if (existing === content) {
       return { status: "up-to-date", schemaPath, firstDatabaseName };
     }
@@ -69,16 +79,23 @@ export async function pullSchema(
       status: "stale",
       schemaPath,
       reason: existing === null ? "missing" : "out-of-date",
+      summary,
     };
   }
 
-  const previousSchema = await readGeneratedSchema(absoluteSchemaPath);
-  const schemaChanges =
-    previousSchema === null ? null : diffSchemas(previousSchema, schema);
   await fs.mkdir(path.dirname(absoluteSchemaPath), { recursive: true });
   await fs.writeFile(absoluteSchemaPath, content);
 
-  return { status: "written", schemaPath, firstDatabaseName, schemaChanges };
+  const previous = existing === null ? null : parseGeneratedSchema(existing);
+  const schemaChanges =
+    previous === null ? null : diffSchemas(previous, schema);
+  return {
+    status: "written",
+    schemaPath,
+    firstDatabaseName,
+    summary,
+    schemaChanges,
+  };
 }
 
 function createSchemaModule(schema: Schema): string {
