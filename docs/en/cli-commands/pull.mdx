@@ -89,6 +89,6 @@ You can add a package script for later updates:
 
 ## Schema change summary
 
-A normal pull compares the previous generated schema and reports added or removed databases, changed database IDs, and added, removed, or changed property types. Missing or unsupported manually edited schemas are skipped for comparison and are never executed. `--check` compares the generated file without writing or printing a change summary.
+A normal pull compares the previous generated schema and reports added or removed databases, changed database IDs, and added, removed, or changed property types. Missing or unsupported manually edited schemas are skipped for comparison and are never executed. `--check` never writes the file. It omits the summary when the file is current and prints semantic changes when it is stale.
 
 Stale `pull --check` also prints the semantic summary without writing. The first pull and an unsupported previous schema file have distinct messages. Comparison never executes the local module.
