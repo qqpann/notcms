@@ -87,22 +87,8 @@ You can add a package script for later updates:
 }
 ```
 
-## Change summary
+## Schema change summary
 
-After a successful write, `pull` summarizes added/removed databases and properties,
-property type changes, and database IDs (with before/after values). `--check`
-prints the same summary when the file is stale while preserving the file.
+A normal pull compares the previous generated schema and reports added or removed databases, changed database IDs, and added, removed, or changed property types. Missing or unsupported manually edited schemas are skipped for comparison and are never executed. `--check` compares the generated file without writing or printing a change summary.
 
-```text
-Changed database ID: "blog"
-  "old_id" -> "nids_new_id"
-Added database: "releases"
-```
-
-A repeated pull prints `No semantic schema changes.` if only formatting or key
-order changed. A missing previous file is identified as the first pull. Local
-modules are never executed: generated object literals, bare keys, trailing
-commas, and comments are supported. For expressions, single-quoted strings, or
-other unsupported edits, the CLI explicitly says the summary is unavailable;
-normal generation still continues, so review the file diff. Database renames
-appear as removal/addition. An ID change does not by itself imply an outage.
+Stale `pull --check` also prints the semantic summary without writing. The first pull and an unsupported previous schema file have distinct messages. Comparison never executes the local module.

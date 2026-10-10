@@ -1,9 +1,9 @@
 import { Client } from "notcms";
 import {
   type BlogPost,
+  type Release,
   contentUrl,
   createContentReader,
-  type Release,
   selectBlogPosts,
   selectReleases,
 } from "../../../examples/content-recipes/content";

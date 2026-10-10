@@ -69,7 +69,11 @@
           },
           {
             "group": "Examples",
-            "pages": ["en/examples/nextjs", "en/examples/content-recipes"]
+            "pages": [
+              "en/examples/nextjs",
+              "en/examples/blog-releases",
+              "en/examples/content-recipes"
+            ]
           }
         ]
       },
@@ -98,7 +102,11 @@
           },
           {
             "group": "Examples",
-            "pages": ["ja/examples/nextjs", "ja/examples/content-recipes"]
+            "pages": [
+              "ja/examples/nextjs",
+              "ja/examples/blog-releases",
+              "ja/examples/content-recipes"
+            ]
           }
         ]
       }

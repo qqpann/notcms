@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import type { MockInstance } from "vitest";
 
 const promptMocks = vi.hoisted(() => ({
   confirm: vi.fn(),
@@ -28,7 +29,7 @@ import { init } from "../src/cli/commands";
 describe("init command", () => {
   let dir: string;
   let cwdSpy: ReturnType<typeof vi.spyOn>;
-  let logSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: MockInstance<typeof console.log>;
 
   beforeEach(async () => {
     dir = await fs.mkdtemp(path.join(tmpdir(), "notcms-init-"));

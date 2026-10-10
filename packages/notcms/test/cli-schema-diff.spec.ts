@@ -1,102 +1,328 @@
-import { summarizeSchema } from "../src/cli/features/schema-diff";
-import type { Schema } from "../src/types";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import {
+  diffSchemas,
+  formatSchemaChanges,
+  readGeneratedSchema,
+} from "../src/cli/features/schema-diff";
+import type { Properties, Schema } from "../src/types";
 
-const before = {
-  blog: {
-    id: "old_id",
-    properties: { title: "title", removed: "url", category: "rich_text" },
-  },
-  deleted: { id: "deleted_id", properties: {} },
-} satisfies Schema;
-
-function module(schema: Schema): string {
-  return `export const schema = ${JSON.stringify(schema)} satisfies Schema;`;
-}
-
-describe("schema change summary", () => {
-  it("reports database additions, removals and ID changes alongside property changes", () => {
-    const next = {
+describe("schema diff", () => {
+  it("reports database, ID, property add/remove, and type changes in stable order", () => {
+    const previous = {
       blog: {
-        id: "nids_new_id",
-        properties: { title: "title", added: "checkbox", category: "select" },
+        id: "blog-old",
+        properties: {
+          title: "title",
+          legacy: "number",
+        },
       },
-      releases: { id: "release_id", properties: { title: "title" } },
+      archive: {
+        id: "archive",
+        properties: { body: "rich_text" },
+      },
     } satisfies Schema;
-    expect(summarizeSchema(module(before), next)).toEqual({
-      status: "compared",
-      changes: [
-        'Changed database ID: "blog"\n  "old_id" -> "nids_new_id"',
-        'Added property: "blog"."added" (checkbox)',
-        'Changed property type: "blog"."category"\n  rich_text -> select',
-        'Removed property: "blog"."removed" (url)',
-        'Removed database: "deleted"',
-        'Added database: "releases"',
-      ],
-    });
-  });
-
-  it("ignores key order, whitespace, bare keys, comments and trailing commas", () => {
-    const existing = `import { Client } from "notcms";
-      export const schema = {
-        deleted: { properties: {}, id: "deleted_id", },
-        // Formatter output is still data, without executing Client.
-        blog: { properties: { category: "rich_text", removed: "url", title: "title", }, id: "old_id" },
-      } as const satisfies Schema;
-      throw new Error("must not execute");`;
-    expect(summarizeSchema(existing, before)).toEqual({
-      status: "compared",
-      changes: [],
-    });
-  });
-
-  it("supports computed prototype-like keys and escapes control characters in output", () => {
-    const schema = {
-      ["__proto__"]: { id: "db_proto", properties: { ["__proto__"]: "title" } },
-      constructor: { id: "db_constructor", properties: {} },
-      "line\nbreak": { id: "id\nescape", properties: {} },
+    const current = {
+      blog: {
+        id: "blog-new",
+        properties: {
+          title: "rich_text",
+          publishedAt: "date",
+        },
+      },
+      releases: {
+        id: "releases",
+        properties: { slug: "rich_text" },
+      },
     } satisfies Schema;
-    const existing = module(schema).replace(/"__proto__":/g, '["__proto__"]:');
-    expect(summarizeSchema(existing, schema)).toEqual({
-      status: "compared",
-      changes: [],
-    });
-    expect(summarizeSchema(module({}), schema)).toEqual({
-      status: "compared",
-      changes: [
-        'Added database: "__proto__"',
-        'Added database: "constructor"',
-        'Added database: "line\\nbreak"',
-      ],
-    });
+
+    expect(diffSchemas(previous, current)).toEqual([
+      { kind: "database-removed", database: "archive" },
+      {
+        kind: "database-id-changed",
+        database: "blog",
+        before: "blog-old",
+        after: "blog-new",
+      },
+      {
+        kind: "property-removed",
+        database: "blog",
+        property: "legacy",
+        type: "number",
+      },
+      {
+        kind: "property-added",
+        database: "blog",
+        property: "publishedAt",
+        type: "date",
+      },
+      {
+        kind: "property-type-changed",
+        database: "blog",
+        property: "title",
+        before: "title",
+        after: "rich_text",
+      },
+      { kind: "database-added", database: "releases" },
+    ]);
   });
 
-  it("reads Japanese names when a formatter removes their quotes", () => {
-    const existing = `export const schema = {
-      ブログ: { id: "db_jp", properties: { タイトル: "title" } },
-    } satisfies Schema;`;
+  it("does not report changes when object insertion order differs", () => {
+    const previous = {
+      blog: {
+        id: "blog",
+        properties: { title: "title", slug: "rich_text" },
+      },
+    } satisfies Schema;
+    const current = {
+      blog: {
+        id: "blog",
+        properties: { slug: "rich_text", title: "title" },
+      },
+    } satisfies Schema;
+
+    expect(diffSchemas(previous, current)).toEqual([]);
+    expect(formatSchemaChanges([])).toBe("No schema changes detected.");
+  });
+
+  it("formats ID and type changes with before and after values", () => {
     expect(
-      summarizeSchema(existing, {
-        ブログ: { id: "db_jp", properties: { タイトル: "title" } },
-      })
-    ).toEqual({ status: "compared", changes: [] });
+      formatSchemaChanges([
+        {
+          kind: "database-id-changed",
+          database: "blog",
+          before: "old-id",
+          after: "new-id",
+        },
+        {
+          kind: "property-type-changed",
+          database: "blog",
+          property: "title",
+          before: "title",
+          after: "rich_text",
+        },
+      ])
+    ).toBe(
+      [
+        "Schema changes:",
+        'Changed database ID: "blog"',
+        '  "old-id" -> "new-id"',
+        'Changed property type: "blog"."title"',
+        '  "title" -> "rich_text"',
+      ].join("\n")
+    );
   });
 
-  it("distinguishes a first pull from an unreadable previous module", () => {
-    expect(summarizeSchema(null, before)).toEqual({ status: "missing" });
-    expect(summarizeSchema("not TypeScript", before)).toEqual({
-      status: "unavailable",
+  it("quotes names and IDs so delimiters and control characters stay unambiguous", () => {
+    expect(
+      formatSchemaChanges([
+        { kind: "database-added", database: "release.notes\nprod" },
+        {
+          kind: "property-added",
+          database: "blog.v2",
+          property: "title\tname",
+          type: "rich_text",
+        },
+      ])
+    ).toBe(
+      [
+        "Schema changes:",
+        'Added database: "release.notes\\nprod"',
+        'Added property: "blog.v2"."title\\tname" ("rich_text")',
+      ].join("\n")
+    );
+  });
+
+  it("escapes C1 control characters in change labels", () => {
+    expect(
+      formatSchemaChanges([
+        { kind: "database-added", database: "control\u009bname" },
+      ])
+    ).toBe(
+      ["Schema changes:", 'Added database: "control\\u009bname"'].join("\n")
+    );
+  });
+
+  it("checks own database and property entries before diffing", () => {
+    const previous: Schema = Object.create(null);
+    const previousProperties: Properties = Object.create(null);
+    previousProperties["constructor"] = "title";
+    previousProperties["toString"] = "url";
+    previous["constructor"] = {
+      id: "constructor-id",
+      properties: {},
+    };
+    previous.blog = {
+      id: "blog",
+      properties: previousProperties,
+    };
+    const current = {
+      blog: {
+        id: "blog",
+        properties: {},
+      },
+    } satisfies Schema;
+
+    expect(diffSchemas(previous, current)).toEqual([
+      {
+        kind: "property-removed",
+        database: "blog",
+        property: "constructor",
+        type: "title",
+      },
+      {
+        kind: "property-removed",
+        database: "blog",
+        property: "toString",
+        type: "url",
+      },
+      { kind: "database-removed", database: "constructor" },
+    ]);
+  });
+
+  describe("readGeneratedSchema", () => {
+    let dir: string;
+
+    beforeEach(async () => {
+      dir = await mkdtemp(path.join(tmpdir(), "notcms-schema-diff-"));
     });
-  });
 
-  it.each([
-    "export const schema = loadSchema();",
-    "export const schema = { blog: { id: process.env.ID, properties: {} } } satisfies Schema;",
-    'export const schema = { blog: { id: "a", properties: { title: "unsupported" } } } satisfies Schema;',
-    'export const schema = { blog: { id: "a", properties: {} }, blog: { id: "b", properties: {} } } satisfies Schema;',
-    'export const schema = { blog: { id: "a", properties: {} } }.someCode();',
-  ])("does not evaluate unsupported local code: %s", (existing) => {
-    expect(summarizeSchema(existing, before)).toEqual({
-      status: "unavailable",
+    afterEach(async () => {
+      await rm(dir, { recursive: true, force: true });
+    });
+
+    it("reads formatter output with bare keys and trailing commas", async () => {
+      const schema = {
+        "release.notes": {
+          id: "release-id",
+          properties: { title: "title", slug: "rich_text" },
+        },
+      } satisfies Schema;
+      const schemaPath = path.join(dir, "schema.ts");
+      await writeFile(
+        schemaPath,
+        `import type { Schema } from "notcms";\n\nexport const schema = {\n  "release.notes": {\n    id: "release-id",\n    properties: {\n      title: "title",\n      slug: "rich_text",\n    },\n  },\n} satisfies Schema;\nexport const nc = new Client({ schema });\n`
+      );
+
+      await expect(readGeneratedSchema(schemaPath)).resolves.toEqual(schema);
+    });
+
+    it("reads semicolonless output and an EOF schema declaration", async () => {
+      const schema = {
+        blog: {
+          id: "blog-id",
+          properties: { title: "title" },
+        },
+      } satisfies Schema;
+      const declaration = `export const schema = {
+  blog: { id: "blog-id", properties: { title: "title" } },
+} satisfies Schema`;
+      const variants = [
+        `${declaration}\nexport const nc = new Client({ schema })\n`,
+        declaration,
+      ];
+
+      for (const [index, content] of variants.entries()) {
+        const schemaPath = path.join(dir, `semicolonless-${index}.ts`);
+        await writeFile(schemaPath, content);
+        await expect(readGeneratedSchema(schemaPath)).resolves.toEqual(schema);
+      }
+    });
+
+    it("rejects same-line wrappers and unrelated expressions after Schema", async () => {
+      const declaration = `export const schema = {
+  blog: { id: "blog-id", properties: { title: "title" } },
+} satisfies Schema`;
+      const invalid = [
+        `${declaration} export const nc = new Client({ schema })`,
+        `${declaration}; unrelated()`,
+        `${declaration}\nunrelated()`,
+      ];
+
+      for (const [index, content] of invalid.entries()) {
+        const schemaPath = path.join(dir, `invalid-suffix-${index}.ts`);
+        await writeFile(schemaPath, content);
+        await expect(readGeneratedSchema(schemaPath)).resolves.toBeNull();
+      }
+    });
+
+    it("reads astral and combining Unicode identifier keys by code point", async () => {
+      const schema = {
+        𝒜: {
+          id: "𝒜",
+          properties: { é: "title" },
+        },
+      } satisfies Schema;
+      const schemaPath = path.join(dir, "unicode-schema.ts");
+      await writeFile(
+        schemaPath,
+        `export const schema = {\n  𝒜: {\n    id: "𝒜",\n    properties: {\n      é: "title",\n    },\n  },\n} satisfies Schema;\n`
+      );
+
+      await expect(readGeneratedSchema(schemaPath)).resolves.toEqual(schema);
+    });
+
+    it("reads both single and double quoted schema strings", async () => {
+      const schema = {
+        "single.name": {
+          id: "single-id",
+          properties: { title: "title" },
+        },
+      } satisfies Schema;
+      const schemaPath = path.join(dir, "quote-schema.ts");
+      await writeFile(
+        schemaPath,
+        `export const schema = {\n  'single.name': {\n    id: 'single-id',\n    properties: { title: "title" },\n  },\n} satisfies Schema;\n`
+      );
+
+      await expect(readGeneratedSchema(schemaPath)).resolves.toEqual(schema);
+    });
+
+    it("ignores schema-shaped text inside comments, strings, and templates", async () => {
+      const schemaPath = path.join(dir, "false-positive.ts");
+      await writeFile(
+        schemaPath,
+        [
+          "/*",
+          'export const schema = { blog: { id: "fake", properties: {} } } satisfies Schema;',
+          "*/",
+          'const text = "export const schema = { blog: { id: \\"fake\\", properties: {} } } satisfies Schema;";',
+          'const template = `export const schema = { blog: { id: "fake", properties: {} } } satisfies Schema;`;',
+        ].join("\n")
+      );
+
+      await expect(readGeneratedSchema(schemaPath)).resolves.toBeNull();
+    });
+
+    it("rejects spreads, accessors, calls, and duplicate keys without evaluating them", async () => {
+      const expressions = [
+        "export const schema = { ...getSchema() } satisfies Schema;",
+        "export const schema = { get blog() { return {}; } } satisfies Schema;",
+        "export const schema = { blog: getSchema() } satisfies Schema;",
+        "export const schema = { [getName()]: {} } satisfies Schema;",
+        "export const schema = { [blog]: {} } satisfies Schema;",
+        "export const schema = { blog: {}, blog: {} } satisfies Schema;",
+      ];
+
+      for (const [index, expression] of expressions.entries()) {
+        const schemaPath = path.join(dir, `unsafe-${index}.ts`);
+        await writeFile(schemaPath, expression);
+        await expect(readGeneratedSchema(schemaPath)).resolves.toBeNull();
+      }
+    });
+
+    it("returns null for missing or manually edited schemas", async () => {
+      await expect(
+        readGeneratedSchema(path.join(dir, "missing.ts"))
+      ).resolves.toBeNull();
+
+      const schemaPath = path.join(dir, "manual.ts");
+      await writeFile(
+        schemaPath,
+        "export const schema = getSchema(); satisfies Schema;\n"
+      );
+      await expect(readGeneratedSchema(schemaPath)).resolves.toBeNull();
     });
   });
 });

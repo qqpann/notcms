@@ -259,7 +259,7 @@ function printPullResult(result: PullSchemaResult) {
       console.log(
         summary.changes.length > 0
           ? summary.changes.join("\n")
-          : "No semantic schema changes."
+          : "No schema changes detected."
       );
     } else if (summary.status === "missing") {
       console.log("No previous schema file; this is the first pull.");
