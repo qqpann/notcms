@@ -1,18 +1,11 @@
-import matter from "gray-matter";
 import type { PageData } from "../notcms-client.js";
+import { stringifyMarkdown } from "./yaml.js";
 
 /**
  * Generate a Markdown file string with YAML frontmatter from page data.
  */
 export function generateMarkdown(page: PageData, dbName: string): string {
-  const frontmatterData: Record<string, unknown> = {};
-
-  // Add all properties first (may include "title" from Notion properties)
-  if (page.properties) {
-    for (const [key, value] of Object.entries(page.properties)) {
-      frontmatterData[key] = value;
-    }
-  }
+  const frontmatterData: Record<string, unknown> = { ...page.properties };
 
   // Override title with page.title (the canonical Notion page title)
   if (page.title != null) {
@@ -26,5 +19,5 @@ export function generateMarkdown(page: PageData, dbName: string): string {
 
   const content = page.content ?? "";
 
-  return matter.stringify(content, frontmatterData);
+  return stringifyMarkdown(content, frontmatterData);
 }

@@ -63,12 +63,38 @@ function defaultBranch(): string {
   return github.context.payload.repository?.default_branch ?? "main";
 }
 
+interface PullRequestSummary {
+  title: string;
+  number: number;
+  html_url: string;
+  head: { ref: string; repo: { full_name: string } | null };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isPullRequestSummary(value: unknown): value is PullRequestSummary {
+  if (!isRecord(value) || !isRecord(value.head)) return false;
+  return (
+    typeof value.title === "string" &&
+    typeof value.number === "number" &&
+    Number.isSafeInteger(value.number) &&
+    value.number > 0 &&
+    typeof value.html_url === "string" &&
+    typeof value.head.ref === "string" &&
+    (value.head.repo === null ||
+      (isRecord(value.head.repo) &&
+        typeof value.head.repo.full_name === "string"))
+  );
+}
+
 async function findOpenSyncPr(token: string): Promise<SyncPullRequest | null> {
   const octokit = github.getOctokit(token);
   const { owner, repo } = github.context.repo;
   const repositoryFullName = `${owner}/${repo}`;
 
-  const { data: prs } = await octokit.rest.pulls.list({
+  const response = await octokit.rest.pulls.list({
     owner,
     repo,
     state: "open",
@@ -78,8 +104,11 @@ async function findOpenSyncPr(token: string): Promise<SyncPullRequest | null> {
     per_page: 100,
   });
 
+  const prs: unknown = response.data;
+  if (!Array.isArray(prs)) throw new Error("Invalid GitHub pull request list");
   const pr = prs.find(
-    (candidate) =>
+    (candidate: unknown): candidate is PullRequestSummary =>
+      isPullRequestSummary(candidate) &&
       [SYNC_PR_TITLE, LEGACY_SYNC_PR_TITLE].includes(candidate.title) &&
       candidate.head.repo?.full_name === repositoryFullName &&
       candidate.head.ref.startsWith(SYNC_BRANCH_PREFIX)
