@@ -61,7 +61,11 @@
           },
           {
             "group": "CLI Commands",
-            "pages": ["en/cli-commands/init", "en/cli-commands/pull"]
+            "pages": [
+              "en/cli-commands/init",
+              "en/cli-commands/pull",
+              "en/cli-commands/migration"
+            ]
           },
           {
             "group": "Examples",
@@ -86,7 +90,11 @@
           },
           {
             "group": "CLI Commands",
-            "pages": ["ja/cli-commands/init", "ja/cli-commands/pull"]
+            "pages": [
+              "ja/cli-commands/init",
+              "ja/cli-commands/pull",
+              "ja/cli-commands/migration"
+            ]
           },
           {
             "group": "Examples",

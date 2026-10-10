@@ -1,0 +1,78 @@
+---
+title: Migrate the CLI and SDK
+description: Replace notcms-kit and upgrade older SDKs with the unified notcms package
+---
+
+The current `notcms` package includes both the SDK and the `notcms` CLI. Use the
+installed CLI with `npx notcms` (npm) or `pnpm exec notcms` (pnpm), so schema
+creation and application imports use the same installed package version.
+
+## Upgrade an existing project
+
+1. Commit or back up your current config, generated schema and lockfile locally.
+2. Remove `notcms-kit` if it is a direct project dependency, and upgrade `notcms`:
+
+```bash
+# npm
+npm uninstall notcms-kit
+npm install notcms@latest
+
+# pnpm equivalents
+pnpm remove notcms-kit
+pnpm add notcms@latest
+```
+
+`@latest` selects the registry's latest release. Teams that pin versions should
+choose their supported target version explicitly instead. `init` deliberately
+preserves existing dependency specs, including old prereleases; running it alone
+does not upgrade `notcms@0.0.12-development`.
+
+3. Keep `notcms.config.json` and `NOTCMS_SECRET_KEY` / `NOTCMS_WORKSPACE_ID`.
+   Do not rerun `init` just to migrate: refresh the existing schema instead.
+
+```bash
+npx notcms pull
+# pnpm: pnpm exec notcms pull
+```
+
+4. Replace scripts that call `notcms-kit` with the corresponding `notcms`
+   command. `notcms-kit init` becomes `notcms init`, and `notcms-kit pull`
+   becomes `notcms pull`. There is no separate CLI dependency to add.
+5. Inspect the generated schema diff and typecheck/test your application.
+   Database/property keys are used exactly as generated: use bracket notation
+   for names with spaces. A public database ID may use the `nids_` prefix;
+   keep the generated ID instead of stripping its prefix or substituting a
+   Notion page ID. The client still supports `list()` and `get(pageId)`.
+6. Handle the SDK error tuple explicitly. A failed CMS request is not an empty
+   result or a missing page:
+
+```typescript
+import { nc } from "./src/notcms/schema";
+
+const [posts, error] = await nc.query.blog.list();
+if (error) throw error;
+// posts is available only after checking error
+```
+
+Compatibility with every historical prerelease is not guaranteed. Resolve any
+application type errors against the regenerated schema and validate your actual
+list/detail requests before deploying.
+
+## New projects and CI
+
+For a new project, use `npm install notcms` then `npx notcms init`.
+Connect and sync your databases in the dashboard before the first pull. `init`
+handles config, browser login when needed, dependency setup, and the first pull.
+Keep credentials on the server and out of version control.
+
+For CI, install from the lockfile, inject credentials as secrets, and run:
+
+```bash
+npx notcms pull --check
+# pnpm: pnpm exec notcms pull --check
+```
+
+This command never prompts or writes the schema. It exits with code 1 when the
+file is missing or differs from generated output. Formatting-only differences
+can still fail this byte-for-byte check. Use `pull` locally and review/commit its
+output to fix it.
