@@ -13,7 +13,6 @@ NotCMSをインストールし、プロジェクトを初期化してデータ�
 ```bash
 npm install notcms
 npx notcms init
-npx notcms pull
 ```
 
 次の例では、`releases` データベースに以下のプロパティがある前提です。
@@ -101,7 +100,7 @@ export function releaseHref(
 }
 ```
 
-localeをURLに含めます。slugはlocaleが違えば再利用できますが、同じlocaleの公開済みリリース間では一意にしてください。同じlocaleに重複slugがある場合は、このresolverが `null` を返して404にできるようにします。slugがないデータベースでは常に一意なページIDを使います。
+localeをURLに含めます。slugはlocaleが違えば再利用できますが、同じlocaleの公開済みリリース間では一意にしてください。同じlocaleに重複slugがある場合は、このresolverが `null` を返して404にできるようにします。同じlocaleでslugが別の公開ページのIDと一致した場合も拒否します。slugがないデータベースでは常に一意なページIDを使います。
 
 slugまたはIDを受け取るlocale-awareなルートでは、localeをresolverへ渡します。一覧から概要を選ぶ前に公開条件と言語を適用し、詳細を取得した後にも同じ条件を再確認します。
 
@@ -113,21 +112,14 @@ export async function getReleaseBySegment(
   const [pages, listError] = await nc.query.releases.list();
   if (listError) throw listError;
 
-  const idMatch = (pages ?? []).find((release) => release.id === segment);
-  const slugMatches = (pages ?? []).filter(
+  const matches = (pages ?? []).filter(
     (release) =>
       isPublished(release) &&
       languageOf(release) === language &&
-      release.properties.slug?.trim() === segment
+      (release.id === segment || release.properties.slug?.trim() === segment)
   );
-  const summary = idMatch
-    ? isPublished(idMatch) && languageOf(idMatch) === language
-      ? idMatch
-      : null
-    : slugMatches.length === 1
-      ? slugMatches[0]
-      : null;
-  if (!summary) return null;
+  if (matches.length !== 1) return null;
+  const summary = matches[0];
 
   const [release, detailError] = await nc.query.releases.get(summary.id);
   if (detailError) throw detailError;

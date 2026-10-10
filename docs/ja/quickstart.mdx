@@ -42,34 +42,23 @@ npx notcms init
 ```
 
 このコマンドは以下を実行します：
-1. スキーマの保存先を確認（デフォルト: `src/notcms/schema.ts`）
-2. `notcms.config.json`設定ファイルを作成
-3. NotCMSの認証情報がなければブラウザログインを案内
+1. `notcms.config.json`設定ファイルを作成
+2. 認証情報がなければブラウザでログインし、`.env.local`へ保存
+3. タイプセーフなスキーマを`src/notcms/schema.ts`へ取得
+4. 最初のクエリ例を表示
 
-## ステップ3: 環境変数を設定
-
-`.env`ファイルにNotCMS認証情報を追加：
-
-```env
-NOTCMS_SECRET_KEY=your-secret-key
-NOTCMS_WORKSPACE_ID=your-workspace-id
-```
-
-<Note>
-  ログインを後回しにした場合は `npx notcms login` を実行するか、両方の環境変数を手動で設定してください。認証情報は[NotCMSダッシュボード](https://dash.notcms.com)から取得できます。
-</Note>
-
-## ステップ4: スキーマを取得
-
-NotionデータベースからTypeScript型を生成：
+Notionデータベースのスキーマを変更した後は、単独のpullコマンドで更新できます：
 
 ```bash
 npx notcms pull
 ```
 
-これにより、`src/notcms/schema.ts`にタイプセーフなスキーマファイルが作成されます：
+生成されるスキーマは次のようになります：
 
 ```typescript
+import { Client } from "notcms";
+import type { Schema } from "notcms";
+
 export const schema = {
   blog: {
     id: "abc123...",
@@ -81,17 +70,16 @@ export const schema = {
     }
   }
 } satisfies Schema;
+
+export const nc = new Client({ schema });
 ```
 
-## ステップ5: NotCMSを使い始める
+## ステップ3: NotCMSを使い始める
 
-クライアントを作成してコンテンツのクエリを開始：
+生成されたクライアントをimportしてコンテンツのクエリを開始：
 
 ```typescript
-import { Client } from 'notcms';
-import { schema } from './notcms/schema';
-
-const nc = new Client({ schema });
+import { nc } from './notcms/schema';
 
 // 公開されたブログ記事をすべて取得
 const [posts, error] = await nc.query.blog.list();

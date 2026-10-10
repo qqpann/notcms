@@ -14,7 +14,6 @@ Install NotCMS, initialize the project, and pull the database schema:
 ```bash
 npm install notcms
 npx notcms init
-npx notcms pull
 ```
 
 The example below assumes a `releases` database with these properties:
@@ -111,7 +110,7 @@ export function releaseHref(
 The locale is part of the URL. A slug may be reused across different locales,
 but it must be unique among published releases within one locale. If a locale
 contains duplicate slugs, this resolver returns `null` so the route can return
-a 404 instead of choosing an arbitrary record. A database without a slug uses
+a 404 instead of choosing an arbitrary record. The same rule rejects a slug that matches another published page's ID in the same locale. A database without a slug uses
 the page ID, which is always unique.
 
 When a route accepts either a locale-aware slug or an ID, pass the locale into
@@ -126,21 +125,14 @@ export async function getReleaseBySegment(
   const [pages, listError] = await nc.query.releases.list();
   if (listError) throw listError;
 
-  const idMatch = (pages ?? []).find((release) => release.id === segment);
-  const slugMatches = (pages ?? []).filter(
+  const matches = (pages ?? []).filter(
     (release) =>
       isPublished(release) &&
       languageOf(release) === language &&
-      release.properties.slug?.trim() === segment
+      (release.id === segment || release.properties.slug?.trim() === segment)
   );
-  const summary = idMatch
-    ? isPublished(idMatch) && languageOf(idMatch) === language
-      ? idMatch
-      : null
-    : slugMatches.length === 1
-      ? slugMatches[0]
-      : null;
-  if (!summary) return null;
+  if (matches.length !== 1) return null;
+  const summary = matches[0];
 
   const [release, detailError] = await nc.query.releases.get(summary.id);
   if (detailError) throw detailError;
