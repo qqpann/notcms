@@ -135,6 +135,7 @@ CI usage, and compatibility checks.
 
 Check out these examples to get started quickly:
 
+- [Publication, language and stable URL recipes](examples/content-recipes/README.md) for blogs and release notes
 
 - 📚 [Next.js Simple Blog Template](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
 - 🎨 [More templates available on our website](https://notcms.com/templates)

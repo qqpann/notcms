@@ -81,7 +81,7 @@ export const nc = new Client({ schema });
 ```typescript
 import { nc } from './notcms/schema';
 
-// 公開されたブログ記事をすべて取得
+// 全記事を取得し、表示前にアプリの公開条件で絞り込みます
 const [posts, error] = await nc.query.blog.list();
 
 if (error) {
@@ -126,4 +126,4 @@ if (error) {
   </Accordion>
 </AccordionGroup>
 
-[旧 CLI・SDK からの移行](/ja/cli-commands/migration)
+[旧 CLI・SDK からの移行](/ja/cli-commands/migration) · [ブログ・リリースノートのレシピ](/ja/examples/content-recipes)
