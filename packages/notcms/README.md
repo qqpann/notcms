@@ -77,6 +77,7 @@ this is especially necessary for prerelease SDKs such as `0.0.12-development`.
 See the [migration checklist](../../docs/en/cli-commands/migration.mdx) for package-manager equivalents,
 CI usage, and compatibility checks.
 
+See the [tested blog and release-note recipes](../../examples/content-recipes/README.md) for publication, language, URLs, and failure handling.
 
 ### SDK Usage
 
