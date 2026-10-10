@@ -2,8 +2,14 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { findStaleSyncFiles } from "../src/git.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { findStaleSyncFiles, handleOnChange } from "../src/git.js";
+
+const prList = vi.hoisted(() => vi.fn());
+vi.mock("@actions/github", () => ({
+  getOctokit: () => ({ rest: { pulls: { list: prList } } }),
+  context: { repo: { owner: "fixture", repo: "repo" }, payload: {} },
+}));
 
 function managedMarkdown(id: string): string {
   return [
@@ -32,6 +38,7 @@ describe("findStaleSyncFiles", () => {
   }
 
   beforeEach(() => {
+    prList.mockResolvedValue({ data: [] });
     originalCwd = process.cwd();
     repoDir = fs.mkdtempSync(path.join(os.tmpdir(), "notcms-sync-action-"));
     git(["init"]);
@@ -52,6 +59,22 @@ describe("findStaleSyncFiles", () => {
   afterEach(() => {
     process.chdir(originalCwd);
     fs.rmSync(repoDir, { force: true, recursive: true });
+  });
+
+  it("ignores malformed GitHub pull request entries", async () => {
+    prList.mockResolvedValue({
+      data: [null, {}, { title: "NotCMS: Sync content", head: {} }],
+    });
+    await expect(handleOnChange("pr", "fixture-token", [])).resolves.toEqual(
+      {}
+    );
+  });
+
+  it("rejects a non-array GitHub pull request response", async () => {
+    prList.mockResolvedValue({ data: {} });
+    await expect(handleOnChange("pr", "fixture-token", [])).rejects.toThrow(
+      "Invalid GitHub pull request list"
+    );
   });
 
   it("marks a previous generated path stale when the same page is generated elsewhere", async () => {
