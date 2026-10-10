@@ -5,7 +5,7 @@
 The October 2026 refresh removes vulnerable dependency paths from the Sync Action and SDK CLI, and updates build tooling through `pnpm-lock.yaml`. The Action dependency change is reviewed separately.
 
 - Upgrade Changesets CLI to 3.0.3: its new dependency graph removes the old js-yaml/argparse/sprintf-js path. Contributor tooling uses Node 24 and pnpm 11; the published SDK still supports Node >=18.17.
-- Remove unused ts-node, eliminating its vulnerable diff dependency.
+- Remove ts-node, which is unused in build/test workflows, eliminating its vulnerable diff dependency. Legacy VS Code launch entries still reference ts-node/Jest; those obsolete debugger settings require a separate update.
 - Refresh compatible transitive versions, including brace-expansion, cross-spawn, glob, minimatch, picomatch and rollup. The SDK patch changeset covers rebuilt CLI dependencies.
 - Override postcss-selector-parser to 7.1.6 for Tailwind 3/PostCSS, and tmp to 0.2.7 for legacy external-editor consumers. These cross-version overrides require demo build/visual checks and an actual external-editor temporary-file compatibility check. No install-hook permissions are expanded.
 
@@ -22,7 +22,7 @@ For npm release approval, follow [staged publishing](./npm-staged-publishing.md)
 2026年10月の更新で Sync Action と SDK CLI の脆弱な依存経路を除去し、`pnpm-lock.yaml` の開発ツール依存を更新します。Action の依存変更は別 PR でレビューします。
 
 - Changesets CLI を3.0.3へ更新し、旧 js-yaml/argparse/sprintf-js 経路を除去します。開発ツールはNode24・pnpm11を使い、公開SDKのNode >=18.17対応は維持します。
-- 未使用のts-nodeを削除し、脆弱なdiff依存を除去します。
+- build/testで未使用のts-nodeを削除し、脆弱なdiff依存を除去します。古いVS Code設定にはts-node/Jestの参照が残っており、これらのデバッガー設定は別途更新が必要です。
 - brace-expansion、cross-spawn、glob、minimatch、picomatch、rollupなどを互換範囲で更新します。再ビルドするCLIの依存変更にSDKのpatch changesetを用意します。
 - Tailwind3/PostCSSのpostcss-selector-parserを7.1.6、旧external-editorが使うtmpを0.2.7へoverrideします。メジャーを跨ぐ更新はデモのビルド・見た目と、実際のexternal-editorの一時ファイル互換性を検証します。インストールフックの許可は追加しません。
 
