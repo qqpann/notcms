@@ -56,6 +56,7 @@ describe("init command", () => {
     loginMocks.getCredentialsFromEnv.mockReturnValue(credentials);
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog posts",
     });
@@ -82,6 +83,7 @@ describe("init command", () => {
     loginMocks.saveCredentials.mockResolvedValue(path.join(dir, ".env.local"));
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "",
     });
@@ -120,6 +122,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: null,
     });
@@ -143,6 +146,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -169,6 +173,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -195,6 +200,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -220,6 +226,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -254,6 +261,7 @@ describe("init command", () => {
       });
       pullMocks.pullSchema.mockResolvedValue({
         status: "written",
+        summary: { status: "missing" },
         schemaPath: "src/notcms/schema.ts",
         firstDatabaseName,
       });

@@ -29,7 +29,7 @@ function isSchemaEntry(entry: unknown): entry is Schema[string] {
   );
 }
 
-function isSchema(value: unknown): value is Schema {
+export function isSchema(value: unknown): value is Schema {
   return isPlainObject(value) && Object.values(value).every(isSchemaEntry);
 }
 
