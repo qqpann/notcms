@@ -34,7 +34,7 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 - 🎯 **Simple API**: Clean and intuitive API for fetching content
 - 📝 **Notion as Backend**: Use Notion's user-friendly editor for content creation
 - 🔄 **Framework Agnostic**: Works with any JavaScript framework (Next.js, React, Vue, etc.)
-- 🛠️ **CLI Tools**: Includes notcms-kit for easy project setup and schema management
+- 🛠️ **CLI Tools**: Includes the NotCMS CLI for project setup, browser login, and schema management
 
 ## Getting Started
 
@@ -46,42 +46,37 @@ npm install notcms
 
 ### Usage
 
-#### 0. Set Up Environment Variables
-
-Create a `.env` file in your project root:
-
-```env
-NOTCMS_SECRET_KEY=your_secret_key
-NOTCMS_WORKSPACE_ID=your_workspace_id
-```
-
-You can get these values from the NotCMS Dashboard.
-
 #### 1. Initialize a Project
 
-NotCMS Kit provides command-line tools to streamline your workflow. You can use it directly with npx:
+Run the CLI directly with npx:
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
-This will create a `notcms.config.json` file in your project root.
+This creates `notcms.config.json`. If credentials are missing, it opens browser
+login and saves `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID` to `.env.local`.
+It ensures `notcms` is both a direct dependency and available to the project,
+offering either the detected package manager's install command or an add
+command without replacing an existing dependency spec. It then pulls the
+schema and prints a runnable first query example.
 
-#### 2. Define Your Schema
+#### 2. Refresh Your Schema
 
-The easiest way to define your schema is to use NotCMS Kit:
+Run the standalone pull command whenever your Notion database schema changes:
 
 ```bash
-npx notcms-kit pull
+npx notcms pull
 ```
 
-This will automatically fetch your database schema from Notion and generate a TypeScript schema file.
+This fetches your database schema from NotCMS and regenerates the configured TypeScript file.
 
 For reference, the generated schema will look something like this:
 
 ```ts
 // src/notcms/schema.ts
-import { Client, Schema } from "notcms";
+import { Client } from "notcms";
+import type { Schema } from "notcms";
 
 export const schema = {
   blog: {
@@ -91,7 +86,7 @@ export const schema = {
       description: "rich_text",
       published: "checkbox",
       thumbnails: "files",
-      // Run notcms-kit pull again when properties are updated
+      // Run notcms pull again when properties are updated
     },
   },
 } satisfies Schema;
@@ -142,7 +137,7 @@ If you encounter schema-related errors:
 
 1. Make sure your Notion database IDs are correct
 2. Verify that the property types match what's in your Notion database
-3. Try running `npx notcms-kit pull` to regenerate your schema
+3. Try running `npx notcms pull` to regenerate your schema
 
 ## Contributing
 

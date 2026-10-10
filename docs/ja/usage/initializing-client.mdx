@@ -22,7 +22,7 @@ const nc = new Client({
 
 クライアントを初期化する前に、以下を確認してください：
 
-1. **スキーマの生成** - 初回は `npx notcms-kit init` を実行、更新は `npx notcms-kit pull` を実行
+1. **スキーマの生成** - 初回は `npx notcms init` を実行、更新は `npx notcms pull` を実行
 2. **環境変数** - API認証情報の設定
 3. **NotCMSのインストール** - プロジェクトの依存関係に `notcms` を追加
 
@@ -133,14 +133,14 @@ export const nc = new Client({
   </Accordion>
   
   <Accordion title="スキーマが見つからない">
-    - `npx notcms-kit pull` を実行してスキーマを生成
+    - `npx notcms pull` を実行してスキーマを生成
     - インポートパスが正しいことを確認
     - スキーマファイルが正しくエクスポートされていることを確認
   </Accordion>
   
   <Accordion title="TypeScriptエラー">
     - NotCMSを最新バージョンに更新
-    - `npx notcms-kit pull` でスキーマを再生成
+    - `npx notcms pull` でスキーマを再生成
     - TypeScriptバージョンの互換性を確認
   </Accordion>
 </AccordionGroup>

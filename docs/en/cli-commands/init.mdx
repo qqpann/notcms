@@ -1,58 +1,109 @@
 ---
 title: init
-description: Initialize a new NotCMS project
+description: Initialize NotCMS through browser login and the first schema pull
 ---
 
 ## Overview
 
-The `init` command sets up NotCMS in your project with interactive configuration.
+The `init` command takes a project from configuration through its first schema
+pull in one interactive flow.
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 ## What it does
 
-1. Creates `notcms.config.json` configuration file
-2. Checks environment variables in `.env`
+1. Prompts for the generated schema path
+2. Creates `notcms.config.json`
+3. Loads existing credentials from `.env`, `.env.local`, or `.dev.vars`
+4. If credentials are missing, offers browser login and saves them to `.env.local`
+5. Ensures `notcms` is both a direct project dependency and resolvable
+6. Pulls the schema automatically
+7. Prints a first query using the generated `nc` client
+
+If you decline browser login, the config file remains available and the command
+shows how to run `notcms login` later. It does not attempt to pull without
+credentials.
 
 ## Options
 
 | Option | Description | Default |
-|--------|-------------|---------|
-| `--env` | Environment file path | `[".env", ".env.local", ".dev.vars"]` |
+| --- | --- | --- |
+| `-e, --env <PATH>` | Comma-separated environment file paths | `.env,.env.local,.dev.vars` |
 
-## Interactive Setup
+## Interactive setup
 
-The command will guide you through:
+The command first asks where to save the generated schema:
 
-### 1. Configuration
-
+```text
+? Enter the path to save the schema (src/notcms/schema.ts)
 ```
-? Schema file path: ./src/notcms/schema.ts
+
+When credentials are missing, it asks before starting browser login:
+
+```text
+? No NotCMS credentials found. Log in via browser to set them up now? (Y/n)
 ```
+
+The browser flow displays a device code, lets you select a workspace, and
+returns credentials to the CLI. The same credentials are used immediately for
+the automatic schema pull.
+
+`init` considers setup complete only when `notcms` is declared directly in
+`dependencies` or `devDependencies` and can be resolved from the target project.
+If it is declared but not installed, `init` offers the package manager's plain
+install command so local, workspace, and pinned dependency specs are preserved:
+
+```text
+pnpm install
+npm install
+yarn install
+bun install
+```
+
+If it is not declared directly, `init` offers the corresponding add command:
+
+```text
+pnpm add notcms
+npm install notcms
+yarn add notcms
+bun add notcms
+```
+
+It shows the exact command and asks before running it, with yes as the default.
+On POSIX platforms the package manager is executed directly with shell mode
+disabled. On Windows, fixed validated arguments are passed through `cmd.exe` to
+invoke the package manager's `.cmd` shim; project-controlled text is never
+interpolated into that command. If installation is declined, fails, or the
+session is non-interactive, schema generation continues and the manual
+installation command is printed as the final action.
+
+The package manager is selected from a valid `packageManager` field, the closest
+lockfiles, or the invoking package manager. An invalid explicit field, or
+conflicting closest lockfiles that the invoking package manager cannot
+disambiguate, stops automatic installation. Schema generation still completes
+and `init` explains how to resolve the package-manager configuration manually.
 
 ## Examples
 
 ### Basic initialization
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
-### Specify environment file path
-
-Use this if you already have `.env` configured:
+### Load credentials from a custom env file
 
 ```bash
-npx notcms-kit init --env .env.development
+npx notcms --env .env.development init
 ```
 
-## Troubleshooting
+## Next steps
 
-## Next Steps
+Import the `nc` client from the generated schema file and run the query printed
+by the command. When the Notion database structure changes, refresh it with:
 
-After initialization, you can:
-
-1. Start using the NotCMS client in your code
-2. Run `npx notcms-kit pull` to update your schema
+```bash
+npx notcms pull
+```

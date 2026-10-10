@@ -1,58 +1,106 @@
 ---
 title: init
-description: 新しいNotCMSプロジェクトの初期化
+description: ブラウザログインから最初のスキーマ取得までNotCMSを初期化
 ---
 
 ## 概要
 
-`init`コマンドは、対話型の設定でプロジェクトにNotCMSをセットアップします。
+`init`コマンドは、プロジェクトの設定から最初のスキーマ取得までを
+1つの対話フローで完了します。
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
 ## 実行内容
 
-1. `notcms.config.json` 設定ファイルを作成
-2. `.env`内の環境変数をチェック
+1. 生成するスキーマの保存先を確認
+2. `notcms.config.json`を作成
+3. `.env`、`.env.local`、`.dev.vars`から既存の認証情報を読み込み
+4. 認証情報がなければブラウザログインを提案し、`.env.local`へ保存
+5. `notcms`が直接依存として宣言され、プロジェクトから解決可能かを確認
+6. スキーマを自動取得
+7. 生成された`nc`クライアントを使う最初のクエリを表示
+
+ブラウザログインを拒否した場合も設定ファイルは残り、後から
+`notcms login`を実行する方法を表示します。認証情報なしでpullは実行しません。
 
 ## オプション
 
 | オプション | 説明 | デフォルト |
-|--------|-------------|---------|
-| `--env` | 環境ファイルのパス | `[".env", ".env.local", ".dev.vars"]` |
+| --- | --- | --- |
+| `-e, --env <PATH>` | カンマ区切りの環境ファイルパス | `.env,.env.local,.dev.vars` |
 
 ## 対話型セットアップ
 
-コマンドが以下をガイドします：
+最初に、生成するスキーマの保存先を確認します：
 
-### 1. 設定
+```text
+? Enter the path to save the schema (src/notcms/schema.ts)
+```
 
+認証情報がない場合は、ブラウザログインを開始する前に確認します：
+
+```text
+? No NotCMS credentials found. Log in via browser to set them up now? (Y/n)
 ```
-? Schema file path: ./src/notcms/schema.ts
+
+ブラウザにはデバイスコードとワークスペース選択が表示されます。認証後に
+返された認証情報は、そのまま自動スキーマ取得に利用されます。
+
+`init`は、`notcms`が`dependencies`または`devDependencies`に直接宣言され、
+対象プロジェクトから解決できる場合だけセットアップ済みと判断します。直接宣言済みでも
+未インストールの場合は、ローカル・workspace・固定バージョンなど既存の依存指定を
+維持するため、package managerの通常のinstallコマンドを提案します：
+
+```text
+pnpm install
+npm install
+yarn install
+bun install
 ```
+
+直接宣言されていない場合は、対応するaddコマンドを提案します：
+
+```text
+pnpm add notcms
+npm install notcms
+yarn add notcms
+bun add notcms
+```
+
+実行前に正確なコマンドを表示し、デフォルトyesで確認します。POSIX環境ではshell
+modeを無効にしてpackage managerを直接実行します。Windowsではpackage managerの
+`.cmd` shimを起動するため、固定された検証済み引数だけを`cmd.exe`へ渡し、
+プロジェクト由来の文字列をコマンドへ展開しません。拒否、インストール失敗、
+非対話セッションの場合もスキーマ生成を続け、最後に手動インストールコマンドを
+表示します。
+
+package managerは、有効な`packageManager`フィールド、最も近いlockfile、または
+起動元package managerから選択します。明示されたフィールドが無効な場合や、最も近い
+場所に競合するlockfileがあり起動元からも判定できない場合は、自動実行しません。
+スキーマ生成は完了させたうえで、package manager設定を手動で解決する方法を表示します。
 
 ## 例
 
 ### 基本的な初期化
 
 ```bash
-npx notcms-kit init
+npx notcms init
 ```
 
-### 環境ファイルパスの指定
-
-すでに`.env`が設定されている場合に使用：
+### 独自の環境ファイルから認証情報を読み込む
 
 ```bash
-npx notcms-kit init --env .env.development
+npx notcms --env .env.development init
 ```
-
-## トラブルシューティング
 
 ## 次のステップ
 
-初期化後、以下を実行できます：
+生成されたスキーマファイルから`nc`クライアントをimportし、コマンドが表示した
+クエリを実行します。Notionデータベースの構造を変更した後は、次のコマンドで
+更新できます：
 
-1. コード内でNotCMSクライアントの使用を開始
-2. `npx notcms-kit pull`を実行してスキーマを更新
+```bash
+npx notcms pull
+```
