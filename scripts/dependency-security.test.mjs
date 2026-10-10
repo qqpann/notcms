@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import {
   copyFile,
   mkdir,
@@ -15,30 +14,11 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { runCommand } from "./staged-publish.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const rootRequire = createRequire(new URL("../package.json", import.meta.url));
 const changesetCli = rootRequire.resolve("@changesets/cli/bin.js");
-
-function run(command, args, cwd) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd,
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    let output = "";
-    child.stdout.on("data", (chunk) => {
-      output += chunk;
-    });
-    child.stderr.on("data", (chunk) => {
-      output += chunk;
-    });
-    child.on("error", reject);
-    child.on("close", (code) =>
-      code === 0 ? resolve(output) : reject(new Error(output))
-    );
-  });
-}
 
 for (const consumer of [
   "packages/notcms",
@@ -120,7 +100,12 @@ test("Changesets generates the staged SDK patch without altering the checkout", 
       path.join(root, ".changeset/secure-cli-dependencies.md"),
       path.join(fixture, ".changeset/secure-cli-dependencies.md")
     );
-    await run(process.execPath, [changesetCli, "version"], fixture);
+    const result = await runCommand(
+      process.execPath,
+      [changesetCli, "version"],
+      { cwd: fixture }
+    );
+    assert.equal(result.exitCode, 0, `${result.stdout}\n${result.stderr}`);
     const original = JSON.parse(
       await readFile(path.join(root, "packages/notcms/package.json"), "utf8")
     );
