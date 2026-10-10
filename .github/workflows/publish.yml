@@ -70,6 +70,9 @@ jobs:
       - name: Build package for staging
         if: steps.stage-decision.outputs.should_stage == 'true'
         run: pnpm --filter notcms build
+      - name: Test package before staging
+        if: steps.stage-decision.outputs.should_stage == 'true'
+        run: pnpm --filter notcms test --run
       - name: Verify package contents before staging
         if: steps.stage-decision.outputs.should_stage == 'true'
         run: node scripts/staged-publish.mjs verify-pack

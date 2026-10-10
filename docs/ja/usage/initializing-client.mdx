@@ -13,7 +13,7 @@ import { schema } from './notcms/schema';
 
 const nc = new Client({
   schema,
-  apiKey: process.env.NOTCMS_SECRET_KEY,
+  secretKey: process.env.NOTCMS_SECRET_KEY,
   workspaceId: process.env.NOTCMS_WORKSPACE_ID
 });
 ```
@@ -22,7 +22,7 @@ const nc = new Client({
 
 クライアントを初期化する前に、以下を確認してください：
 
-1. **スキーマの生成** - 初回は `npx notcms-kit init` を実行、更新は `npx notcms-kit pull` を実行
+1. **スキーマの生成** - `npx notcms init` で最初のスキーマを生成し、`npx notcms pull` で更新
 2. **環境変数** - API認証情報の設定
 3. **NotCMSのインストール** - プロジェクトの依存関係に `notcms` を追加
 
@@ -55,13 +55,9 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
   </Tab>
   
   <Tab title="Vite">
-    ```typescript
-    const nc = new Client({
-      schema,
-      apiKey: import.meta.env.VITE_NOTCMS_SECRET_KEY,
-      workspaceId: import.meta.env.VITE_NOTCMS_WORKSPACE_ID
-    });
-    ```
+    NotCMSクライアントはサーバーのエンドポイントまたはサーバーサイドレンダリングで使用します。
+    `VITE_` で始まる変数はブラウザへ公開されるため、`NOTCMS_SECRET_KEY` を `VITE_` 変数へ入れないでください。
+    サーバーランタイムでsecretを読み込み、そこで `Client` に渡します。
   </Tab>
 </Tabs>
 
@@ -77,7 +73,7 @@ import { schema } from '@/notcms/schema';
 // サーバー専用クライアント
 export const nc = new Client({
   schema,
-  apiKey: process.env.NOTCMS_SECRET_KEY!,
+  secretKey: process.env.NOTCMS_SECRET_KEY!,
   workspaceId: process.env.NOTCMS_WORKSPACE_ID!
 });
 ```
@@ -92,7 +88,7 @@ import { schema } from '~/notcms/schema';
 // .server.ts拡張子でサーバー専用を明示
 export const nc = new Client({
   schema,
-  apiKey: process.env.NOTCMS_SECRET_KEY!,
+  secretKey: process.env.NOTCMS_SECRET_KEY!,
   workspaceId: process.env.NOTCMS_WORKSPACE_ID!
 });
 ```
@@ -110,7 +106,7 @@ import {
 
 export const nc = new Client({
   schema,
-  apiKey: NOTCMS_SECRET_KEY,
+  secretKey: NOTCMS_SECRET_KEY,
   workspaceId: NOTCMS_WORKSPACE_ID
 });
 ```
@@ -133,14 +129,14 @@ export const nc = new Client({
   </Accordion>
   
   <Accordion title="スキーマが見つからない">
-    - `npx notcms-kit pull` を実行してスキーマを生成
+    - `npx notcms pull` を実行してスキーマを生成
     - インポートパスが正しいことを確認
     - スキーマファイルが正しくエクスポートされていることを確認
   </Accordion>
   
   <Accordion title="TypeScriptエラー">
     - NotCMSを最新バージョンに更新
-    - `npx notcms-kit pull` でスキーマを再生成
+    - `npx notcms pull` でスキーマを再生成
     - TypeScriptバージョンの互換性を確認
   </Accordion>
 </AccordionGroup>

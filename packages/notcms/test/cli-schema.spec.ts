@@ -1,4 +1,4 @@
-import { fetchSchema } from "../src/cli/features/schema";
+import { fetchSchema, fetchSchemaResponse } from "../src/cli/features/schema";
 import { PROPERTY_TYPES } from "../src/types";
 
 describe("fetchSchema", () => {
@@ -43,6 +43,73 @@ describe("fetchSchema", () => {
           Authorization: "Bearer sk_test",
         },
       }
+    );
+  });
+
+  it("uses an API host loaded after the schema module was imported", async () => {
+    stubCredentials();
+    vi.stubEnv("NOTCMS_API_HOST", "http://127.0.0.1:12345/v1");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ schema: {} }), { status: 200 })
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await fetchSchema();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://127.0.0.1:12345/v1/ws/ws_test/schema",
+      expect.any(Object)
+    );
+  });
+
+  it("returns the server-selected onboarding database metadata", async () => {
+    stubCredentials();
+    const schema = {
+      Blog: { id: "db_1", properties: { slug: "rich_text" } },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(
+            JSON.stringify({ onboardingDatabaseName: "Blog", schema }),
+            { status: 200 }
+          )
+        )
+    );
+
+    await expect(fetchSchemaResponse()).resolves.toEqual({
+      onboardingDatabaseName: "Blog",
+      schema,
+    });
+  });
+
+  it("uses explicitly supplied credentials when the environment is empty", async () => {
+    vi.stubEnv("NOTCMS_SECRET_KEY", undefined);
+    vi.stubEnv("NOTCMS_WORKSPACE_ID", undefined);
+    const schema = {
+      blog: { id: "db_1", properties: { slug: "rich_text" } },
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ schema }), { status: 200 })
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      fetchSchema({ secretKey: "ncsec_login", workspaceId: "ws_login" })
+    ).resolves.toEqual(schema);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.notcms.com/v1/ws/ws_login/schema",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer ncsec_login",
+        }),
+      })
     );
   });
 

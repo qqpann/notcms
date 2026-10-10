@@ -294,3 +294,74 @@ test("does not stage after an authentication or network lookup failure", async (
     );
   }
 });
+
+test("rejects legacy tokens before any registry request", async () => {
+  for (const key of ["NPM_TOKEN", "NODE_AUTH_TOKEN"]) {
+    let called = false;
+    await assert.rejects(
+      stagePackage({
+        env: { [key]: "fixture-token" },
+        run: async () => {
+          called = true;
+          throw new Error("must not run");
+        },
+      }),
+      /Refusing to stage/
+    );
+    assert.equal(called, false);
+  }
+});
+
+test("fails after a rejected stage without approving or falling back to publish", async () => {
+  for (const [output, category] of [
+    ["E409 version already staged", "duplicate-version"],
+    ["E404 Not Found", "registry-not-found"],
+    ["E403 trusted publisher is not authorized", "authentication"],
+    ["ETIMEDOUT socket hang up", "network"],
+    ["unexpected failure", "unknown"],
+  ]) {
+    const calls = [];
+    const run = async (command, args) => {
+      calls.push([command, ...args]);
+      return args[0] === "view"
+        ? { exitCode: 1, stdout: "", stderr: "npm error code E404" }
+        : { exitCode: 1, stdout: "", stderr: output };
+    };
+    await assert.rejects(
+      stagePackage({
+        env: {},
+        packageJson: { name: "notcms", version: "0.3.0" },
+        run,
+      }),
+      { message: new RegExp(`^${category}:`) }
+    );
+    assert.deepEqual(calls, [
+      ["npm", "view", "notcms@0.3.0", "version", "--json"],
+      ["npm", "stage", "publish", "--ignore-scripts"],
+    ]);
+  }
+});
+
+test("redacts npm authentication data in stage failure messages", async () => {
+  const token = "npm_fixture_token_12345";
+  const run = async (_command, args) =>
+    args[0] === "view"
+      ? { exitCode: 1, stdout: "", stderr: "npm error code E404" }
+      : {
+          exitCode: 1,
+          stdout: "",
+          stderr: `E403 authToken=${token} Bearer ${token}`,
+        };
+  await assert.rejects(
+    stagePackage({
+      env: {},
+      packageJson: { name: "notcms", version: "0.3.0" },
+      run,
+    }),
+    (error) => {
+      assert.ok(!error.message.includes(token));
+      assert.match(error.message, /\[REDACTED\]/);
+      return true;
+    }
+  );
+});
