@@ -42,9 +42,9 @@ npx notcms pull
 
 旧 CLI・SDK を使っている場合は[移行ガイド](/ja/cli-commands/migration)を先に確認します。
 CLI は `schema` と `nc` を含む `src/notcms/schema.ts` を生成します。
-[`content.ts`](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/content.ts) をその隣の `src/notcms/content.ts` へコピーしてください。
+[`content.ts`](https://github.com/qqpann/notcms/blob/main/examples/content-recipes/content.ts) をその隣の `src/notcms/content.ts` へコピーしてください。
 型は `schema.blog.properties` / `schema.releases.properties` から推論します。
-キーが異なる場合は型と selector を変更します。[サンプルスキーマ](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/schema.ts) の
+キーが異なる場合は型と selector を変更します。[サンプルスキーマ](https://github.com/qqpann/notcms/blob/main/examples/content-recipes/schema.ts) の
 仮 ID は実環境へコピーせず、必ず自身のスキーマを pull します。pull 後にアプリの型検査を行います。
 
 reader をサーバー側で作ります。`NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` は
