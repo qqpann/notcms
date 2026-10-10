@@ -1,0 +1,9 @@
+# Sync Action releases
+
+`Sync Action Release` runs after every push to `main`, or a manual run on `main`. Preparation and publication runs test and build the Action; unchanged runs and alias-only repairs skip these steps. It prepares `release/sync-action` with the patch version and rebuilt `sync-action/dist`, then opens or updates a release PR in this repository with a short English title and body. This maintainer workflow does not create content-sync PRs in repositories using the Sync Action; those are handled by `sync-action/src/git.ts`. The branch is reserved for the workflow; do not add manual edits to it. Repository settings must allow GitHub Actions to create pull requests.
+
+Review and merge that PR normally. On its merge, a reproducible build creates the immutable `sync-action@X.Y.Z` tag and updates `vX` atomically at the reviewed main commit. The workflow never commits or pushes to main and does not merge PRs. Repeated runs with unchanged release inputs do nothing, except repairing a missing or outdated major alias at the original version-tag commit. Each run publishes its reviewed trigger commit; main may advance while the run executes. Downgrades and overwriting an existing version tag are rejected, and the major alias uses a lease to prevent overwriting a concurrent update.
+
+PRs created with `GITHUB_TOKEN` do not automatically trigger other workflows. The preparation run tests the release script and Action, typechecks it, and builds dist. If the repository requires PR checks, a maintainer must close and reopen the generated PR to trigger those checks before merging. Failures are retained as failures; release summaries appear only after tags are successfully pushed.
+
+Local validation: `pnpm test:sync-release`, `pnpm --filter notcms-sync-action test`, `pnpm --filter notcms-sync-action typecheck`, `pnpm --filter notcms-sync-action build`.
