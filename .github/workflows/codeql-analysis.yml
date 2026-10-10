@@ -11,6 +11,7 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [main]
+  workflow_dispatch:
   schedule:
     - cron: "36 7 * * 6"
 
@@ -29,12 +30,12 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
