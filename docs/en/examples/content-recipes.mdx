@@ -46,10 +46,10 @@ npx notcms pull
 
 If upgrading an old CLI or SDK, follow the [migration guide](/en/cli-commands/migration).
 The CLI writes `src/notcms/schema.ts`, including `schema` and `nc`.
-Copy [`content.ts`](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/content.ts) to `src/notcms/content.ts` next to
+Copy [`content.ts`](https://github.com/qqpann/notcms/blob/main/examples/content-recipes/content.ts) to `src/notcms/content.ts` next to
 that generated file. Its types derive from `schema.blog.properties` and
 `schema.releases.properties`; update them if your keys differ. See the
-[sample schema](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/schema.ts) for reference, but do not copy its fake IDs
+[sample schema](https://github.com/qqpann/notcms/blob/main/examples/content-recipes/schema.ts) for reference, but do not copy its fake IDs
 into a live app. Run your application's typecheck after each schema pull.
 
 Wrap the reader on the server. Keep `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID`
