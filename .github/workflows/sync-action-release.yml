@@ -77,7 +77,7 @@ jobs:
           | N/A (Action release artifacts only) | N/A (Action release artifacts only) |
 
           ### Pull-Request Checklist
-          - [x] Code is up-to-date with the `main` branch
+          - [ ] Code is up-to-date with the `main` branch — N/A (prepared from the triggering main commit; main may advance)
           - [ ] `pnpm check` passes with this change — N/A (generated release artifacts)
           - [ ] `pnpm test` passes with this change — N/A (no root test script; scoped tests passed)
           - [ ] This pull request links relevant issues as `Fixes #0000` — N/A (no issue)
@@ -98,7 +98,7 @@ jobs:
           | なし（Action のリリース成果物のみ） | なし（Action のリリース成果物のみ） |
 
           ### PR チェックリスト
-          - [x] コードが `main` ブランチの最新状態を取り込んでいる
+          - [ ] コードが `main` ブランチの最新状態を取り込んでいる — なし（起動元 main コミットを基点とし、その後 main が進む場合があります）
           - [ ] この変更に対する `pnpm check` が成功する — なし（生成されたリリース成果物）
           - [ ] この変更に対する `pnpm test` が成功する — なし（ルートに test スクリプトなし、対象テストは成功）
           - [ ] 関連 Issue を `Fixes #0000` としてリンクしている — なし（Issue なし）
