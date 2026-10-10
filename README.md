@@ -1,7 +1,7 @@
 <div align="center">
   <a href="https://notcms.com">
     <picture>
-      <img alt="NotCMS logo" src="/docs/assets/notcms-icon.png" height="128">
+      <img alt="NotCMS logo" src="./docs/assets/notcms-icon.png" height="128">
     </picture>
   </a>
   <h1>NotCMS</h1>
@@ -27,6 +27,8 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 [![DeepWiki][deepwiki-img]][deepwiki-url]
 
 </div>
+
+[English](README.md) | [日本語](README.ja.md)
 
 ## Key Features
 
@@ -174,7 +176,7 @@ This project is organized as a monorepo with multiple packages:
 
 - `packages/notcms`: [MIT License](packages/notcms/LICENSE)
 - `packages/notcms-kit` (deprecated): [MIT License](packages/notcms-kit/LICENSE)
-- `examples/`: [MIT License](examples/LICENSE)
+- `examples/nextjs-simple-blog-template`: [MIT License](examples/nextjs-simple-blog-template/LICENSE)
 
 See individual directories for specific license details.
 
