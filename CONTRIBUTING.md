@@ -29,7 +29,7 @@ pnpm check
 
 This project uses [Changesets](https://github.com/changesets/changesets) for version management and changelog generation.
 
-**All pull requests must include a changeset.**
+**Changes to the published SDK or bundled CLI must include a changeset.** Workflow-only, documentation-only and private Action changes use their own validation/release process. Contributor tooling uses Node 24 and pnpm 11. See [dependency security](./docs/dependency-security.md).
 
 ### How to add a changeset
 
@@ -61,4 +61,4 @@ When changes with changesets are merged to `main`:
 
 1. A "Version Packages" PR is automatically created
 2. This PR updates versions and CHANGELOGs
-3. When merged, packages are automatically published to npm
+3. After merge, packages are staged; an owner must approve npm publication as described in [staged publishing](./docs/npm-staged-publishing.md).

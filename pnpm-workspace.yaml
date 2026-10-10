@@ -11,3 +11,9 @@ allowBuilds:
   'sharp@0.34.5': true
 minimumReleaseAgeExclude:
   - postcss@8.5.17
+
+# Tailwind 3 and postcss-nested retain the same selector-parser API with the fixed v7 line.
+overrides:
+  postcss-selector-parser: 7.1.6
+  # external-editor uses the compatible tmpNameSync API; 0.0.33 cannot receive fixes.
+  tmp: 0.2.7

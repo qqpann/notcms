@@ -16,9 +16,7 @@
   "bin": {
     "notcms": "./dist/cli.cjs"
   },
-  "files": [
-    "dist/**/*"
-  ],
+  "files": ["dist/**/*"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -67,7 +65,6 @@
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "dedent": "^1.5.3",
-    "ts-node": "^10.9.2",
     "tsup": "^8.0.0",
     "typescript": "^5.5.4",
     "vitest": "^5.0.3"
