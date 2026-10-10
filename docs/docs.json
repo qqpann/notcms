@@ -61,11 +61,19 @@
           },
           {
             "group": "CLI Commands",
-            "pages": ["en/cli-commands/init", "en/cli-commands/pull"]
+            "pages": [
+              "en/cli-commands/init",
+              "en/cli-commands/pull",
+              "en/cli-commands/migration"
+            ]
           },
           {
             "group": "Examples",
-            "pages": ["en/examples/nextjs", "en/examples/blog-releases"]
+            "pages": [
+              "en/examples/nextjs",
+              "en/examples/blog-releases",
+              "en/examples/content-recipes"
+            ]
           }
         ]
       },
@@ -86,11 +94,19 @@
           },
           {
             "group": "CLI Commands",
-            "pages": ["ja/cli-commands/init", "ja/cli-commands/pull"]
+            "pages": [
+              "ja/cli-commands/init",
+              "ja/cli-commands/pull",
+              "ja/cli-commands/migration"
+            ]
           },
           {
             "group": "Examples",
-            "pages": ["ja/examples/nextjs", "ja/examples/blog-releases"]
+            "pages": [
+              "ja/examples/nextjs",
+              "ja/examples/blog-releases",
+              "ja/examples/content-recipes"
+            ]
           }
         ]
       }

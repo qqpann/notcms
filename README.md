@@ -114,9 +114,30 @@ if (error) {
 }
 ```
 
+### Upgrade from the legacy CLI or SDK
+
+The SDK and CLI now ship together in `notcms`. Update old dependency specs
+explicitly: `init` preserves an existing SDK version rather than upgrading it.
+
+```bash
+npm uninstall notcms-kit # Only if it is a project dependency
+npm install notcms@latest
+npx notcms pull
+npx notcms pull --check
+```
+
+Keep `notcms.config.json` and your server-side credentials. Replace old
+`notcms-kit init` / `notcms-kit pull` scripts with `notcms init` / `notcms pull`.
+Regenerate the schema and typecheck your application before deploying an upgrade;
+this is especially necessary for prerelease SDKs such as `0.0.12-development`.
+See the [migration checklist](docs/en/cli-commands/migration.mdx) for package-manager equivalents,
+CI usage, and compatibility checks.
+
 ## Examples and Templates
 
 Check out these examples to get started quickly:
+
+- [Publication, language and stable URL recipes](examples/content-recipes/README.md) for blogs and release notes
 
 - 📚 [Next.js Simple Blog Template](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
 - 🎨 [More templates available on our website](https://notcms.com/templates)

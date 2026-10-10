@@ -9,7 +9,7 @@ export const PACKAGE_JSON_PATH = "packages/notcms/package.json";
 export const CHANGELOG_PATH = "packages/notcms/CHANGELOG.md";
 export const PACKAGE_DIR = join(ROOT_DIR, "packages/notcms");
 const VERSION_PATTERN =
-  /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
 const MIN_NODE_VERSION = [22, 14, 0];
 const MIN_NPM_VERSION = [11, 15, 0];
 
@@ -272,8 +272,27 @@ export function decideStage({
   ) {
     throw new TypeError("package versions must be valid semver values");
   }
-  if (previousVersion === currentVersion) {
+  const previous = previousVersion.match(VERSION_PATTERN);
+  const current = currentVersion.match(VERSION_PATTERN);
+  // This main-branch workflow stages stable releases with npm's default tag.
+  // Prereleases need an explicit release channel rather than this workflow.
+  if (current[4]) {
+    return { shouldStage: false, reason: "prerelease-not-supported" };
+  }
+  let precedence = previous[4] ? 1 : 0;
+  for (let index = 1; index <= 3; index += 1) {
+    const before = BigInt(previous[index]);
+    const after = BigInt(current[index]);
+    if (before !== after) {
+      precedence = after > before ? 1 : -1;
+      break;
+    }
+  }
+  if (precedence === 0) {
     return { shouldStage: false, reason: "no-version-change" };
+  }
+  if (precedence < 0) {
+    return { shouldStage: false, reason: "version-not-increased" };
   }
 
   const files = new Set(changedFiles);

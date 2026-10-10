@@ -122,3 +122,4 @@ dist/
 # examples
 examples/*
 !examples/nextjs-simple-blog-template
+!examples/content-recipes

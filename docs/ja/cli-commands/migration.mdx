@@ -1,0 +1,73 @@
+---
+title: CLI・SDK の移行
+description: notcms-kit と旧 SDK から、CLI を同梱した notcms へ移行
+---
+
+現在の `notcms` パッケージは SDK と CLI の両方を含みます。npm では
+`npx notcms`、pnpm では `pnpm exec notcms` でインストール済みの CLI を使うと、
+スキーマ生成とアプリの import に同じパッケージのバージョンを使えます。
+
+## 既存プロジェクトを更新する
+
+1. 設定・生成スキーマ・lockfile をローカルでコミットまたはバックアップします。
+2. `notcms-kit` が直接依存なら削除し、`notcms` を更新します。
+
+```bash
+# npm
+npm uninstall notcms-kit
+npm install notcms@latest
+
+# pnpm の場合
+pnpm remove notcms-kit
+pnpm add notcms@latest
+```
+
+`@latest` はレジストリの最新リリースを選びます。バージョンを固定するチームは、
+利用する対象バージョンを明示してください。`init` は既存の依存指定を維持するため、
+実行するだけでは `notcms@0.0.12-development` などの旧 SDK は更新されません。
+
+3. `notcms.config.json` と `NOTCMS_SECRET_KEY` / `NOTCMS_WORKSPACE_ID` は維持します。
+   移行のために `init` を再実行する必要はありません。既存設定で再取得します。
+
+```bash
+npx notcms pull
+# pnpm: pnpm exec notcms pull
+```
+
+4. scripts の `notcms-kit init` を `notcms init`、`notcms-kit pull` を
+   `notcms pull` に置き換えます。独立した CLI パッケージの追加は不要です。
+5. 生成差分を確認し、アプリの型検査とテストを実行します。DB・プロパティ名は
+   生成されたキーを使い、空白を含む名前にはブラケット記法を使います。
+   公開 DB ID に `nids_` prefix が付く場合も生成値をそのまま使い、prefix を
+   削除したり Notion ページ ID に置き換えたりしません。
+   クライアントの `list()` と `get(pageId)` は引き続き利用できます。
+6. SDK の error tuple を確認します。取得障害を空一覧やページ未検出へ変換しません。
+
+```typescript
+import { nc } from "./src/notcms/schema";
+
+const [posts, error] = await nc.query.blog.list();
+if (error) throw error;
+// error 確認後に posts を利用
+```
+
+すべての過去の prerelease との互換性は保証しません。再生成した型に合わせて
+アプリの型エラーを解消し、実際の一覧・詳細取得を検証してからデプロイします。
+
+## 新規導入と CI
+
+新規プロジェクトでは `npm install notcms`、`npx notcms init` の順で実行します。
+初回 pull の前に Dashboard で DB を接続・同期してください。`init` は設定、
+必要時のブラウザ認証、依存関係の準備、初回 pull を扱います。
+認証情報はサーバーにだけ配置し、Git 管理へ含めません。
+
+CI では lockfile に従って依存を準備し、認証情報を secrets として渡して実行します。
+
+```bash
+npx notcms pull --check
+# pnpm: pnpm exec notcms pull --check
+```
+
+このコマンドは対話もスキーマへの書き込みもせず、ファイルが未生成または
+生成結果と異なる場合は終了コード1を返します。比較はバイト単位のため整形だけでも
+失敗し得ます。ローカルで `pull` を実行し、出力をレビュー・コミットしてください。

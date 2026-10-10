@@ -365,3 +365,45 @@ test("redacts npm authentication data in stage failure messages", async () => {
     }
   );
 });
+
+test("rejects downgrades, build-only changes and prereleases in the stable workflow", () => {
+  const decide = (previousVersion, currentVersion) =>
+    decideStage({
+      hasChangesets: false,
+      previousVersion,
+      currentVersion,
+      changedFiles: [PACKAGE_JSON_PATH, CHANGELOG_PATH],
+    });
+  for (const [before, after] of [
+    ["1.0.0", "0.99.0"],
+    ["0.3.0", "0.2.9"],
+    ["0.3.2", "0.3.1"],
+  ]) {
+    assert.deepEqual(decide(before, after), {
+      shouldStage: false,
+      reason: "version-not-increased",
+    });
+  }
+  assert.deepEqual(decide("0.3.0+first", "0.3.0+second"), {
+    shouldStage: false,
+    reason: "no-version-change",
+  });
+  for (const after of ["0.3.0-rc.1", "0.4.0-rc.1"]) {
+    assert.deepEqual(decide("0.3.0", after), {
+      shouldStage: false,
+      reason: "prerelease-not-supported",
+    });
+  }
+  assert.deepEqual(decide("0.3.0-rc.1", "0.3.0"), {
+    shouldStage: true,
+    reason: "version-changed",
+  });
+  assert.deepEqual(decide("0.3.0", "0.3.10"), {
+    shouldStage: true,
+    reason: "version-changed",
+  });
+  for (const invalid of ["01.3.0", "0.3.0-01", "0.3.0-rc..1", "0.3.0+"]) {
+    assert.throws(() => decide(invalid, "0.4.0"), /valid semver/);
+    assert.throws(() => decide("0.3.0", invalid), /valid semver/);
+  }
+});

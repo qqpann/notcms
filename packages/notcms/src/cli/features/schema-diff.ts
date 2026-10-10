@@ -55,6 +55,10 @@ export async function readGeneratedSchema(
     return null;
   }
 
+  return parseGeneratedSchema(content);
+}
+
+export function parseGeneratedSchema(content: string): Schema | null {
   const declarationStart = findSchemaDeclaration(content);
   if (declarationStart === null) {
     return null;
@@ -436,4 +440,25 @@ function quote(value: string): string {
     /[\u007f-\u009f\u2028\u2029]/gu,
     (character) => `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`
   );
+}
+
+export type SchemaSummary =
+  | { status: "compared"; changes: string[] }
+  | { status: "missing" }
+  | { status: "unavailable" };
+
+export function summarizeSchema(
+  existing: string | null,
+  schema: Schema
+): SchemaSummary {
+  if (existing === null) return { status: "missing" };
+  const previous = parseGeneratedSchema(existing);
+  if (previous === null) return { status: "unavailable" };
+  const changes = diffSchemas(previous, schema);
+  return {
+    status: "compared",
+    changes: changes.map((change) =>
+      formatSchemaChanges([change]).slice("Schema changes:\n".length)
+    ),
+  };
 }

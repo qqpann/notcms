@@ -1,0 +1,158 @@
+---
+title: Blog and release-note recipes
+description: Combine publication, language, stable URLs and error handling with the typed SDK
+---
+
+## 1. Choose a schema and publication policy
+
+| Database | Notion property | Sample policy |
+| --- | --- | --- |
+| `blog` | `title` (title), `published` (checkbox), `published_at` (date), `language` (select) | Checkbox must be true AND a valid date must be at or before now |
+| `releases` | `title` (title), `released_at` (date), `language` (select), `products` (multi_select), `version_number` (rich_text) | Valid release date must be at or before now |
+
+Use the database keys and property names above to reproduce the example. These
+are application choices, not fixed NotCMS behavior. `list()` returns all synced
+pages; filtering happens on the server in this example. This is presentation
+filtering, not an API access-control mechanism: credentials can read drafts, so
+keep them on the server and keep private material out of any publicly exposed DB.
+Dates with a time use their timezone; date-only values use UTC midnight here.
+For a local publication timezone, adapt the date comparison explicitly.
+
+- `language` uses the exact values `ja` and `en`; null/empty belongs to Japanese.
+  Unsupported language values are excluded. An absent translation produces an
+  empty list or 404, without silently showing Japanese on the English route.
+- Missing/invalid dates and future dates are excluded. Blogs also need the
+  checkbox. Releases do not require a version or product value.
+- Lists sort by publication date descending; IDs break ties. The input is not
+  mutated. The same policy is checked for detail access, including a second
+  check after the latest detail properties arrive.
+- URLs are `/{locale}/blog/{encoded ID}` or `/{locale}/releases/{encoded ID}`.
+  There is no slug requirement or version-based key: missing versions and the
+  same version in different products stay distinct. If your app chooses slugs,
+  define uniqueness, fallback, and redirect policy first; SDK `get()` accepts a
+  page ID, not a slug. Do not put unvalidated slugs directly into a path.
+
+## 2. Generate types and copy the tested reader
+
+Connect both databases in Dashboard and complete a sync. Then run in your
+Next.js App Router project:
+
+```bash
+npm install notcms server-only
+npx notcms init
+# After changing Notion properties, sync in Dashboard then run:
+npx notcms pull
+```
+
+If upgrading an old CLI or SDK, follow the [migration guide](/en/cli-commands/migration).
+The CLI writes `src/notcms/schema.ts`, including `schema` and `nc`.
+Copy [`content.ts`](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/content.ts) to `src/notcms/content.ts` next to
+that generated file. Its types derive from `schema.blog.properties` and
+`schema.releases.properties`; update them if your keys differ. See the
+[sample schema](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/schema.ts) for reference, but do not copy its fake IDs
+into a live app. Run your application's typecheck after each schema pull.
+
+Wrap the reader on the server. Keep `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID`
+in `.env.local` and your deployment secrets, never `NEXT_PUBLIC_*` or client code.
+The framework-independent reader is covered by SDK tests using fake responses.
+
+```typescript
+// src/notcms/reader.ts (server only)
+import "server-only";
+import { nc } from "./schema";
+import { createContentReader } from "./content";
+
+export const content = createContentReader(nc);
+```
+
+## 3. List and generate URLs (Next.js 16 App Router)
+
+These routes assume the standard `@/*` alias to `src/*` and the default cache
+configuration. Awaiting `connection()` makes the page depend on a real request.
+The example labels are placeholders: use your application's translation messages.
+
+```tsx
+// app/[locale]/releases/page.tsx
+import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { content } from "@/notcms/reader";
+import { contentUrl } from "@/notcms/content";
+
+export default async function ReleasesPage({ params }: {
+  params: Promise<{ locale: string }>;
+}) {
+  await connection();
+  const { locale } = await params;
+  if (locale !== "ja" && locale !== "en") notFound();
+  const releases = await content.listReleases(locale);
+  return (
+    <main>
+      <h1>{locale === "ja" ? "リリースノート" : "Release notes"}</h1>
+      {releases.length === 0 ? (
+        <p>{locale === "ja" ? "この言語のリリースはありません。" : "No releases in this language."}</p>
+      ) : (
+        <ul>{releases.map((release) => (
+          <li key={release.id}>
+            <a href={contentUrl("releases", locale, release.id)}>{release.title}</a>
+          </li>
+        ))}</ul>
+      )}
+    </main>
+  );
+}
+```
+
+For blogs, use `content.listBlog(locale)` and `contentUrl("blog", locale, post.id)`
+in `app/[locale]/blog/page.tsx`. Empty results are a successful query with no
+published records in that language. Do not use `posts ?? []` on failed requests.
+
+## 4. Fetch detail with the same publication rules
+
+```tsx
+// app/[locale]/releases/[id]/page.tsx
+import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { content } from "@/notcms/reader";
+
+export default async function ReleasePage({ params }: {
+  params: Promise<{ locale: string; id: string }>;
+}) {
+  await connection();
+  const { locale, id } = await params;
+  if (locale !== "ja" && locale !== "en") notFound();
+  const release = await content.getRelease(id, locale);
+  if (release === null) notFound();
+  return <article><h1>{release.title}</h1><pre>{release.content}</pre></article>;
+}
+```
+
+For blog detail, use `content.getBlog(id, locale)` in
+`app/[locale]/blog/[id]/page.tsx`. Params are already decoded by Next.js;
+do not decode them a second time. The example shows Markdown as escaped plain
+text. Add your chosen Markdown renderer and sanitize any HTML before display.
+
+## Failure, caching and policy changes
+
+The reader returns null only after a successful query establishes that the page
+is absent or excluded by the policy. Network, 401/403, 429 and upstream 5xx
+errors are thrown; an error during detail retrieval also propagates, even if the
+list succeeded. Next.js can display these through an `error.tsx` boundary instead
+of recording a successful empty list or 404. Do not catch these errors and return
+`[]` or call `notFound()`.
+
+This recipe uses request-time rendering without an application cache. The API
+can still have a short cache window. If adding ISR or build-time generation,
+fail the build/revalidation on CMS errors, define how long stale published data
+may remain visible, and schedule updates for future publication dates. Static
+sites need a rebuild after new publication times. Invalidate list and detail
+caches together when withdrawing or changing language. Display filtering alone
+cannot guarantee immediate removal from already-built or cached public pages.
+
+Change `selectBlogPosts`, `selectReleases`, `matchesLanguage`, and `contentUrl`
+for your own schema and policy. A version/product field is display data in this
+recipe, never the route identity. To preview drafts, build a separate authenticated
+server route rather than relaxing public list/detail checks.
+
+References checked on 2026-10-11: [dynamic route params](https://nextjs.org/docs/app/api-reference/file-conventions/dynamic-routes),
+[connection](https://nextjs.org/docs/app/api-reference/functions/connection),
+[error handling](https://nextjs.org/docs/app/getting-started/error-handling).

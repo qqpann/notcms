@@ -81,7 +81,7 @@ Import the generated client and start querying your content:
 ```typescript
 import { nc } from './notcms/schema';
 
-// Fetch all published blog posts
+// Fetch all blog posts; apply your publication policy before displaying them
 const [posts, error] = await nc.query.blog.list();
 
 if (error) {
@@ -125,3 +125,5 @@ if (error) {
     Run `npx notcms pull` again to regenerate the schema if you've made changes to your Notion databases.
   </Accordion>
 </AccordionGroup>
+
+[Legacy CLI/SDK migration](/en/cli-commands/migration) · [Blog/release-note recipes](/en/examples/content-recipes)
