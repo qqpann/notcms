@@ -55,6 +55,14 @@ describe("safe YAML frontmatter", () => {
   ])("rejects malformed or non-mapping frontmatter %s", (input) =>
     expect(() => parseMarkdown(input)).toThrow()
   );
+  it.each(["2026-10-11", "null", "~", "!!set {a, b}", "!!binary SGVsbG8="])(
+    "rejects non-mapping YAML values %s",
+    (yaml) => {
+      expect(() => parseMarkdown(`---\n${yaml}\n---\nbody`)).toThrow(
+        "YAML frontmatter must be a mapping"
+      );
+    }
+  );
   it("does not evaluate JavaScript frontmatter", () => {
     const text = "---js\n{ notcms_id: process.exit(1) }\n---\nbody";
     expect(parseMarkdown(text)).toEqual({ data: {}, content: text });

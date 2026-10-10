@@ -1,7 +1,12 @@
 import { parseDocument, stringify } from "yaml";
 
 function isMapping(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (Object.getPrototypeOf(value) === Object.prototype ||
+      Object.getPrototypeOf(value) === null)
+  );
 }
 
 /** Parse only YAML frontmatter; never evaluate executable frontmatter engines. */
@@ -21,7 +26,7 @@ export function parseMarkdown(input: string): {
   });
   if (document.errors.length) throw new Error("Invalid YAML frontmatter");
   const data: unknown = document.toJS({ maxAliasCount: 100 });
-  if (data !== null && !isMapping(data)) {
+  if (!(document.contents === null && data === null) && !isMapping(data)) {
     throw new Error("YAML frontmatter must be a mapping");
   }
   return {

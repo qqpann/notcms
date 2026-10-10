@@ -32701,7 +32701,10 @@ exports.parseMarkdown = parseMarkdown;
 exports.stringifyMarkdown = stringifyMarkdown;
 const yaml_1 = __nccwpck_require__(8127);
 function isMapping(value) {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+    return (typeof value === "object" &&
+        value !== null &&
+        (Object.getPrototypeOf(value) === Object.prototype ||
+            Object.getPrototypeOf(value) === null));
 }
 /** Parse only YAML frontmatter; never evaluate executable frontmatter engines. */
 function parseMarkdown(input) {
@@ -32721,7 +32724,7 @@ function parseMarkdown(input) {
     if (document.errors.length)
         throw new Error("Invalid YAML frontmatter");
     const data = document.toJS({ maxAliasCount: 100 });
-    if (data !== null && !isMapping(data)) {
+    if (!(document.contents === null && data === null) && !isMapping(data)) {
         throw new Error("YAML frontmatter must be a mapping");
     }
     return {
