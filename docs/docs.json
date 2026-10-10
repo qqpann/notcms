@@ -65,7 +65,7 @@
           },
           {
             "group": "Examples",
-            "pages": ["en/examples/nextjs"]
+            "pages": ["en/examples/nextjs", "en/examples/blog-releases"]
           }
         ]
       },
@@ -90,7 +90,7 @@
           },
           {
             "group": "Examples",
-            "pages": ["ja/examples/nextjs"]
+            "pages": ["ja/examples/nextjs", "ja/examples/blog-releases"]
           }
         ]
       }

@@ -44,6 +44,8 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 npm install notcms
 ```
 
+The CLI is included in `notcms`; no separate CLI package is required. Replace deprecated `npx notcms-kit <command>` usage with `npx notcms <command>`.
+
 ### Usage
 
 #### 1. Initialize a Project
@@ -150,7 +152,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 This project is organized as a monorepo with multiple packages:
 
 - `packages/notcms`: [MIT License](packages/notcms/LICENSE)
-- `packages/notcms-kit`: [MIT License](packages/notcms-kit/LICENSE)
+- `packages/notcms-kit` (deprecated): [MIT License](packages/notcms-kit/LICENSE)
 - `examples/`: [MIT License](examples/LICENSE)
 
 See individual directories for specific license details.
