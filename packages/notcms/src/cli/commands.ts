@@ -7,7 +7,6 @@ import dedent from "dedent";
 import { dumpConfig } from "./features/config.js";
 import type { DependencySetupResult } from "./features/dependency.js";
 import type { PullSchemaOptions, PullSchemaResult } from "./features/pull.js";
-import { formatSchemaChanges } from "./features/schema-diff.js";
 import type { Config, Credentials } from "./types.js";
 
 type LoginResult = {
@@ -254,6 +253,22 @@ async function runPull(options: PullSchemaOptions = {}) {
 }
 
 function printPullResult(result: PullSchemaResult) {
+  if (result.status !== "up-to-date") {
+    const summary = result.summary;
+    if (summary.status === "compared") {
+      console.log(
+        summary.changes.length > 0
+          ? summary.changes.join("\n")
+          : "No schema changes detected."
+      );
+    } else if (summary.status === "missing") {
+      console.log("No previous schema file; this is the first pull.");
+    } else {
+      console.log(
+        "Schema change summary unavailable: the previous file is not a supported schema literal. Review the file diff."
+      );
+    }
+  }
   if (result.status === "stale") {
     const reason = result.reason === "missing" ? "missing" : "out of date";
     console.log(
@@ -289,7 +304,6 @@ function printPullResult(result: PullSchemaResult) {
     return;
   }
 
-  console.log(formatSchemaChanges(result.schemaChanges ?? null));
   console.log(
     boxen(
       dedent`

@@ -38,6 +38,7 @@ describe("pullSchema", () => {
 
     await expect(pullSchema({ credentials })).resolves.toEqual({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "schema.ts",
       firstDatabaseName: "Blog posts",
       schemaChanges: null,
@@ -81,6 +82,61 @@ export const nc = new Client({ schema });`);
     });
   });
 
+  it("compares the previous file and prints ID and database changes after saving", async () => {
+    stubSchema({ blog: { id: "old_id", properties: { title: "title" } } });
+    await writeConfig("schema.ts");
+    await pullSchema({ credentials });
+    stubSchema({
+      blog: { id: "nids_new_id", properties: { title: "title" } },
+      releases: { id: "release_id", properties: {} },
+    });
+    const { pull } = await import("../src/cli/commands");
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.stubEnv("NOTCMS_SECRET_KEY", credentials.secretKey);
+    vi.stubEnv("NOTCMS_WORKSPACE_ID", credentials.workspaceId);
+    try {
+      await pull();
+      const output = log.mock.calls.map(([value]) => String(value)).join("\n");
+      expect(output).toContain('Changed database ID: "blog"');
+      expect(output).toContain('"old_id" -> "nids_new_id"');
+      expect(output).toContain('Added database: "releases"');
+      expect(output).toContain("Schema pulled successfully");
+      expect(await fs.readFile(path.join(dir, "schema.ts"), "utf-8")).toContain(
+        "nids_new_id"
+      );
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  it("reports no semantic changes on a repeated pull", async () => {
+    stubSchema({ blog: { id: "db_blog", properties: { title: "title" } } });
+    await writeConfig("schema.ts");
+    await pullSchema({ credentials });
+    expect(await pullSchema({ credentials })).toMatchObject({
+      status: "written",
+      summary: { status: "compared", changes: [] },
+    });
+  });
+
+  it("includes changes in check mode without modifying the previous file", async () => {
+    stubSchema({ blog: { id: "old_id", properties: {} } });
+    await writeConfig("schema.ts");
+    await pullSchema({ credentials });
+    const previous = await fs.readFile(path.join(dir, "schema.ts"), "utf-8");
+    stubSchema({ blog: { id: "new_id", properties: {} } });
+    expect(await pullSchema({ check: true, credentials })).toMatchObject({
+      status: "stale",
+      summary: {
+        status: "compared",
+        changes: ['Changed database ID: "blog"\n  "old_id" -> "new_id"'],
+      },
+    });
+    expect(await fs.readFile(path.join(dir, "schema.ts"), "utf-8")).toBe(
+      previous
+    );
+  });
+
   it("uses the server-selected onboarding database for query guidance", async () => {
     const schema = {
       "Older Blog": { id: "db_old", properties: { Title: "title" } },
@@ -102,6 +158,7 @@ export const nc = new Client({ schema });`);
     await expect(pullSchema({ credentials })).resolves.toMatchObject({
       firstDatabaseName: "Blog",
       status: "written",
+      summary: { status: "missing" },
     });
   });
 
@@ -125,6 +182,7 @@ export const nc = new Client({ schema });`);
     await expect(pullSchema({ credentials })).resolves.toMatchObject({
       firstDatabaseName: null,
       status: "written",
+      summary: { status: "missing" },
     });
   });
 
@@ -138,6 +196,7 @@ export const nc = new Client({ schema });`);
       status: "stale",
       schemaPath: "src/notcms/schema.ts",
       reason: "missing",
+      summary: { status: "missing" },
     });
     await expect(
       fs.readFile(path.join(dir, "src/notcms/schema.ts"), "utf-8")
@@ -155,6 +214,7 @@ export const nc = new Client({ schema });`);
       status: "stale",
       schemaPath: "schema.ts",
       reason: "out-of-date",
+      summary: { status: "unavailable" },
     });
     await expect(
       fs.readFile(path.join(dir, "schema.ts"), "utf-8")
@@ -167,6 +227,7 @@ export const nc = new Client({ schema });`);
 
     await expect(pullSchema({ credentials })).resolves.toEqual({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: null,
       schemaChanges: null,
