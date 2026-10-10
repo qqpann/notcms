@@ -3,8 +3,14 @@ import path from "node:path";
 import type { Schema } from "../../types.js";
 import type { Credentials } from "../types.js";
 import { loadConfig } from "./config.js";
+import {
+  type SchemaChange,
+  type SchemaSummary,
+  diffSchemas,
+  parseGeneratedSchema,
+  summarizeSchema,
+} from "./schema-diff.js";
 import { fetchSchemaResponse } from "./schema.js";
-import { type SchemaSummary, summarizeSchema } from "./schema-diff.js";
 
 export type PullSchemaOptions = {
   check?: boolean;
@@ -16,6 +22,7 @@ type WrittenSchemaResult = {
   schemaPath: string;
   firstDatabaseName: string | null;
   summary: SchemaSummary;
+  schemaChanges: SchemaChange[] | null;
 };
 
 type UpToDateSchemaResult = {
@@ -79,7 +86,16 @@ export async function pullSchema(
   await fs.mkdir(path.dirname(absoluteSchemaPath), { recursive: true });
   await fs.writeFile(absoluteSchemaPath, content);
 
-  return { status: "written", schemaPath, firstDatabaseName, summary };
+  const previous = existing === null ? null : parseGeneratedSchema(existing);
+  const schemaChanges =
+    previous === null ? null : diffSchemas(previous, schema);
+  return {
+    status: "written",
+    schemaPath,
+    firstDatabaseName,
+    summary,
+    schemaChanges,
+  };
 }
 
 function createSchemaModule(schema: Schema): string {
