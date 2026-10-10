@@ -1,5 +1,24 @@
 # notcms
 
+## 0.3.0
+
+### Minor Changes
+
+- 9323ae5: Complete CLI initialization through the first schema pull. `notcms init` now
+  uses existing credentials or browser login, ensures `notcms` is a direct and
+  resolvable project dependency with the safely detected package manager, writes
+  the generated schema, and prints a safe runnable first-query example while
+  preserving the standalone `login`, `pull`, and `pull --check` commands.
+
+### Patch Changes
+
+- 5a14295: Align the SDK README and documentation with the bundled `npx notcms` CLI and add a blog and release notes implementation recipe.
+- e49affe: Add tested blog and release-note recipes covering publication dates, language fallback, stable ID URLs and error propagation.
+- 133a7d2: Fix schema generation when the configured output file is at the project root.
+- 561a6ae: Update the Next.js blog example to Next.js 16 and React 19.
+- 7ef0ea3: Document migration from notcms-kit and prerelease SDKs to the bundled CLI, including dependency upgrades, config preservation and CI schema checks.
+- b395219: Show database, ID, and property changes after `notcms pull` so schema synchronization is easier to review.
+
 ## 0.2.0
 
 ### Minor Changes
