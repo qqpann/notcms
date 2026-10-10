@@ -66,48 +66,14 @@ jobs:
           git commit -m "chore: prepare sync-action@$VERSION"
           git push --force-with-lease="refs/heads/$BRANCH:$PREVIOUS" origin "HEAD:refs/heads/$BRANCH"
           cat > "$RUNNER_TEMP/sync-release-pr.md" <<'BODY'
-          ## English
+          Prepare the Sync Action version and rebuilt dist for review.
 
-          ### Description of change
-          Prepare the Sync Action version and rebuilt dist for review. After this PR is merged, Sync Action Release publishes immutable version and major tags without pushing to main. Validation: release script tests, Sync Action tests, typecheck and build passed in the preparation run. Base: main; no prerequisite PR.
+          Validation passed in the preparation run: release script tests, Sync Action tests, typecheck and build.
 
-          ### UI screenshots
-          | Before | After |
-          | --- | --- |
-          | N/A (Action release artifacts only) | N/A (Action release artifacts only) |
-
-          ### Pull-Request Checklist
-          - [ ] Code is up-to-date with the `main` branch — N/A (prepared from the triggering main commit; main may advance)
-          - [ ] `pnpm check` passes with this change — N/A (generated release artifacts)
-          - [ ] `pnpm test` passes with this change — N/A (no root test script; scoped tests passed)
-          - [ ] This pull request links relevant issues as `Fixes #0000` — N/A (no issue)
-          - [ ] There are new or updated unit tests validating the change — N/A (existing release and Action tests passed)
-          - [ ] Documentation has been updated to reflect this change — N/A (generated version/dist only)
-          - [x] The new commits follow conventions outlined in the [conventional commit spec](https://www.conventionalcommits.org/en/v1.0.0/)
-
-          ---
-
-          ## 日本語
-
-          ### 変更内容
-          Sync Action のバージョンと再ビルドした dist をレビュー用に準備します。マージ後は Sync Action Release が main へ push せず、バージョンタグとメジャータグを公開します。準備実行でリリーススクリプトのテスト、Action のテスト・型検査・ビルドが成功しました。base: main、先行 PR なし。
-
-          ### UI スクリーンショット
-          | 変更前 | 変更後 |
-          | --- | --- |
-          | なし（Action のリリース成果物のみ） | なし（Action のリリース成果物のみ） |
-
-          ### PR チェックリスト
-          - [ ] コードが `main` ブランチの最新状態を取り込んでいる — なし（起動元 main コミットを基点とし、その後 main が進む場合があります）
-          - [ ] この変更に対する `pnpm check` が成功する — なし（生成されたリリース成果物）
-          - [ ] この変更に対する `pnpm test` が成功する — なし（ルートに test スクリプトなし、対象テストは成功）
-          - [ ] 関連 Issue を `Fixes #0000` としてリンクしている — なし（Issue なし）
-          - [ ] 変更を検証する単体テストを追加・更新している — なし（既存のリリース・Action テストが成功）
-          - [ ] 変更に合わせてドキュメントを更新している — なし（バージョン・dist の生成のみ）
-          - [x] 新しいコミットが [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) の規約に従っている
+          After merge, Sync Action Release publishes the version and major tags from the reviewed commit.
           BODY
           PR=$(gh pr list --state open --head "$BRANCH" --base main --json number --jq '.[0].number // empty')
-          TITLE="chore: release sync-action@$VERSION / Sync Action $VERSION を公開"
+          TITLE="chore: release sync-action@$VERSION"
           if [ -n "$PR" ]; then
             gh pr edit "$PR" --title "$TITLE" --body-file "$RUNNER_TEMP/sync-release-pr.md"
           else
