@@ -1,12 +1,15 @@
 {
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "packageManager": "pnpm@11.11.0",
   "scripts": {
     "format": "biome format --write .",
     "lint-biome": "biome lint --write .",
     "check": "biome check --write .",
     "prepare": "husky",
-    "test:staged-publish": "node --test scripts/staged-publish.test.mjs"
+    "test:staged-publish": "node --test scripts/staged-publish.test.mjs",
+    "test:sync-release": "node --test scripts/sync-action-release.test.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
