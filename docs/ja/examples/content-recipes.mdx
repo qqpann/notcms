@@ -1,0 +1,148 @@
+---
+title: ブログ・リリースノートの実装レシピ
+description: 型付き SDK で公開判定・言語・安定した URL・取得失敗を組み合わせる
+---
+
+## 1. スキーマと公開方針を決める
+
+| DB | Notion プロパティ | この例の公開条件 |
+| --- | --- | --- |
+| `blog` | `title` (title)、`published` (checkbox)、`published_at` (date)、`language` (select) | checkbox が true かつ有効な日時が現在以前 |
+| `releases` | `title` (title)、`released_at` (date)、`language` (select)、`products` (multi_select)、`version_number` (rich_text) | 有効なリリース日時が現在以前 |
+
+同じ DB キー・プロパティ名で作成すると、この例を再現できます。これはアプリ側の方針で、
+NotCMS の固定仕様ではありません。`list()` は同期済みの全ページを返し、この例では
+サーバー側で絞ります。表示上の絞り込みは API のアクセス制御ではなく、認証情報で
+下書きも取得できます。キーはサーバーに置き、公開する DB に機密情報を入れないでください。
+時刻付き日時はそのタイムゾーンを使い、日付だけの場合は UTC 0時とします。
+日本時間の公開時刻に合わせる場合は、この比較を変更してください。
+
+- `language` は `ja` / `en` を使い、null・空文字は日本語に分類します。ほかの値は除外します。
+  翻訳がない言語は空一覧または404とし、英語 URL に日本語を自動表示しません。
+- 日時未設定・無効な日時・未来日時を除外し、ブログでは公開 checkbox も必須です。
+  リリースではバージョン・製品の未設定を許容します。
+- 公開日の降順、同日時は ID 順に並べ、元配列は変更しません。
+  詳細取得にも同じ条件を適用し、最新の詳細プロパティを取得した後も再確認します。
+- URL は `/{locale}/blog/{エンコードした ID}` または
+  `/{locale}/releases/{エンコードした ID}` です。slug やバージョンを必須にしないため、
+  バージョン未設定・製品間で同じバージョンでも別の記事として表示できます。
+  slug を採用する場合は、一意性・未設定時の fallback・変更時の redirect を先に決めます。
+  SDK の `get()` は slug ではなくページ ID を受け取ります。
+
+## 2. 型を生成して検証済み reader を配置する
+
+Dashboard で両 DB を接続し、同期を完了してから Next.js App Router プロジェクトで実行します。
+
+```bash
+npm install notcms server-only
+npx notcms init
+# After changing Notion properties, sync in Dashboard then run:
+npx notcms pull
+```
+
+旧 CLI・SDK を使っている場合は[移行ガイド](/ja/cli-commands/migration)を先に確認します。
+CLI は `schema` と `nc` を含む `src/notcms/schema.ts` を生成します。
+[`content.ts`](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/content.ts) をその隣の `src/notcms/content.ts` へコピーしてください。
+型は `schema.blog.properties` / `schema.releases.properties` から推論します。
+キーが異なる場合は型と selector を変更します。[サンプルスキーマ](https://github.com/qqpann/notcms/tree/main/examples/content-recipes/schema.ts) の
+仮 ID は実環境へコピーせず、必ず自身のスキーマを pull します。pull 後にアプリの型検査を行います。
+
+reader をサーバー側で作ります。`NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` は
+`.env.local` とデプロイ先の secrets に置き、`NEXT_PUBLIC_*` やクライアントコードへ渡しません。
+フレームワーク非依存の reader は fake レスポンスを使った SDK テストで検証しています。
+
+```typescript
+// src/notcms/reader.ts (server only)
+import "server-only";
+import { nc } from "./schema";
+import { createContentReader } from "./content";
+
+export const content = createContentReader(nc);
+```
+
+## 3. 一覧と URL を生成する（Next.js 16 App Router）
+
+`@/*` が `src/*` を指す標準 alias と既定のキャッシュ設定を前提にしています。
+`connection()` を await してリクエスト時に描画します。表示文言は例なので、
+実際のアプリでは翻訳メッセージへ移してください。
+
+```tsx
+// app/[locale]/releases/page.tsx
+import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { content } from "@/notcms/reader";
+import { contentUrl } from "@/notcms/content";
+
+export default async function ReleasesPage({ params }: {
+  params: Promise<{ locale: string }>;
+}) {
+  await connection();
+  const { locale } = await params;
+  if (locale !== "ja" && locale !== "en") notFound();
+  const releases = await content.listReleases(locale);
+  return (
+    <main>
+      <h1>{locale === "ja" ? "リリースノート" : "Release notes"}</h1>
+      {releases.length === 0 ? (
+        <p>{locale === "ja" ? "この言語のリリースはありません。" : "No releases in this language."}</p>
+      ) : (
+        <ul>{releases.map((release) => (
+          <li key={release.id}>
+            <a href={contentUrl("releases", locale, release.id)}>{release.title}</a>
+          </li>
+        ))}</ul>
+      )}
+    </main>
+  );
+}
+```
+
+ブログでは `app/[locale]/blog/page.tsx` で `content.listBlog(locale)` と
+`contentUrl("blog", locale, post.id)` を使います。空一覧は「取得成功し、
+この言語で公開した記事がない」場合にだけ表示し、失敗時に `posts ?? []` としません。
+
+## 4. 一覧と同じ条件で詳細を取得する
+
+```tsx
+// app/[locale]/releases/[id]/page.tsx
+import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { content } from "@/notcms/reader";
+
+export default async function ReleasePage({ params }: {
+  params: Promise<{ locale: string; id: string }>;
+}) {
+  await connection();
+  const { locale, id } = await params;
+  if (locale !== "ja" && locale !== "en") notFound();
+  const release = await content.getRelease(id, locale);
+  if (release === null) notFound();
+  return <article><h1>{release.title}</h1><pre>{release.content}</pre></article>;
+}
+```
+
+ブログ詳細では `app/[locale]/blog/[id]/page.tsx` から
+`content.getBlog(id, locale)` を使います。Next.js の params はデコード済みなので
+二重デコードしません。例では Markdown をエスケープされたプレーンテキストで表示します。
+HTML として描画する場合は renderer と HTML サニタイズを追加してください。
+
+## 失敗・キャッシュ・方針の変更
+
+reader が null を返すのは、取得成功後にページ不在または公開条件の不一致が確定した場合です。
+ネットワーク、401/403、429、上流5xxの失敗は throw し、一覧成功後に詳細取得が失敗した場合も
+伝播します。Next.js の `error.tsx` で表示し、成功した空一覧や404として保存しません。
+これらのエラーを catch して `[]` を返したり、`notFound()` へ置き換えたりしないでください。
+
+この例はアプリ側キャッシュを追加せずリクエスト時に描画します。API 側には短いキャッシュ期間が
+あり得ます。ISR・ビルド時生成を追加する場合は CMS 障害でビルド／再検証を失敗させ、
+古い公開情報の保持期間と未来の公開日時での更新方法を決めます。静的サイトは公開時刻後に
+再ビルドが必要です。非公開化・言語変更時には一覧と詳細のキャッシュを同時に無効化します。
+表示条件だけで既に生成・キャッシュした公開ページの即時削除を保証することはできません。
+
+自分のスキーマや方針に合わせて `selectBlogPosts`、`selectReleases`、`matchesLanguage`、
+`contentUrl` を変更できます。バージョン・製品は表示用で、URL の識別子にはしません。
+下書きプレビューは公開条件を緩めず、別の認証済みサーバールートで実装します。
+
+2026-10-11 に確認した公式資料：[動的ルートの params](https://nextjs.org/docs/app/api-reference/file-conventions/dynamic-routes)、
+[connection](https://nextjs.org/docs/app/api-reference/functions/connection)、
+[エラー処理](https://nextjs.org/docs/app/getting-started/error-handling)。

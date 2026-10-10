@@ -37,27 +37,55 @@ npm install notcms
 
 ### CLI Usage
 
-Pull your schema from NotCMS:
+Initialize NotCMS from config through the first schema pull:
 
 ```bash
-# Initialize config
 npx notcms init
+```
 
-# Pull schema from NotCMS
+When credentials are missing, `init` opens browser login, saves them to
+`.env.local`, ensures `notcms` is a direct and installed project dependency,
+pulls the schema, and prints a runnable first query example. Existing dependency
+specs are preserved by running the package manager's plain install command.
+Use the standalone commands when you need to log in or refresh the schema later:
+
+```bash
+npx notcms login
 npx notcms pull
+npx notcms pull --check # Check without writing, for CI/CD
 ```
 
 > **Migration from notcms-kit**: The CLI is now included in the `notcms` package.
 > Use `npx notcms` instead of `npx notcms-kit`.
 
+### Upgrade from the legacy CLI or SDK
+
+The SDK and CLI now ship together in `notcms`. Update old dependency specs
+explicitly: `init` preserves an existing SDK version rather than upgrading it.
+
+```bash
+npm uninstall notcms-kit # Only if it is a project dependency
+npm install notcms@latest
+npx notcms pull
+npx notcms pull --check
+```
+
+Keep `notcms.config.json` and your server-side credentials. Replace old
+`notcms-kit init` / `notcms-kit pull` scripts with `notcms init` / `notcms pull`.
+Regenerate the schema and typecheck your application before deploying an upgrade;
+this is especially necessary for prerelease SDKs such as `0.0.12-development`.
+See the [migration checklist](../../docs/en/cli-commands/migration.mdx) for package-manager equivalents,
+CI usage, and compatibility checks.
+
+See the [tested blog and release-note recipes](../../examples/content-recipes/README.md) for publication, language, URLs, and failure handling.
+
 ### SDK Usage
 
 ```ts
-import { Client } from "notcms";
+import { nc } from "./notcms/schema";
 
-const nc = Client({ schema });
-
-const [pages] = await nc.query.blog.list();
+const [pages, error] = await nc.query.blog.list();
+if (error) throw error;
 const [page] = await nc.query.blog.get(pages[0].id);
 ```
 
