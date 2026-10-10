@@ -46,6 +46,24 @@ describe("fetchSchema", () => {
     );
   });
 
+  it("uses an API host loaded after the schema module was imported", async () => {
+    stubCredentials();
+    vi.stubEnv("NOTCMS_API_HOST", "http://127.0.0.1:12345/v1");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ schema: {} }), { status: 200 })
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await fetchSchema();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://127.0.0.1:12345/v1/ws/ws_test/schema",
+      expect.any(Object)
+    );
+  });
+
   it("returns the server-selected onboarding database metadata", async () => {
     stubCredentials();
     const schema = {

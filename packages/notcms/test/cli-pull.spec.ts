@@ -40,6 +40,7 @@ describe("pullSchema", () => {
       status: "written",
       schemaPath: "schema.ts",
       firstDatabaseName: "Blog posts",
+      schemaChanges: null,
     });
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/ws/ws_test/schema"),
@@ -168,6 +169,7 @@ export const nc = new Client({ schema });`);
       status: "written",
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: null,
+      schemaChanges: null,
     });
   });
 
@@ -227,6 +229,39 @@ export const nc = new Client({ schema });`);
       "https://api.notcms.com/v1/ws/ws_generated/db/db_proto/pages",
       expect.objectContaining({ method: "GET" })
     );
+  });
+
+  it("compares the previously generated schema before overwriting it", async () => {
+    await writeConfig("schema.ts");
+    stubSchema({ Blog: { id: "db_blog", properties: { Title: "title" } } });
+    await pullSchema({ credentials });
+    stubSchema({ Blog: { id: "db_blog", properties: { Title: "rich_text" } } });
+
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      schemaChanges: [
+        {
+          kind: "property-type-changed",
+          database: "Blog",
+          property: "Title",
+          before: "title",
+          after: "rich_text",
+        },
+      ],
+    });
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      schemaChanges: [],
+    });
+  });
+
+  it("compares generated prototype-like keys without executing computed expressions", async () => {
+    await writeConfig("schema.ts");
+    stubSchema({
+      ["__proto__"]: { id: "db_proto", properties: { ["__proto__"]: "title" } },
+    });
+    await pullSchema({ credentials });
+    await expect(pullSchema({ credentials })).resolves.toMatchObject({
+      schemaChanges: [],
+    });
   });
 
   function stubSchema(schema: Schema) {

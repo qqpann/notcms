@@ -7,6 +7,7 @@ import dedent from "dedent";
 import { dumpConfig } from "./features/config.js";
 import type { DependencySetupResult } from "./features/dependency.js";
 import type { PullSchemaOptions, PullSchemaResult } from "./features/pull.js";
+import { formatSchemaChanges } from "./features/schema-diff.js";
 import type { Config, Credentials } from "./types.js";
 
 type LoginResult = {
@@ -288,6 +289,7 @@ function printPullResult(result: PullSchemaResult) {
     return;
   }
 
+  console.log(formatSchemaChanges(result.schemaChanges ?? null));
   console.log(
     boxen(
       dedent`
