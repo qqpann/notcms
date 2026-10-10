@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import type { MockInstance } from "vitest";
 
 const promptMocks = vi.hoisted(() => ({
   confirm: vi.fn(),
@@ -28,7 +29,7 @@ import { init } from "../src/cli/commands";
 describe("init command", () => {
   let dir: string;
   let cwdSpy: ReturnType<typeof vi.spyOn>;
-  let logSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: MockInstance<typeof console.log>;
 
   beforeEach(async () => {
     dir = await fs.mkdtemp(path.join(tmpdir(), "notcms-init-"));
@@ -56,6 +57,7 @@ describe("init command", () => {
     loginMocks.getCredentialsFromEnv.mockReturnValue(credentials);
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog posts",
     });
@@ -82,6 +84,7 @@ describe("init command", () => {
     loginMocks.saveCredentials.mockResolvedValue(path.join(dir, ".env.local"));
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "",
     });
@@ -120,6 +123,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: null,
     });
@@ -143,6 +147,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -169,6 +174,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -195,6 +201,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -220,6 +227,7 @@ describe("init command", () => {
     });
     pullMocks.pullSchema.mockResolvedValue({
       status: "written",
+      summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -254,6 +262,7 @@ describe("init command", () => {
       });
       pullMocks.pullSchema.mockResolvedValue({
         status: "written",
+        summary: { status: "missing" },
         schemaPath: "src/notcms/schema.ts",
         firstDatabaseName,
       });
