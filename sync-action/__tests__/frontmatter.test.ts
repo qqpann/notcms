@@ -1,6 +1,6 @@
-import matter from "gray-matter";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { generateMarkdown } from "../src/markdown/frontmatter.js";
+import { parseMarkdown as matter } from "../src/markdown/yaml.js";
 import type { PageData } from "../src/notcms-client.js";
 
 describe("generateMarkdown", () => {

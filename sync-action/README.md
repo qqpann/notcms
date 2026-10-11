@@ -170,6 +170,10 @@ We respect your privacy...
    - `pull-requests: write` — to create PRs (when `on_change` is `pr` or `pr-auto-merge`)
 5. Enable "Allow GitHub Actions to create and approve pull requests" in **Settings → Actions → General** (required for PR creation)
 
+## Frontmatter safety
+
+The Action reads YAML mapping frontmatter only, including existing YAML 1.1 booleans and timestamps. Invalid or non-mapping frontmatter is treated as unreadable. JavaScript frontmatter is never evaluated. Dependencies and committed dist are rebuilt before release; `runs.using` remains `node24`.
+
 ## License
 
 MIT

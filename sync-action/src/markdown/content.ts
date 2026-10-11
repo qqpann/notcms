@@ -1,4 +1,4 @@
-import matter from "gray-matter";
+import { parseMarkdown as matter } from "./yaml.js";
 
 export interface NotCmsMetadata {
   id: string;
