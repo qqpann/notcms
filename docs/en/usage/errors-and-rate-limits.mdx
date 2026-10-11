@@ -1,0 +1,42 @@
+---
+title: Errors and Rate Limits
+description: Handle failed requests and the content API rate limits
+---
+
+## Handling Errors
+
+Every query returns a tuple instead of throwing. On failure, the first item is `undefined`, the second is the `Error`, and the third is the HTTP `Response` when the request reached the API.
+
+```typescript
+const [posts, error, response] = await nc.query.blog.list();
+
+if (error) {
+  console.error(response?.status, error.message);
+}
+```
+
+## Rate Limits
+
+The content API (schema, list, and get) is rate limited to prevent abuse. The limits are the same on every plan.
+
+| Requests | Counted per | Limit |
+| --- | --- | --- |
+| Authenticated requests | Secret key | 600 per 60 seconds |
+| Requests that fail authentication | IP address | 30 per 60 seconds |
+
+- Limits are approximate, because they are counted per Cloudflare location.
+- Cached responses also count toward the limit.
+- Different secret keys do not affect each other.
+
+When you exceed a limit, the API responds with `429`, a `Retry-After: 60` header, and the body `{ "error": "rate_limited" }`.
+
+The SDK does not retry automatically. Check the status and wait before trying again:
+
+```typescript
+const [posts, error, response] = await nc.query.blog.list();
+
+if (error && response?.status === 429) {
+  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? 60);
+  // Try again after retryAfterSeconds
+}
+```
