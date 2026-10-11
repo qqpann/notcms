@@ -122,6 +122,25 @@ describe("DatabaseHandler", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it("passes ID filters to the API including an empty list", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: [] }));
+    vi.stubGlobal("fetch", fetchMock);
+    await createClient().query.abc.list({
+      where: { id: { in: ["p1", "p2"] } },
+    });
+    await createClient().query.abc.list({ where: { id: { in: [] } } });
+    expect(
+      JSON.parse(
+        new URL(fetchMock.mock.calls[0][0]).searchParams.get("filter") ?? "null"
+      )
+    ).toEqual({ id: { in: ["p1", "p2"] } });
+    expect(
+      JSON.parse(
+        new URL(fetchMock.mock.calls[1][0]).searchParams.get("filter") ?? "null"
+      )
+    ).toEqual({ id: { in: [] } });
+  });
+
   it("gets a single page by id", async () => {
     const page = { id: "p1", title: "Hello", properties: {} };
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: page }));

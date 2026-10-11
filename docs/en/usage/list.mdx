@@ -63,6 +63,27 @@ Dates are compared in UTC. A date without a time is midnight UTC (09:00 in Japan
 
 `sort` accepts exactly one scalar property with `"asc"` or `"desc"`. Array properties cannot be sorted. Empty values come last in either direction. Ties, and lists without `sort`, use registration order followed by page ID. Unknown properties, unsupported operators and invalid inputs return HTTP 400 through the usual error tuple.
 
+## Retrieve related pages by ID
+
+A relation contains Notion page IDs. Retrieve the related pages from a database you select, with at most 100 IDs per call:
+
+```typescript
+const [posts, postsError] = await nc.query.blog.list({ where: { published: true } });
+if (postsError) throw postsError;
+const ids = [...new Set(posts.flatMap(post => post.properties.writers ?? []))];
+const [writers, writersError] = await nc.query.writers.list({ where: { id: { in: ids } } });
+if (writersError) throw writersError;
+const writerById = new Map(writers.map(writer => [writer.id, writer]));
+const orderedWriters = ids.flatMap(id => {
+  const writer = writerById.get(id);
+  return writer ? [writer] : [];
+});
+```
+
+If there are more than 100 unique IDs, split them into batches of 100. An empty list returns no pages; more than 100 IDs returns HTTP 400. Unknown, deleted, unsynced, and out-of-scope pages are omitted. IDs are deduplicated and UUID hyphens/case are normalized. Responses use the normal sort order, not the input order; use a Map to restore the relation order as above (canonical IDs returned by Notion and NotCMS match).
+
+The returned properties are typed for the selected database. No recursive expansion occurs, so self-references or cycles do not issue extra requests. `id: { in: [...] }` targets page IDs. A schema property named `id` still supports its regular conditions such as `id: { equals: "custom-value" }`.
+
 ## Rate limits
 
 Public schema, list and detail requests share a limit of **600 requests per 60 seconds per API key**, on every plan. Cached requests count too. Failed authentication is limited separately to 30 requests per 60 seconds per IP; image delivery and CLI authentication use separate policies. Cloudflare applies these approximate limits per location, so they are abuse protection rather than a billing quota.

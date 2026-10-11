@@ -63,6 +63,27 @@ const [posts, error] = await nc.query.blog.list({
 
 `sort` は配列型を除く1プロパティに `"asc"` または `"desc"` を指定します。空の値はどちらでも末尾、同値の場合と `sort` 省略時は登録順、次にページID順です。未知のプロパティ、非対応の演算子、不正な入力はHTTP 400となり、通常のエラータプルで返します。
 
+## 関連ページをIDで一括取得
+
+relationはNotionのページIDの配列です。関連先のデータベースを選び、1回につき最大100件のIDで取得できます。
+
+```typescript
+const [posts, postsError] = await nc.query.blog.list({ where: { published: true } });
+if (postsError) throw postsError;
+const ids = [...new Set(posts.flatMap(post => post.properties.writers ?? []))];
+const [writers, writersError] = await nc.query.writers.list({ where: { id: { in: ids } } });
+if (writersError) throw writersError;
+const writerById = new Map(writers.map(writer => [writer.id, writer]));
+const orderedWriters = ids.flatMap(id => {
+  const writer = writerById.get(id);
+  return writer ? [writer] : [];
+});
+```
+
+重複を除いたIDが100件を超える場合は100件ずつに分割します。空配列は空の結果、100件超はHTTP 400です。未登録・削除済み・未同期・対象外のページは結果に含めません。IDの重複を除き、UUIDのハイフン・大文字小文字を正規化します。結果は通常の並べ替え順で、入力順ではありません。上のようにMapを使うとrelationの順を復元できます（NotionとNotCMSが返す正規形のIDは一致します）。
+
+型は取得先として選んだDBの型です。再帰的に展開しないため、自己参照や循環参照で追加リクエストは発生しません。`id: { in: [...] }` はページIDを指します。スキーマに `id` プロパティがある場合、`id: { equals: "値" }` などの通常条件はそのプロパティに適用されます。
+
 ## レート制限
 
 公開スキーマ・一覧・詳細のリクエストは、全プラン共通で **APIキーごとに60秒あたり600件** までです。キャッシュへのアクセスも数えます。認証失敗は別にIPごとに60秒あたり30件、画像配信とCLI認証は別の方針です。Cloudflareの拠点ごとの近似値による悪用対策で、課金の使用量上限ではありません。

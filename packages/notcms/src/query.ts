@@ -26,10 +26,14 @@ type Condition<TType extends PropertyType, TValue> =
 
 /** Conditions on different properties are combined with AND. */
 export type Where<TDatabase extends Schema[string]> = {
-  [K in keyof TDatabase["properties"]]?: Condition<
-    TDatabase["properties"][K],
-    NonNullable<InferProperties<TDatabase["properties"]>[K]>
-  >;
+  [K in keyof TDatabase["properties"] | "id"]?:
+    | (K extends "id" ? { in: readonly string[] } : never)
+    | (K extends keyof TDatabase["properties"]
+        ? Condition<
+            TDatabase["properties"][K],
+            NonNullable<InferProperties<TDatabase["properties"]>[K]>
+          >
+        : never);
 };
 
 type SortableKeys<T extends Properties> = {
