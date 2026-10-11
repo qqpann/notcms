@@ -71,3 +71,22 @@ function checkInvalidQueries(client: Client<typeof schema>) {
   client.query.blog.list({ sort: { tags: "asc" } });
 }
 void checkInvalidQueries;
+
+function checkIdPropertyQueries(
+  client: Client<{
+    records: { id: "records"; properties: { id: "title" } };
+  }>
+) {
+  client.query.records.list({ where: { id: "external-id" } });
+  client.query.records.list({ where: { id: { equals: "external-id" } } });
+  client.query.records.list({ where: { id: { in: ["page-id"] } } });
+  client.query.records.list({
+    // @ts-expect-error page IDs and property operators cannot be mixed
+    where: { id: { in: ["page-id"], equals: "external-id" } },
+  });
+  client.query.records.list({
+    // @ts-expect-error page IDs and empty checks cannot be mixed
+    where: { id: { in: ["page-id"], is_empty: true } },
+  });
+}
+void checkIdPropertyQueries;
