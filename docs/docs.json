@@ -56,7 +56,8 @@
             "pages": [
               "en/usage/initializing-client",
               "en/usage/list",
-              "en/usage/get"
+              "en/usage/get",
+              "en/usage/errors-and-rate-limits"
             ]
           },
           {
@@ -89,7 +90,8 @@
             "pages": [
               "ja/usage/initializing-client",
               "ja/usage/list",
-              "ja/usage/get"
+              "ja/usage/get",
+              "ja/usage/errors-and-rate-limits"
             ]
           },
           {
