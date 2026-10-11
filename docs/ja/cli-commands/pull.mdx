@@ -96,6 +96,8 @@ export const nc = new Client({ schema });
 
 ## 選択肢の型
 
+CLIは `?include=options` を自動で指定して選択肢を取得します。旧CLIにはoptionsを含まないスキーマを返すため、生成したコードを旧SDKでも引き続き型検査できます。
+
 データベースごとの任意フィールド `options` に、`select`・`status`・`multi_select` の選択肢名を保持します。`as const satisfies Schema` により、たとえば `options: { language: ["en", "ja"] }` のselect/statusは `"en" | "ja" | null`、multi-selectは `("en" | "ja")[] | null` になります。`where` の条件にも同じ選択肢が適用されます。
 
 取得済みの空配列はselect/statusが `null`、multi-selectが `never[] | null` になります。`options` のない旧スキーマは従来の `string | null`／`string[] | null` を維持します。APIはメタデータ取得までoptionsを省略し、通常のDB同期またはサービス側のバックフィルで補完します。

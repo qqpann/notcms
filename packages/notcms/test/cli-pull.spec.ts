@@ -45,7 +45,7 @@ describe("pullSchema", () => {
       schemaChanges: null,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining("/ws/ws_test/schema"),
+      expect.stringContaining("/ws/ws_test/schema?include=options"),
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer ncsec_test",
@@ -283,7 +283,7 @@ export const nc = new Client({ schema });`);
     const pages = [{ id: "page_1", title: "Safe", properties: {} }];
     const fetchMock = vi.fn((url: string | URL | Request) => {
       const href = String(url);
-      if (href.endsWith("/schema")) {
+      if (href.endsWith("/schema?include=options")) {
         return Promise.resolve(
           new Response(JSON.stringify({ schema }), { status: 200 })
         );

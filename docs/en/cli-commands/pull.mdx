@@ -96,6 +96,8 @@ Stale `pull --check` also prints the semantic summary without writing. The first
 
 ## Choice types
 
+The CLI automatically requests choice metadata with `?include=options`. Older CLIs keep receiving schemas without options, so their generated modules remain compatible with older SDKs.
+
 The optional per-database `options` field contains names for `select`, `status`, and `multi_select` properties. Generated schemas use `as const satisfies Schema`, so a select or status with `options: { language: ["en", "ja"] }` becomes `"en" | "ja" | null`. A multi-select becomes `("en" | "ja")[] | null`. These choices also constrain `where` operands.
 
 A known empty option list yields `null` for select/status and `never[] | null` for multi-select. Older schemas without options retain `string | null` or `string[] | null`. The API omits options until metadata has been fetched; normal database sync or the service backfill populates it.
