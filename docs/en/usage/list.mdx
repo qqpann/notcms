@@ -30,8 +30,54 @@ function processPosts(posts: BlogPosts) {
   posts.forEach(post => {
     // Full type safety and IDE autocomplete
     console.log(post.title);
-    console.log(post.published);
+    console.log(post.properties.published);
   });
+}
+```
+
+## Filter and sort
+
+```typescript
+const [posts, error] = await nc.query.blog.list({
+  where: {
+    published: true,
+    language: "ja",
+    released_at: { on_or_before: new Date() },
+  },
+  sort: { released_at: "desc" },
+});
+```
+
+Property names and operands are inferred from your schema. Conditions are combined with AND and compare the published values, including locked properties. `list()` without arguments still returns all pages.
+
+| Operator | Property types |
+| --- | --- |
+| Direct value, `equals`, `not_equals` | checkbox, number, strings, formula (string or number) |
+| `is_empty: true`, `is_not_empty: true` | All types |
+| `contains` | multi_select (exact element match) |
+| `before`, `after`, `on_or_before`, `on_or_after` | date, created_time, last_edited_time; accepts an ISO string or `Date` |
+
+At most 10 conditions can be combined, including multiple operators on a property. Empty means a missing property, `null`, an empty string or an empty array. `not_equals` also matches empty values; use `is_empty` to match `null` explicitly.
+
+Dates are compared in UTC. A date without a time is midnight UTC (09:00 in Japan), and a timestamp without a timezone is also UTC. A date range uses its start. Invalid dates are rejected.
+
+`sort` accepts exactly one scalar property with `"asc"` or `"desc"`. Array properties cannot be sorted. Empty values come last in either direction. Ties, and lists without `sort`, use registration order followed by page ID. Unknown properties, unsupported operators and invalid inputs return HTTP 400 through the usual error tuple.
+
+## Rate limits
+
+Public schema, list and detail requests share a limit of **600 requests per 60 seconds per API key**, on every plan. Cached requests count too. Failed authentication is limited separately to 30 requests per 60 seconds per IP; image delivery and CLI authentication use separate policies. Cloudflare applies these approximate limits per location, so they are abuse protection rather than a billing quota.
+
+The API returns HTTP `429`, `Retry-After: 60`, and `{ "error": "rate_limited" }`. The SDK does not retry automatically. Keep the response and schedule a later request using the header:
+
+```typescript
+const [posts, error, response] = await nc.query.blog.list();
+if (response?.status === 429) {
+  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? "60");
+  // Retry later, after retryAfterSeconds; avoid an immediate retry loop.
+} else if (error) {
+  throw error;
+} else {
+  console.log(posts);
 }
 ```
 

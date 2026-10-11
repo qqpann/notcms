@@ -30,8 +30,54 @@ function processPosts(posts: BlogPosts) {
   posts.forEach(post => {
     // 完全な型安全性とIDEの自動補完
     console.log(post.title);
-    console.log(post.published);
+    console.log(post.properties.published);
   });
+}
+```
+
+## 絞り込みと並べ替え
+
+```typescript
+const [posts, error] = await nc.query.blog.list({
+  where: {
+    published: true,
+    language: "ja",
+    released_at: { on_or_before: new Date() },
+  },
+  sort: { released_at: "desc" },
+});
+```
+
+プロパティ名と条件の値はスキーマから推論されます。複数の条件は AND で結合し、固定されたプロパティを含む公開時の値に対して比較します。引数なしの `list()` は引き続き全件を返します。
+
+| 演算子 | 対象のプロパティ型 |
+| --- | --- |
+| 値の直接指定、`equals`、`not_equals` | checkbox、number、文字列系、formula（文字列または数値） |
+| `is_empty: true`、`is_not_empty: true` | すべての型 |
+| `contains` | multi_select（配列要素と完全一致） |
+| `before`、`after`、`on_or_before`、`on_or_after` | date、created_time、last_edited_time。ISO文字列または `Date` |
+
+同じプロパティの複数演算子を含め、条件は合計10個までです。空の値は、プロパティなし、`null`、空文字列、空配列です。`not_equals` は空の値も含みます。`null` を指定する場合は `is_empty` を使います。
+
+日付は UTC で比較します。日付のみは UTC 0時（日本時間9時）、タイムゾーン省略時も UTC として扱います。日付範囲は開始日時で比較し、存在しない日付はエラーにします。
+
+`sort` は配列型を除く1プロパティに `"asc"` または `"desc"` を指定します。空の値はどちらでも末尾、同値の場合と `sort` 省略時は登録順、次にページID順です。未知のプロパティ、非対応の演算子、不正な入力はHTTP 400となり、通常のエラータプルで返します。
+
+## レート制限
+
+公開スキーマ・一覧・詳細のリクエストは、全プラン共通で **APIキーごとに60秒あたり600件** までです。キャッシュへのアクセスも数えます。認証失敗は別にIPごとに60秒あたり30件、画像配信とCLI認証は別の方針です。Cloudflareの拠点ごとの近似値による悪用対策で、課金の使用量上限ではありません。
+
+超過時はHTTP `429`、`Retry-After: 60`、`{ "error": "rate_limited" }` を返します。SDKは自動再試行しません。レスポンスのヘッダーを読み、その時間が過ぎてから再試行します。
+
+```typescript
+const [posts, error, response] = await nc.query.blog.list();
+if (response?.status === 429) {
+  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? "60");
+  // retryAfterSeconds 後に再試行する。即時の繰り返しは避ける。
+} else if (error) {
+  throw error;
+} else {
+  console.log(posts);
 }
 ```
 
