@@ -16,6 +16,7 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:staged-publish
+      - run: pnpm test:dependency-security
       - run: pnpm test:sync-release
       - run: pnpm --filter notcms-sync-action test
       - run: pnpm --filter notcms-sync-action typecheck
