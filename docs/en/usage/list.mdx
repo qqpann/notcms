@@ -63,23 +63,7 @@ Dates are compared in UTC. A date without a time is midnight UTC (09:00 in Japan
 
 `sort` accepts exactly one scalar property with `"asc"` or `"desc"`. Array properties cannot be sorted. Empty values come last in either direction. Ties, and lists without `sort`, use registration order followed by page ID. Unknown properties, unsupported operators and invalid inputs return HTTP 400 through the usual error tuple.
 
-## Rate limits
-
-Public schema, list and detail requests share a limit of **600 requests per 60 seconds per API key**, on every plan. Cached requests count too. Failed authentication is limited separately to 30 requests per 60 seconds per IP; image delivery and CLI authentication use separate policies. Cloudflare applies these approximate limits per location, so they are abuse protection rather than a billing quota.
-
-The API returns HTTP `429`, `Retry-After: 60`, and `{ "error": "rate_limited" }`. The SDK does not retry automatically. Keep the response and schedule a later request using the header:
-
-```typescript
-const [posts, error, response] = await nc.query.blog.list();
-if (response?.status === 429) {
-  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? "60");
-  // Retry later, after retryAfterSeconds; avoid an immediate retry loop.
-} else if (error) {
-  throw error;
-} else {
-  console.log(posts);
-}
-```
+For error tuples, HTTP 429, and retry guidance, see [Errors and Rate Limits](/en/usage/errors-and-rate-limits).
 
 ## Next Steps
 

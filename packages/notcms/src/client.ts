@@ -19,13 +19,10 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
   declare readonly $inferPages: Pages<InferProperties<TDatabase["properties"]>>;
 
   // common function to fetch data
-  private async fetch<T>(
-    url: string | URL | globalThis.Request,
-    method: string
-  ) {
+  private async fetch<T>(createUrl: () => string | URL, method: string) {
     let response: Response | undefined;
     try {
-      response = await fetch(url, {
+      response = await fetch(createUrl(), {
         method,
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
@@ -72,17 +69,16 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    *      - `Response | undefined`: The optional HTTP response object.
    */
   list(options?: ListOptions<TDatabase>) {
-    const url = new URL(routes.pages(this.workspaceId, this.databaseId));
-    if (options?.where !== undefined) {
-      url.searchParams.set("filter", JSON.stringify(options.where));
-    }
-    if (options?.sort !== undefined) {
-      url.searchParams.set("sort", JSON.stringify(options.sort));
-    }
-    return this.fetch<Pages<InferProperties<TDatabase["properties"]>>>(
-      url.toString(),
-      "GET"
-    );
+    return this.fetch<Pages<InferProperties<TDatabase["properties"]>>>(() => {
+      const url = new URL(routes.pages(this.workspaceId, this.databaseId));
+      if (options?.where !== undefined) {
+        url.searchParams.set("filter", JSON.stringify(options.where));
+      }
+      if (options?.sort !== undefined) {
+        url.searchParams.set("sort", JSON.stringify(options.sort));
+      }
+      return url.toString();
+    }, "GET");
   }
 
   /**
@@ -103,7 +99,7 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    */
   get(pageId: string) {
     return this.fetch<Page<InferProperties<TDatabase["properties"]>>>(
-      routes.page(this.workspaceId, this.databaseId, pageId),
+      () => routes.page(this.workspaceId, this.databaseId, pageId),
       "GET"
     );
   }

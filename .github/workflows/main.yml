@@ -21,6 +21,8 @@ jobs:
       - run: pnpm --filter notcms-sync-action test
       - run: pnpm --filter notcms-sync-action typecheck
       - run: pnpm --filter notcms-sync-action build
+      - name: Typecheck SDK source and type tests
+        run: pnpm --filter notcms typecheck
       - run: pnpm run build
         working-directory: packages/notcms
       - run: pnpm run test
