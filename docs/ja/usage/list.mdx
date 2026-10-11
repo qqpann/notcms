@@ -84,23 +84,7 @@ const orderedWriters = ids.flatMap(id => {
 
 型は取得先として選んだDBの型です。再帰的に展開しないため、自己参照や循環参照で追加リクエストは発生しません。`id: { in: [...] }` はページIDを指します。スキーマに `id` プロパティがある場合、`id: { equals: "値" }` などの通常条件はそのプロパティに適用されます。
 
-## レート制限
-
-公開スキーマ・一覧・詳細のリクエストは、全プラン共通で **APIキーごとに60秒あたり600件** までです。キャッシュへのアクセスも数えます。認証失敗は別にIPごとに60秒あたり30件、画像配信とCLI認証は別の方針です。Cloudflareの拠点ごとの近似値による悪用対策で、課金の使用量上限ではありません。
-
-超過時はHTTP `429`、`Retry-After: 60`、`{ "error": "rate_limited" }` を返します。SDKは自動再試行しません。レスポンスのヘッダーを読み、その時間が過ぎてから再試行します。
-
-```typescript
-const [posts, error, response] = await nc.query.blog.list();
-if (response?.status === 429) {
-  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? "60");
-  // retryAfterSeconds 後に再試行する。即時の繰り返しは避ける。
-} else if (error) {
-  throw error;
-} else {
-  console.log(posts);
-}
-```
+エラータプル・HTTP 429・再試行の扱いは[エラーとレート制限](/ja/usage/errors-and-rate-limits)を参照してください。
 
 ## 次のステップ
 

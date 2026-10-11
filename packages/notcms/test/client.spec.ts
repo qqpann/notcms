@@ -50,6 +50,7 @@ describe("Client constructor", () => {
 describe("DatabaseHandler", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -101,6 +102,46 @@ describe("DatabaseHandler", () => {
     });
     expect(data).toEqual([]);
     expect(error).toBeNull();
+  });
+
+  it("returns an error tuple when the API host is invalid", async () => {
+    vi.stubEnv("NOTCMS_API_HOST", "not a URL");
+    vi.resetModules();
+    const { Client: InvalidHostClient } = await import("../src/client");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const [data, error, response] = await new InvalidHostClient({
+      secretKey: "sk_test",
+      workspaceId: "ws_test",
+      schema,
+    }).query.abc.list();
+
+    expect(data).toBeUndefined();
+    expect(error).toBeInstanceOf(TypeError);
+    expect(response).toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("returns an error tuple when serializing a query fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const date = new Date("2026-10-11T00:00:00Z");
+    const serializationError = new Error("Cannot serialize date");
+    vi.spyOn(date, "toJSON").mockImplementation(() => {
+      throw serializationError;
+    });
+
+    const [data, error, response] = await createClient().query.abc.list({
+      where: { publishedAt: { before: date } },
+    });
+
+    expect(data).toBeUndefined();
+    expect(error).toBe(serializationError);
+    expect(response).toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("preserves Retry-After and returns 429 without retrying", async () => {

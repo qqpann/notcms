@@ -1,0 +1,42 @@
+---
+title: エラーとレート制限
+description: 失敗したリクエストの扱いと、コンテンツ API のレート制限
+---
+
+## エラーの扱い
+
+クエリは例外を投げず、タプルを返します。失敗したときは、1 つ目が `undefined`、2 つ目が `Error`、3 つ目がリクエストが API に届いた場合の HTTP `Response` です。
+
+```typescript
+const [posts, error, response] = await nc.query.blog.list();
+
+if (error) {
+  console.error(response?.status, error.message);
+}
+```
+
+## レート制限
+
+コンテンツ API（スキーマ、一覧、詳細の取得）には、悪用を防ぐためのレート制限があります。上限はすべてのプランで同じです。
+
+| 対象 | 数える単位 | 上限 |
+| --- | --- | --- |
+| 認証に成功したリクエスト | シークレットキーごと | 60 秒あたり 600 件 |
+| 認証に失敗したリクエスト | IP アドレスごと | 60 秒あたり 30 件 |
+
+- Cloudflare の拠点ごとに数えるため、上限は目安です。
+- キャッシュから返したリクエストも数えます。
+- 異なるシークレットキーどうしは、互いに影響しません。
+
+上限を超えると、API は `429`、`Retry-After: 60` ヘッダー、本文 `{ "error": "rate_limited" }` を返します。
+
+SDK は自動で再試行しません。ステータスを確認し、待ってから再試行してください。
+
+```typescript
+const [posts, error, response] = await nc.query.blog.list();
+
+if (error && response?.status === 429) {
+  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? 60);
+  // retryAfterSeconds 秒後に再試行する
+}
+```
