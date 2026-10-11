@@ -17,6 +17,18 @@ const ACORN_OPTIONS = {
 } as const;
 
 export type SchemaChange =
+  | {
+      kind: "option-added" | "option-removed";
+      database: string;
+      property: string;
+      option: string;
+    }
+  | {
+      kind: "options-availability-changed";
+      database: string;
+      property: string;
+      available: boolean;
+    }
   | { kind: "database-added"; database: string }
   | { kind: "database-removed"; database: string }
   | {
@@ -142,9 +154,16 @@ function parseSchemaDeclaration(source: string, start: number): unknown {
       return null;
     }
 
-    const wrapperTokens = Array.from(
+    let wrapperTokens = Array.from(
       tokenizer(source.slice(expression.end), ACORN_OPTIONS)
     );
+    if (
+      wrapperTokens.length >= 2 &&
+      tokenText(source, expression.end, wrapperTokens[0]) === "as" &&
+      tokenText(source, expression.end, wrapperTokens[1]) === "const"
+    ) {
+      wrapperTokens = wrapperTokens.slice(2);
+    }
     if (
       wrapperTokens.length < 2 ||
       tokenText(source, expression.end, wrapperTokens[0]) !== "satisfies" ||
@@ -261,6 +280,18 @@ function expressionToValue(expression: Expression): unknown {
     }
     return expression.value;
   }
+  if (expression.type === "ArrayExpression") {
+    return expression.elements.map((element) => {
+      if (
+        element === null ||
+        element.type !== "Literal" ||
+        typeof element.value !== "string"
+      ) {
+        throw new Error("Option arrays must contain only strings");
+      }
+      return element.value;
+    });
+  }
   if (expression.type !== "ObjectExpression") {
     throw new Error("Schema expressions must be objects or strings");
   }
@@ -365,6 +396,30 @@ export function diffSchemas(previous: Schema, current: Schema): SchemaChange[] {
         });
         continue;
       }
+      const beforeOptions =
+        before.options && hasOwn(before.options, property)
+          ? before.options[property]
+          : undefined;
+      const afterOptions =
+        after.options && hasOwn(after.options, property)
+          ? after.options[property]
+          : undefined;
+      if ((beforeOptions === undefined) !== (afterOptions === undefined)) {
+        changes.push({
+          kind: "options-availability-changed",
+          database,
+          property,
+          available: afterOptions !== undefined,
+        });
+      }
+      for (const option of [...new Set(afterOptions ?? [])].sort()) {
+        if (!beforeOptions?.includes(option))
+          changes.push({ kind: "option-added", database, property, option });
+      }
+      for (const option of [...new Set(beforeOptions ?? [])].sort()) {
+        if (!afterOptions?.includes(option))
+          changes.push({ kind: "option-removed", database, property, option });
+      }
       const beforeType = before.properties[property];
       const afterType = after.properties[property];
       if (beforeType !== afterType) {
@@ -399,6 +454,21 @@ export function formatSchemaChanges(
   const lines = ["Schema changes:"];
   for (const change of changes) {
     switch (change.kind) {
+      case "option-added":
+        lines.push(
+          `Added option: ${propertyLabel(change)} = ${quote(change.option)}`
+        );
+        break;
+      case "option-removed":
+        lines.push(
+          `Removed option: ${propertyLabel(change)} = ${quote(change.option)}`
+        );
+        break;
+      case "options-availability-changed":
+        lines.push(
+          `${change.available ? "Added" : "Removed"} option metadata: ${propertyLabel(change)}`
+        );
+        break;
       case "database-added":
         lines.push(`Added database: ${quote(change.database)}`);
         break;

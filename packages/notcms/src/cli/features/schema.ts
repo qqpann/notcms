@@ -21,11 +21,26 @@ function isProperties(value: unknown): value is Properties {
   );
 }
 
+function isPropertyOptions(value: unknown, properties: Properties): boolean {
+  return (
+    isPlainObject(value) &&
+    Object.entries(value).every(
+      ([key, options]) =>
+        Object.prototype.hasOwnProperty.call(properties, key) &&
+        ["select", "status", "multi_select"].includes(properties[key]) &&
+        Array.isArray(options) &&
+        options.every((option) => typeof option === "string")
+    )
+  );
+}
+
 function isSchemaEntry(entry: unknown): entry is Schema[string] {
   return (
     isPlainObject(entry) &&
     typeof entry.id === "string" &&
-    isProperties(entry.properties)
+    isProperties(entry.properties) &&
+    (entry.options === undefined ||
+      isPropertyOptions(entry.options, entry.properties))
   );
 }
 

@@ -37,7 +37,16 @@ export type PropertyType = (typeof PROPERTY_TYPES)[number];
 
 export type Properties = Record<string, PropertyType>;
 
-export type Schema = Record<string, { id: string; properties: Properties }>;
+export type PropertyOptions = Record<string, readonly string[]>;
+export type Schema = Record<
+  string,
+  { id: string; properties: Properties; options?: PropertyOptions }
+>;
+
+export type InferDatabaseProperties<T extends Schema[string]> = InferProperties<
+  T["properties"],
+  T extends { options: infer O extends PropertyOptions } ? O : {}
+>;
 
 export type Page<T> = Prettify<{
   id: string;
@@ -53,11 +62,18 @@ export type Pages<T> = Prettify<{
 }>[];
 
 /** Utility type to map property string to their corresponding types */
-export type InferProperties<T extends Properties> = Prettify<MapProperties<T>>;
-type MapProperties<T extends Properties> = {
-  [K in keyof T]: T[K] extends keyof PropertyTypeMap
-    ? PropertyTypeMap[T[K]]
-    : never;
+export type InferProperties<
+  T extends Properties,
+  O extends PropertyOptions = {},
+> = Prettify<MapProperties<T, O>>;
+type MapProperties<T extends Properties, O extends PropertyOptions> = {
+  [K in keyof T]: K extends keyof O
+    ? T[K] extends "select" | "status"
+      ? O[K][number] | null
+      : T[K] extends "multi_select"
+        ? O[K][number][] | null
+        : PropertyTypeMap[T[K]]
+    : PropertyTypeMap[T[K]];
 };
 type PropertyTypeMap = {
   // boolean
