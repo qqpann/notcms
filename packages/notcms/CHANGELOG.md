@@ -1,5 +1,21 @@
 # notcms
 
+## 0.4.0
+
+### Minor Changes
+
+- 297fccb: Add typed property filters and single-property sorting to `list()`, preserving calls without arguments. Return request-construction errors through the existing error tuple.
+  
+  Correct formula inference from `string | null` to `string | number | null` to match numeric API values. Code that previously assumed every non-null formula was a string must now narrow the value before using string methods.
+- c0c3f6e: Support typed `where: { id: { in: [...] } }` queries to retrieve related pages in one list request.
+- 7a459d3: Preserve select, status, and multi-select choice names in generated schemas. Infer literal unions for page values and query operands, keep legacy string fallbacks when options are absent, and report option changes during schema pull.
+  
+  The CLI requests choice metadata with `include=options`. Older CLIs keep receiving the original schema shape, so their generated modules continue to typecheck with older SDKs.
+
+### Patch Changes
+
+- 54afe66: Update bundled CLI dependencies to patched versions.
+
 ## 0.3.0
 
 ### Minor Changes
