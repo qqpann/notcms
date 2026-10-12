@@ -20,6 +20,7 @@ jobs:
   releases:
     if: >-
       github.repository == 'qqpann/notcms' &&
+      github.ref == 'refs/heads/main' &&
       (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 10

@@ -10,6 +10,20 @@ import {
 import { CHANGELOG_PATH, PACKAGE_JSON_PATH } from "./staged-publish.mjs";
 
 const commit = "a".repeat(40);
+
+test("release job stays on main with a separate GitHub-only token", async () => {
+  const workflow = await readFile(
+    new URL("../.github/workflows/sdk-github-releases.yml", import.meta.url),
+    "utf8"
+  );
+  assert.match(workflow, /github\.ref == 'refs\/heads\/main'/);
+  assert.match(workflow, /github\.repository == 'qqpann\/notcms'/);
+  assert.match(workflow, /ref: main/);
+  assert.match(workflow, /persist-credentials: false/);
+  assert.match(workflow, /contents: write/);
+  assert.doesNotMatch(workflow, /id-token:|NPM_TOKEN|NODE_AUTH_TOKEN/);
+});
+
 const changelog = `# notcms
 
 ## 0.4.0
