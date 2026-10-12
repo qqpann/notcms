@@ -1,181 +1,96 @@
 ---
 title: Astro integration
-description: Build a static blog with typed Notion content and images
+description: Choose when to fetch Notion content and how to turn it into pages
 ---
 
-This guide uses Node.js 24, Astro 6.4.8 and the `notcms` package (SDK and CLI in
-one package). The static ID-based example works with NotCMS 0.4.0. The optional
-`findFirst` example needs the release containing that method; it is not in 0.4.0.
+NotCMS supplies content; Astro decides when that content becomes HTML. Fetch from
+Astro's server-side code, then pass the page data to your templates.
 
-## 1. Prepare content
+This guide assumes a generated `nc` client and a synchronized `blog` database.
+The examples use `published` (Checkbox), `slug` (Text), and `cover` (Files & media).
+Use your own database and property names.
 
-Create a Notion database named `blog` with these exact property names and types:
-`title` (Title), `published` (Checkbox), `slug` (Text), `cover` (Files & media).
-Create one checked post with text in its page body and an uploaded cover image;
-create an unchecked draft too. Connect the database in the NotCMS dashboard,
-select it for synchronization, and wait for a successful sync, including images.
-The database key in the generated schema must be `blog`; adapt all examples if
-your actual key or property names differ.
+For setup from a new project, use the [complete Astro example](https://github.com/qqpann/notcms/tree/main/examples/astro).
+It includes schema generation, environment setup, and working list/detail pages.
 
-`published` is an application rule, not an automatic NotCMS access restriction.
-Your key can retrieve other synchronized pages too. Only sync content intended
-for this workspace's consumers. Keep the key server-side and never prefix it
-with `PUBLIC_`, import the client into a browser script, or serialize it into HTML.
-Image URLs returned by the API are public URLs: never upload private media for
-this example. A frontend filter is not a security boundary for those assets.
+## Choose when to fetch
 
-## 2. Create and initialize the project
+| Approach | Choose it when | Content updates |
+| --- | --- | --- |
+| Static generation | A blog or documentation site can publish on a build cycle | Sync, then rebuild and deploy |
+| On-demand rendering | Pages need fresh content on each request | Read the latest synchronized content at request time |
 
-```bash
-npm create astro@latest -- astro-notcms --template minimal --no-install --no-git
-cd astro-notcms
-npm install astro@6.4.8 notcms@0.4.0
-npm install --save-dev vite@7.3.5
-npx notcms init
-```
+Both use the same SDK queries. Static generation needs credentials during the
+build. On-demand rendering also needs them in the deployed server's runtime;
+choose an [Astro adapter](https://docs.astro.build/en/guides/on-demand-rendering/) for that host.
 
-Choose `src/notcms/schema.ts`. Log in through the browser and select the workspace
-containing `blog`. The CLI writes `.env.local`, config and schema. Confirm that
-`.env.local` is ignored by Git; commit the config, generated schema and lockfile.
-To configure without browser login, set `NOTCMS_SECRET_KEY` and
-`NOTCMS_WORKSPACE_ID` in `.env.local`, then run `npx notcms init`.
+Keep credentials on the server. The complete example loads the CLI's `.env.local`
+for Node-based builds; see [Astro environment variables](https://docs.astro.build/en/guides/environment-variables/)
+for other runtimes.
 
-## 3. Load server credentials
+## Decide what to publish
 
-Replace `astro.config.mjs` with:
+Use a property such as `published` to express your site's publication rule:
 
-```javascript astro.config.mjs
-import { defineConfig } from "astro/config";
-import { loadEnv } from "vite";
-
-// Load the CLI's .env.local before importing the generated client.
-// Deployment environment values take precedence over local files.
-const local = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "NOTCMS_");
-for (const [key, value] of Object.entries(local)) {
-  process.env[key] ??= value;
-}
-export default defineConfig({});
-```
-
-Vite exposes `.env` values as `import.meta.env`, while the generated client reads
-`process.env`. Loading the `NOTCMS_` prefix in config bridges this for Node builds
-and development, without changing the generated file. Do not add `NOTCMS_` to
-Vite's browser `envPrefix`.
-
-## 4. List posts
-
-```astro src/pages/blog/index.astro
----
-import { nc } from "../../notcms/schema";
+```ts
 const [posts, error] = await nc.query.blog.list({
   where: { published: true },
 });
-if (error) throw new Error("Could not load blog posts");
----
-<html lang="en">
-  <head><meta charset="utf-8" /><title>Blog</title></head>
-  <body>
-    <h1>Blog</h1>
-    <ul>
-      {posts.map((post) => (
-        <li><a href={`/blog/${encodeURIComponent(post.id)}/`}>{post.title}</a></li>
-      ))}
-    </ul>
-  </body>
-</html>
+if (error) throw error;
 ```
 
-## 5. Static detail pages and images
+Apply the same rule to lists and detail pages. A filter controls what your site
+shows; it does not restrict what the workspace key can read. Synchronize only
+content intended for that workspace's consumers. Media URLs are public.
 
-```astro src/pages/blog/[id].astro
----
-import { nc } from "../../notcms/schema";
+## Turn content into routes
 
+For a static site, use the published list to decide which pages exist. Astro's
+`getStaticPaths` returns one route per page:
+
+```ts
 export async function getStaticPaths() {
-  const [posts, error] = await nc.query.blog.list({
-    where: { published: true },
-  });
-  if (error) throw new Error("Could not load blog paths");
+  const [posts, error] = await nc.query.blog.list({ where: { published: true } });
+  if (error) throw error;
   return posts.map((post) => ({ params: { id: post.id } }));
 }
-
-const { id } = Astro.params;
-if (!id) throw new Error("Missing page ID");
-const [post, error] = await nc.query.blog.get(id);
-if (error) throw new Error("Could not load blog post");
-// Recheck in case publication changed after path generation.
-if (post.properties.published !== true) throw new Error("Post is no longer published");
-const cover = post.properties.cover?.[0];
----
-<html lang="en">
-  <head><meta charset="utf-8" /><title>{post.title}</title></head>
-  <body>
-    <a href="/blog/">All posts</a>
-    <h1>{post.title}</h1>
-    {cover && <img src={cover} alt={`Cover for ${post.title}`} width="800" loading="lazy" />}
-    <pre>{post.content}</pre>
-  </body>
-</html>
 ```
 
-The `files` property returns a nullable array of URL strings; the first is used
-as the cover. A regular `<img>` needs no image optimization configuration or
-API key in the browser. This minimal example displays Markdown as escaped text
-in `<pre>`. For formatted HTML, use a Markdown renderer with HTML sanitization;
-do not pass untrusted raw Markdown/HTML directly to `set:html`.
+Inside `src/pages/blog/[id].astro`, use that ID to fetch the page and its body:
 
-```bash
-npm run build
-npm run preview
+```ts
+const [post, error] = await nc.query.blog.get(Astro.params.id!);
+if (error) throw error;
 ```
 
-Open `/blog/`, follow the published post's link, and check its title, body and
-cover. The unchecked draft must not appear, and its ID URL must be a 404.
-Any API failure aborts the build instead of publishing an empty blog. Non-generated
-routes are served as 404s by your static host. Changing content or unpublishing a
-post requires a rebuild and deployment; deploy a fresh output directory so old
-HTML does not remain. Run `npx notcms pull` after schema changes and use
-[scheduled schema checks](/en/cli-commands/schema-ci).
+Recheck publication before rendering the detail page: content can change between
+the list and detail requests. In a static build, let an API failure stop the build
+rather than publishing an incomplete site. Unpublishing also requires a fresh deployment.
 
-## Optional: request-time rendering and slugs
+For an on-demand slug route, use `findFirst({ where: { slug, published: true } })`.
+Treat no match as a 404 and an API failure as a service error. Keep slugs unique
+and manage redirects when they change. See [fetching one page](/en/usage/get) for
+`findFirst` usage and release availability.
 
-Static builds need credentials only at build time. For request-time pages, install
-an adapter for your host and set `output: "server"`; for a Node host run
-`npx astro add node` and choose standalone mode. Keep the config's local environment
-loading for development, and provide both `NOTCMS_` variables to the production
-Node process at runtime. Other adapters have their own secret/runtime bindings;
-this `process.env` recipe targets Node, not edge runtimes.
+## Render the body and images
 
-Replace the ID detail route with `src/pages/blog/[slug].astro` below (do not keep
-two competing dynamic routes). Upgrade NotCMS to a release with `findFirst` first.
-Change list links to `/blog/${encodeURIComponent(post.properties.slug)}/` and skip
-posts with an empty slug. For an ID fallback use a distinct `/blog/id/[id]` route.
-The router supplies a decoded parameter: do not decode it a second time.
+`post.content` contains Markdown. Choose a Markdown renderer for your site and
+sanitize any HTML it produces. The complete example displays escaped text so
+that content fetching can be tried without choosing a renderer.
 
-```astro src/pages/blog/[slug].astro
----
-import { nc } from "../../notcms/schema";
-export const prerender = false;
-const slug = Astro.params.slug;
-if (!slug) return new Response("Not found", { status: 404 });
-const [post, error] = await nc.query.blog.findFirst({
-  where: { slug, published: true },
-});
-if (error) return new Response("Content temporarily unavailable", { status: 503 });
-if (post === null || post.properties.published !== true) {
-  return new Response("Not found", { status: 404 });
-}
----
-<html lang="en">
-  <head><meta charset="utf-8" /><title>{post.title}</title></head>
-  <body><h1>{post.title}</h1><pre>{post.content}</pre></body>
-</html>
+A Files & media property contains image URLs. For example, render the first cover:
+
+```astro
+{post.properties.cover?.[0] && (
+  <img src={post.properties.cover[0]} alt={post.title} />
+)}
 ```
 
-Missing posts return 404 and API failures return 503. Duplicate slugs select the
-first registered page unless you specify `sort`; keep slugs unique in editorial
-practice. Changed slugs need application-managed redirects. Add a language
-condition for language-specific slugs. See [findFirst](/en/usage/get) for ordering,
-two-request behavior and errors.
+Use these URLs with Astro's image tools if you need optimization. Image processing
+is a site-level choice; the SDK does not require a particular renderer or layout.
 
-[Astro environment variables](https://docs.astro.build/en/guides/environment-variables/) · [Routing](https://docs.astro.build/en/guides/routing/) · [On-demand rendering](https://docs.astro.build/en/guides/on-demand-rendering/)
+## Keep the schema current
+
+After changing Notion properties, wait for synchronization, then run
+`npx notcms pull` and review the generated types. [Schema checks in CI](/en/cli-commands/schema-ci)
+help catch changes before the next deployment.

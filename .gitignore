@@ -125,3 +125,4 @@ examples/*
 !examples/content-recipes
 
 !examples/schema-ci
+!examples/astro

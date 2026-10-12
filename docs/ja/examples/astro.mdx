@@ -1,172 +1,93 @@
 ---
-title: Astro 連携ガイド
-description: 型付きスキーマから一覧・詳細・画像表示まで作る
+title: Astroとの連携
+description: Notionのコンテンツをいつ取得し、どうページにするかを選ぶ
 ---
 
-Node.js 24、Astro 6.4.8、SDKとCLIを含む `notcms` パッケージを使用します。
-静的なIDルートの例はNotCMS 0.4.0で動きます。後半の `findFirst` はその機能を含む
-リリースが必要で、0.4.0には含まれません。
+NotCMSはコンテンツを提供し、AstroはそれをいつHTMLにするかを決めます。
+Astroのサーバー側コードで取得し、ページのデータをテンプレートに渡します。
 
-## 1. コンテンツを用意する
+このガイドでは、生成済みの `nc` クライアントと、同期済みの `blog` データベースを使います。
+例のプロパティは `published`（チェックボックス）、`slug`（テキスト）、`cover`（ファイル＆メディア）です。
+データベース名やプロパティ名は自分のスキーマに合わせてください。
 
-Notionで `blog` データベースに `title`（タイトル）、`published`（チェックボックス）、
-`slug`（テキスト）、`cover`（ファイル＆メディア）をこの名前で作ります。
-本文とアップロード画像のあるチェック済み記事と、チェックなしの下書きを1件ずつ用意します。
-NotCMSのダッシュボードで接続・同期対象へ追加し、画像を含め同期完了を待ちます。
-生成スキーマのキーが `blog` であることを確認し、実際の名前が異なる場合は例を置き換えます。
+新規プロジェクトから試す場合は、[実行可能なAstroサンプル](https://github.com/qqpann/notcms/tree/main/examples/astro)を使えます。
+スキーマ生成、環境変数の設定、一覧・詳細ページをまとめています。
 
-`published` は利用側の公開条件です。NotCMSが自動的に非公開データへのアクセスを禁止する
-ものではなく、キーは他の同期済みページも取得できます。ワークスペースの利用者へ渡せる
-内容だけを同期してください。キーを `PUBLIC_` 変数、ブラウザーのスクリプト、HTMLへ
-含めません。画像URLは公開URLなので機密画像を同期せず、表示側のフィルターを画像の
-アクセス制御として扱わないでください。
+## いつ取得するかを選ぶ
 
-## 2. 新規プロジェクトと初期化
+| 方式 | 向いている用途 | コンテンツの更新 |
+| --- | --- | --- |
+| 静的生成 | ビルドのタイミングで公開できるブログやドキュメント | 同期後に再ビルド・デプロイする |
+| オンデマンドレンダリング | リクエストごとに新しい内容を表示したいページ | リクエスト時に同期済みの最新内容を取得する |
 
-```bash
-npm create astro@latest -- astro-notcms --template minimal --no-install --no-git
-cd astro-notcms
-npm install astro@6.4.8 notcms@0.4.0
-npm install --save-dev vite@7.3.5
-npx notcms init
-```
+使うSDKのクエリは同じです。静的生成ではビルド時に認証情報が必要です。
+オンデマンドでは配備先のサーバーでも認証情報を使えるようにし、
+その環境に合った[Astroアダプター](https://docs.astro.build/ja/guides/on-demand-rendering/)を選びます。
 
-出力先は `src/notcms/schema.ts` を選び、ブラウザーでログインして `blog` のある
-ワークスペースを選択します。CLIは `.env.local`、設定、スキーマを生成します。
-`.env.local` がGitで無視されることを確認し、設定・生成スキーマ・lockfileをコミットします。
-ブラウザーログインを使わない場合は `.env.local` に `NOTCMS_SECRET_KEY` と
-`NOTCMS_WORKSPACE_ID` を設定して `npx notcms init` を実行します。
+認証情報はサーバー側だけで扱います。実行サンプルではCLIの `.env.local` をNodeのビルドで読み込みます。
+ほかの実行環境は[Astroの環境変数ガイド](https://docs.astro.build/ja/guides/environment-variables/)を参照してください。
 
-## 3. サーバー用の環境変数
+## 何を公開するかを決める
 
-`astro.config.mjs` を次の内容にします。
+`published` のようなプロパティで、サイトの公開条件を表します。
 
-```javascript astro.config.mjs
-import { defineConfig } from "astro/config";
-import { loadEnv } from "vite";
-
-// Load the CLI's .env.local before importing the generated client.
-// Deployment environment values take precedence over local files.
-const local = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "NOTCMS_");
-for (const [key, value] of Object.entries(local)) {
-  process.env[key] ??= value;
-}
-export default defineConfig({});
-```
-
-生成クライアントは `process.env` を読むため、Viteの `import.meta.env` に任せず
-設定ファイルで `NOTCMS_` の変数を読み込みます。生成ファイルの手修正は不要です。
-ブラウザーへ公開するViteの `envPrefix` に `NOTCMS_` を追加しないでください。
-
-## 4. 一覧
-
-```astro src/pages/blog/index.astro
----
-import { nc } from "../../notcms/schema";
+```ts
 const [posts, error] = await nc.query.blog.list({
   where: { published: true },
 });
-if (error) throw new Error("Could not load blog posts");
----
-<html lang="en">
-  <head><meta charset="utf-8" /><title>Blog</title></head>
-  <body>
-    <h1>Blog</h1>
-    <ul>
-      {posts.map((post) => (
-        <li><a href={`/blog/${encodeURIComponent(post.id)}/`}>{post.title}</a></li>
-      ))}
-    </ul>
-  </body>
-</html>
+if (error) throw error;
 ```
 
-## 5. 静的な詳細ページと画像
+一覧と詳細には同じ公開条件を適用します。フィルターはサイトに表示する内容を選ぶもので、
+ワークスペースのキーが読める範囲を制限するものではありません。
+そのワークスペースの利用者へ提供するコンテンツだけを同期してください。メディアのURLは公開URLです。
 
-```astro src/pages/blog/[id].astro
----
-import { nc } from "../../notcms/schema";
+## コンテンツをルートにする
 
+静的サイトでは、公開記事の一覧から作成するページを決めます。
+Astroの `getStaticPaths` で、記事ごとにルートを返します。
+
+```ts
 export async function getStaticPaths() {
-  const [posts, error] = await nc.query.blog.list({
-    where: { published: true },
-  });
-  if (error) throw new Error("Could not load blog paths");
+  const [posts, error] = await nc.query.blog.list({ where: { published: true } });
+  if (error) throw error;
   return posts.map((post) => ({ params: { id: post.id } }));
 }
-
-const { id } = Astro.params;
-if (!id) throw new Error("Missing page ID");
-const [post, error] = await nc.query.blog.get(id);
-if (error) throw new Error("Could not load blog post");
-// Recheck in case publication changed after path generation.
-if (post.properties.published !== true) throw new Error("Post is no longer published");
-const cover = post.properties.cover?.[0];
----
-<html lang="en">
-  <head><meta charset="utf-8" /><title>{post.title}</title></head>
-  <body>
-    <a href="/blog/">All posts</a>
-    <h1>{post.title}</h1>
-    {cover && <img src={cover} alt={`Cover for ${post.title}`} width="800" loading="lazy" />}
-    <pre>{post.content}</pre>
-  </body>
-</html>
 ```
 
-`files` はURL文字列の配列またはnullです。先頭をカバーに使い、通常の `<img>` で表示する
-ため画像最適化の設定やブラウザー内のAPIキーは不要です。最小例ではMarkdown本文を
-`<pre>` のエスケープ済みテキストとして表示します。装飾する場合はMarkdown変換後の
-HTMLをサニタイズし、未信頼の本文をそのまま `set:html` に渡さないでください。
+`src/pages/blog/[id].astro` では、そのIDから本文を含むページを取得します。
 
-```bash
-npm run build
-npm run preview
+```ts
+const [post, error] = await nc.query.blog.get(Astro.params.id!);
+if (error) throw error;
 ```
 
-`/blog/` から記事を開き、タイトル・本文・画像を確認します。下書きは一覧に出ず、
-そのIDルートは404になることを確認します。API失敗はビルドを停止し、空のブログを
-公開しません。生成されないルートは静的ホストで404にします。更新・公開停止の反映は
-再ビルドと再配置が必要です。古いHTMLを残さないよう新しい出力一式を配置します。
-スキーマ変更時は `npx notcms pull` と [CIの定期検査](/ja/cli-commands/schema-ci)を使います。
+一覧取得後に内容が変わることもあるため、詳細を表示する前にも公開状態を確認します。
+静的生成中にAPI取得が失敗した場合は、不完全なサイトを公開せずビルドを止めます。
+記事を非公開にしたときも、新しいビルドのデプロイが必要です。
 
-## 任意: SSR と slug
+オンデマンドのslugルートでは、`findFirst({ where: { slug, published: true } })` を使います。
+該当なしは404、API取得の失敗はサービスエラーとして扱います。slugの一意性と変更時のリダイレクトはサイト側で管理します。
+使い方と利用できるリリースは[1件のページ取得](/ja/usage/get)を参照してください。
 
-静的生成ではビルド時だけ秘密値が必要です。SSRはホストに応じたadapterを導入し、
-`output: "server"` にします。Nodeホストなら `npx astro add node` でstandaloneを選びます。
-開発用の環境読み込みは設定に残し、本番ではNodeプロセスの実行環境に2つの `NOTCMS_`
-変数を設定します。その他のadapterは実行環境の秘密値bindingに合わせる必要があります。
-この `process.env` の手順はNode向けです。
+## 本文と画像を表示する
 
-NotCMSを `findFirst` 対応版へ更新してからID詳細を `src/pages/blog/[slug].astro` に
-置き換えます。競合する動的ルートを2つ残さないでください。一覧リンクは
-`/blog/${encodeURIComponent(post.properties.slug)}/` にし、slugなしの記事は除外します。
-IDフォールバックは別の `/blog/id/[id]` ルートを使います。ルーターからの値は
-デコード済みなので二重にデコードしません。
+`post.content` にはMarkdownが入ります。サイトに合ったMarkdownレンダラーを選び、
+生成したHTMLをサニタイズして表示します。実行サンプルでは、レンダラーを決める前でも取得を試せるよう、
+エスケープしたテキストを表示しています。
 
-```astro src/pages/blog/[slug].astro
----
-import { nc } from "../../notcms/schema";
-export const prerender = false;
-const slug = Astro.params.slug;
-if (!slug) return new Response("Not found", { status: 404 });
-const [post, error] = await nc.query.blog.findFirst({
-  where: { slug, published: true },
-});
-if (error) return new Response("Content temporarily unavailable", { status: 503 });
-if (post === null || post.properties.published !== true) {
-  return new Response("Not found", { status: 404 });
-}
----
-<html lang="en">
-  <head><meta charset="utf-8" /><title>{post.title}</title></head>
-  <body><h1>{post.title}</h1><pre>{post.content}</pre></body>
-</html>
+ファイル＆メディアのプロパティには画像URLが入ります。たとえば先頭のカバー画像は次のように表示できます。
+
+```astro
+{post.properties.cover?.[0] && (
+  <img src={post.properties.cover[0]} alt={post.title} />
+)}
 ```
 
-該当なしは404、API障害は503です。重複slugは `sort` がなければ登録順の先頭を返すため、
-編集時に一意にします。変更後の旧URLリダイレクトは利用側で管理し、多言語slugは
-言語条件も指定します。並び順・2回のAPI呼び出し・エラーの詳細は
-[findFirst](/ja/usage/get)を参照してください。
+最適化が必要なら、このURLをAstroの画像機能で扱います。
+画像処理はサイト側で選択でき、SDKが特定のレンダラーやレイアウトを要求することはありません。
 
-[Astro environment variables](https://docs.astro.build/en/guides/environment-variables/) · [Routing](https://docs.astro.build/en/guides/routing/) · [On-demand rendering](https://docs.astro.build/en/guides/on-demand-rendering/)
+## スキーマの変更を取り込む
+
+Notionのプロパティを変えたら、同期完了後に `npx notcms pull` を実行し、生成された型を確認します。
+[CIでのスキーマ確認](/ja/cli-commands/schema-ci)を使うと、次のデプロイまでにずれを見つけられます。

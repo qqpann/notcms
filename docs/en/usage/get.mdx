@@ -1,99 +1,77 @@
 ---
-title: Get Single Item
-description: Fetch individual items from your Notion databases
+title: Fetch one page
+description: Choose between a known page ID and a property-based lookup
 ---
 
-## Basic Usage
+Use `get` when you already have a page ID, and `findFirst` when you have a property
+such as a slug. Both return the page's properties and Markdown `content`.
+Database and property names below come from your generated schema.
 
-Fetch a single item by its ID:
+## Fetch by ID
 
-```typescript
-const [post, error] = await nc.query.blog.get('page-id-123');
+An ID identifies a particular page. Use it for links that should keep working
+when a title or slug changes.
 
-if (!error) {
-  console.log(post.title, post.content);
-}
+```ts
+const [post, error] = await nc.query.blog.get("page-id-123");
+if (error) throw error;
+console.log(post.content);
 ```
 
-## Type Safety
+If that page does not exist, `get` returns an error. The SDK does not turn it into
+an empty page.
 
-NotCMS provides full type inference for fetched items:
+## Fetch by a property
 
-```typescript
-// Infer single page type
-type BlogPost = typeof nc.query.blog.$inferPage;
+A property lookup finds a page that matches your site's rule. For example, find
+a published post by its slug:
 
-// Use in your functions
-function processBlogPost(post: BlogPost) {
-  // Full type safety and IDE autocomplete
-  console.log(post.title);
-  console.log(post.published);
-  console.log(post.author);
-}
-```
-
-## Related Items
-
-Fetch related items using multiple queries:
-
-```typescript
-async function getPostWithAuthor(postId: string) {
-  // Get the post
-  const [post, postError] = await nc.query.blog.get(postId);
-  if (postError) throw postError;
-  
-  // Get the author
-  const [author, authorError] = await nc.query.authors.get(post.properties.authors[0]);
-  if (authorError) throw authorError;
-  
-  return {
-    ...post,
-    author
-  };
-}
-```
-
-## Next Steps
-
-<CardGroup cols={2}>
-  <Card title="List Items" icon="list" href="/en/usage/list">
-    Learn to query multiple items
-  </Card>
-  <Card title="Client API" icon="code" href="/en/usage/client">
-    Explore the complete Client API
-  </Card>
-</CardGroup>
-
-## findFirst: fetch by slug or another property
-
-```typescript
-const [post, error, response] = await nc.query.blog.findFirst({
+```ts
+const [post, error] = await nc.query.blog.findFirst({
   where: { slug: "hello-world", published: true },
-  sort: { publishedAt: "desc" },
 });
 if (error) throw error;
-if (post === null) {
-  // Your app decides whether to return HTTP 404.
-} else {
-  console.log(post.content);
-}
+console.log(post?.content);
 ```
 
-Requires the release containing `findFirst` (not available in 0.4.0).
-`where` and `sort` have exactly the same types and semantics as [list()](/en/usage/list).
-The result includes `content` like `get(id)`. No match returns `[null, null, response]`.
-Duplicates return the first match in the requested sort order; ties and omitted
-sort use registration order, then page ID. There is no CMS-level slug setting
-or uniqueness constraint. A changed slug makes the old URL stop matching;
-redirects are the application's responsibility. Missing slugs can use a separate
-ID route and the unchanged `get(pageId)` method. Encode slugs when building URLs;
-pass the decoded route parameter to `where`. For multilingual slugs, add a
-language condition to disambiguate. See the [URL recipes](/en/examples/content-recipes).
+`post` is `null` when nothing matches. Your application can use that result to
+show a 404. A failed request is an error, not a missing page.
 
-Internally this performs `list(options)` then `get(first.id)`: two API requests
-for a match, one for no match. The list currently retrieves all matching metadata.
-It is not an atomic snapshot. If the selected page is deleted before detail
-retrieval, the detail error (including 404) is preserved, not converted to null.
-Other errors and HTTP 429 remain error tuples; no automatic retries occur.
-The third tuple element is the detail response on success, the list response
-for no match, or the failing response (undefined for a network failure).
+<Note>
+`findFirst` requires the release containing this method; it is not available in 0.4.0.
+</Note>
+
+## Decide which match to use
+
+`where` and `sort` work like [list()](/en/usage/list). If several pages match,
+`findFirst` returns the first one in that order; it does not enforce uniqueness.
+
+```ts
+const [post, error] = await nc.query.blog.findFirst({
+  where: { published: true },
+  sort: { publishedAt: "desc" },
+});
+```
+
+Use an explicit sort when “first” matters. For a slug route, keep slugs unique in
+your content workflow, and manage redirects when they change. See the
+[URL recipes](/en/examples/content-recipes) for language-specific slugs and ID fallbacks.
+
+## Handle the result
+
+| Outcome | `post` | `error` |
+| --- | --- | --- |
+| A page was fetched | Page with `properties` and `content` | `null` |
+| No `findFirst` match | `null` | `null` |
+| A request failed | `undefined` | `Error` |
+
+Types are inferred from the generated schema. Check `error` before using the
+page; for `findFirst`, also handle `null`. See [errors and rate limits](/en/usage/errors-and-rate-limits)
+for retry decisions.
+
+<Accordion title="Request and ordering details">
+- `findFirst` calls `list(options)` and then `get(first.id)`: two requests for a match, one for no match. The list currently retrieves all matching metadata.
+- The reads are not an atomic snapshot. If the page disappears before detail retrieval, the detail error is preserved; it is not converted to `null`.
+- With no sort, or when sort values tie, ordering uses registration order followed by page ID.
+- The optional third tuple value is the detail response on success, the list response for no match, or the failed response on error. It is `undefined` for a network failure. The SDK does not retry automatically.
+</Accordion>

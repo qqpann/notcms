@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import {
+  cp,
   mkdir,
   mkdtemp,
   readFile,
@@ -14,25 +15,11 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Pass a node_modules directory containing the guide's Astro/Vite versions.
+// Pass a node_modules directory containing Astro and Vite (see examples/astro).
 // The SDK must be built first. All credentials and content below are fixtures.
 const root = fileURLToPath(new URL("..", import.meta.url));
 const modules = path.resolve(process.argv[2] ?? "node_modules");
 const project = await mkdtemp(path.join(tmpdir(), "notcms-astro-guide-"));
-const guide = await readFile(
-  path.join(root, "docs/en/examples/astro.mdx"),
-  "utf8"
-);
-const japanese = await readFile(
-  path.join(root, "docs/ja/examples/astro.mdx"),
-  "utf8"
-);
-const blocks = [
-  ...guide.matchAll(/```(?:astro|javascript) ([^\n]+)\n([\s\S]*?)```/g),
-];
-for (const [, filename, source] of blocks) {
-  assert.ok(japanese.includes(source), `Japanese example differs: ${filename}`);
-}
 const schema = {
   blog: {
     id: "db_blog",
@@ -122,12 +109,14 @@ try {
     path.join(project, ".env.local"),
     `NOTCMS_SECRET_KEY=fixture-secret\nNOTCMS_WORKSPACE_ID=fixture-workspace\nNOTCMS_API_HOST=http://127.0.0.1:${port}/v1\n`
   );
-  for (const [, filename, source] of blocks) {
-    if (filename.includes("[slug]")) continue;
-    const destination = path.join(project, filename);
-    await mkdir(path.dirname(destination), { recursive: true });
-    await writeFile(destination, source);
-  }
+  // Build the maintained example, independently of the guides' prose/layout.
+  await cp(path.join(root, "examples/astro/src"), path.join(project, "src"), {
+    recursive: true,
+  });
+  await cp(
+    path.join(root, "examples/astro/astro.config.mjs"),
+    path.join(project, "astro.config.mjs")
+  );
   const cli = path.join(root, "packages/notcms/dist/cli.cjs");
   assert.equal((await run(cli, ["pull"])).code, 0);
   assert.equal((await run(cli, ["pull", "--check"])).code, 0);

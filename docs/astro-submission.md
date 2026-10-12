@@ -1,7 +1,5 @@
 # Astro CMS guide submission plan
 
-Related: https://github.com/qqpann/NotCMSApp/issues/125
-
 Checked 2026-10-12: [CMS overview](https://docs.astro.build/en/guides/cms/),
 [Contributor Manual](https://github.com/withastro/docs/blob/main/CONTRIBUTING.md),
 [current CMS sources](https://github.com/withastro/docs/tree/main/src/content/docs/en/guides/cms).
@@ -14,9 +12,8 @@ resource page is a possible starting point; acceptance is the maintainers' decis
 Title: Add a NotCMS integration resource to the CMS guides
 
 NotCMS synchronizes Notion databases to an API and provides a TypeScript SDK.
-We maintain an Astro guide showing setup from a new project, schema generation,
-server-only credentials, filtered lists, static detail pages, public images,
-and request-time slug lookup. Would a resource stub linking to this maintained
+We maintain an Astro guide explaining rendering choices, publication rules,
+content queries, and images, with a runnable static blog example. Would a resource stub linking to this maintained
 guide fit the CMS section? We can expand the page if you prefer an inline guide.
 
 Guide: https://docs.notcms.com/en/examples/astro
@@ -59,13 +56,10 @@ TypeScript SDK for fetching pages and their content.
    translation process handle other languages. Check its rendered PR preview.
 4. Track acceptance separately; no upstream issue/PR has been sent by this change.
 
-## Reproduce the local guide check
+## Verify the example
 
-Build the SDK, install Astro 6.4.8 and Vite 7.3.5 in a scratch project, and run
-`node scripts/verify-astro-guide.mjs /absolute/path/to/scratch/node_modules` from
-this repository. The script extracts the actual English guide snippets, checks
-that Japanese snippets match, generates a schema from a fixture API, and builds
-a fresh temporary Astro project. It verifies list/detail/image HTML, escaped
-content, draft route exclusion, absence of the fixture secret in HTML, and
-build failure when the API fails. This verifies the static guide; real Notion
-onboarding and production host configuration remain environment-specific checks.
+See [the Astro example](../examples/astro/README.md) for setup and the fixture
+check. The check builds the maintained source files rather than extracting code
+from the guide. Guide wording and section order can change without changing the
+example or its verification. Real Notion onboarding and production deployment
+remain environment-specific checks.

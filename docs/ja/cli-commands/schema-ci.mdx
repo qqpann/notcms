@@ -1,93 +1,64 @@
 ---
-title: CI でスキーマを確認する
-description: PR と定期実行で Notion と生成型のずれを検知する
+title: CIでスキーマを確認する
+description: 生成した型と同期済みのNotionプロパティのずれを見つける
 ---
 
-`notcms pull --check` はデータベース名・ID、プロパティ名・型、
-select/status/multi_select の選択肢を、NotCMS が配信する最新スキーマと比較します。
-空白、引用符、コメント、キーや選択肢の順序だけの差では失敗しません。
-ファイルを実行・上書きせず、未生成または解析できないファイルは失敗にします。
+生成スキーマは、コードが想定しているコンテンツの形です。Notionはコードと独立して変更できるため、
+型が古くなっていても気づけないことがあります。`pull --check` は、そのずれをデプロイ前に見つけるためのコマンドです。
 
-## GitHub Actions
+```sh
+npx notcms pull --check
+```
 
-意味的な比較に対応した `notcms` を導入し、`package.json`、`package-lock.json`、
-`notcms.config.json`、生成スキーマをコミットします。CI とローカルは同じ固定版を使い、
-CI で `@latest` を実行しないでください。この変更を含むリリースが必要です
-（0.4.0 はまだ文字列比較です）。
+ローカルのスキーマと、NotCMSに同期された最新のスキーマを比較します。
+Notionへの直接問い合わせや、ローカルファイルの更新は行いません。
 
-npm のルートプロジェクトで `.github/workflows/notcms-schema.yml` に保存します。
+## 何を変更として扱うか
+
+- データベース名とID。
+- プロパティ名と型。
+- セレクト・ステータス・マルチセレクトの選択肢。
+
+整形、キーの順序、選択肢の順序では、スキーマの意味は変わりません。
+生成ファイルがない場合や解析できない場合も、正しいとみなさずチェックを失敗させます。
+意味的比較には、この機能を含む0.4.0より後のリリースが必要です。0.4.0はファイルの文字列を比較します。
+
+## いつ確認するかを選ぶ
+
+| タイミング | 見つけたいずれ |
+| --- | --- |
+| Pull Request | コード変更時に、使っているスキーマが古くなっていないか |
+| 定期実行 | コードを変更していない間に、Notion側が変わっていないか |
+
+編集者と開発者が別々に作業する場合は、両方を使うと役立ちます。
+アプリが利用するワークスペースを対象にし、同期が完了してから確認します。
+
+## ワークフローに組み込む
+
+生成スキーマ、CLI設定、lockfileをコミットし、CIではlockfileからインストールします。
+ローカルとCIで同じSDK・CLIを使った上で、認証情報をCIのシークレットから渡します。
 
 ```yaml
-name: NotCMS schema
-on:
-  pull_request:
-  schedule:
-    - cron: '17 3 * * *'
-  workflow_dispatch:
-permissions:
-  contents: read
-jobs:
-  schema:
-    # Forks and Dependabot do not receive these secrets.
-    if: >-
-      github.actor != 'dependabot[bot]' &&
-      (github.event_name != 'pull_request' ||
-       github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: npm
-      - run: npm ci --ignore-scripts
-      - name: Check schema
-        run: npx --no-install notcms pull --check
-        env:
-          NOTCMS_SECRET_KEY: ${{ secrets.NOTCMS_SECRET_KEY }}
-          NOTCMS_WORKSPACE_ID: ${{ secrets.NOTCMS_WORKSPACE_ID }}
+- name: Check NotCMS schema
+  run: npx --no-install notcms pull --check
+  env:
+    NOTCMS_SECRET_KEY: ${{ secrets.NOTCMS_SECRET_KEY }}
+    NOTCMS_WORKSPACE_ID: ${{ secrets.NOTCMS_WORKSPACE_ID }}
 ```
 
-同じワークスペースの `NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` を
-リポジトリの Actions secrets に登録します。`.env.local` やキーをコミット・出力しません。
-モノレポは作業ディレクトリと `cache-dependency-path` を合わせてください。
-pnpm なら固定版の pnpm をセットアップし、`pnpm install --frozen-lockfile --ignore-scripts`
-と `pnpm exec notcms pull --check` に置き換えます。
+[GitHub Actionsの完全な例](https://github.com/qqpann/notcms/blob/main/examples/schema-ci/notcms-schema.yml)には、
+インストール、PR確認、日次実行、手動実行をまとめています。
+シークレットを使えないfork・DependabotのPRはスキップします。認証情報は信頼できるコードだけに渡し、
+この制限を回避するために `pull_request_target` へ切り替えないでください。
+ログにはスキーマ名や選択肢が出るため、適切なアクセス範囲のリポジトリで実行します。
 
-定期実行は毎日03:17 UTC（12:17 JST）、デフォルトブランチが対象です。
-先にワークフローをデフォルトブランチへマージし、担当者の Actions 失敗通知を有効にします。
-secrets を使えない fork・Dependabot の PR はスキップするため、信頼できる変更を
-メンテナーのブランチに取り込んで確認します。`pull_request_target` へ変更して
-未信頼の PR コードに秘密情報を渡さないでください。同一リポジトリの PR も信頼できる
-作成者に限定します。差分ログにはスキーマの名前・選択肢が出るため、公開範囲にも注意します。
-`--ignore-scripts` はこのCLI専用検査で依存のライフサイクルスクリプトを実行しない指定です。
+## チェックが失敗したら
 
-## 失敗の読み方と修正
+終了コード `0` は一致、`1` はずれまたは確認失敗です。メッセージを見て次の対応を選びます。
 
-終了コード0は一致、1は差分・ファイル不足・解析不能または通信／認証等の失敗です。
-メッセージで原因を区別します。
+- **スキーマが変わった:** 同期を完了させ、ローカルで `npx notcms pull` を実行します。影響するクエリと差分を確認してからコミットします。
+- **ファイルがない・解析できない:** `npx notcms pull` で再生成します。
+- **認証・ネットワークのエラー:** 接続を直して再実行します。型の再生成では解決しません。
 
-```text
-Added option: "blog"."status" = "Published"
-Changed property type: "blog"."slug"
-  "title" -> "rich_text"
-Schema at src/notcms/schema.ts is out of date.
-```
-
-Notion を変更したらダッシュボードで同期完了を待ちます。
-CLI の比較対象は NotCMS に同期済みのスキーマで、Notion への直接照会ではありません。
-その後ローカルで次を実行します。
-
-```bash
-npx notcms pull
-git diff -- src/notcms/schema.ts
-npx notcms pull --check
-git add src/notcms/schema.ts
-git commit -m "update: refresh NotCMS schema"
-```
-
-出力先を変更した場合はパスを合わせます。差分と利用側の型エラーを確認してコミットします。
-生成ファイルの整形は問題ありません。認証・通信エラーは設定やサービスを確認して再実行します。
+CIはずれを知らせる役割にします。Notionの変更をすべて自動で受け入れず、
+スキーマ更新もレビューできるコード変更として扱ってください。

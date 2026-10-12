@@ -1,96 +1,73 @@
 ---
-title: 単一アイテムの取得
-description: Notionデータベースから個別のアイテムを取得
+title: 1件のページを取得する
+description: ページIDによる取得と、プロパティによる検索を使い分ける
 ---
 
-## 基本的な使用方法
+ページIDが分かっているなら `get`、slugなどのプロパティで探すなら `findFirst` を使います。
+どちらもページのプロパティとMarkdownの本文 `content` を返します。
+以下のデータベース名・プロパティ名は、生成したスキーマに合わせてください。
 
-IDで単一のアイテムを取得：
+## IDで取得する
 
-```typescript
-const [post, error] = await nc.query.blog.get('page-id-123');
+IDは特定のページを指します。タイトルやslugが変わっても同じページを参照したい場合に使います。
 
-if (!error) {
-  console.log(post.title, post.content);
-}
+```ts
+const [post, error] = await nc.query.blog.get("page-id-123");
+if (error) throw error;
+console.log(post.content);
 ```
 
-## 型安全性
+ページが存在しなければ `get` はエラーを返します。空のページとしては扱いません。
 
-NotCMSは取得したアイテムに対して完全な型推論を提供します：
+## プロパティで探す
 
-```typescript
-// 単一ページ型を推論
-type BlogPost = typeof nc.query.blog.$inferPage;
+プロパティによる検索は、サイトの条件に合うページを探します。たとえば、公開済みの記事をslugで取得します。
 
-// 関数で使用
-function processBlogPost(post: BlogPost) {
-  // 完全な型安全性とIDEの自動補完
-  console.log(post.title);
-  console.log(post.published);
-  console.log(post.author);
-}
-```
-
-## 関連アイテム
-
-複数のクエリを使用して関連アイテムを取得：
-
-```typescript
-async function getPostWithAuthor(postId: string) {
-  // 記事を取得
-  const [post, postError] = await nc.query.blog.get(postId);
-  if (postError) throw postError;
-  
-  // 著者を取得
-  const [author, authorError] = await nc.query.authors.get(post.properties.authors[0]);
-  if (authorError) throw authorError;
-  
-  return {
-    ...post,
-    author
-  };
-}
-```
-
-## 次のステップ
-
-<CardGroup cols={2}>
-  <Card title="アイテムの一覧取得" icon="list" href="/ja/usage/list">
-    複数アイテムのクエリ方法を学ぶ
-  </Card>
-  <Card title="クライアントAPI" icon="code" href="/ja/usage/client">
-    完全なクライアントAPIを探索
-  </Card>
-</CardGroup>
-
-## findFirst: slug などのプロパティで1件取得
-
-```typescript
-const [post, error, response] = await nc.query.blog.findFirst({
+```ts
+const [post, error] = await nc.query.blog.findFirst({
   where: { slug: "hello-world", published: true },
-  sort: { publishedAt: "desc" },
 });
 if (error) throw error;
-if (post === null) {
-  // 404 にするかは利用側で決めます。
-} else {
-  console.log(post.content);
-}
+console.log(post?.content);
 ```
 
-`findFirst` を含むリリースが必要です（0.4.0 には未搭載）。
-`where`／`sort` は [list()](/ja/usage/list) と同じ型・意味です。
-返却値は `get(id)` と同様に本文 `content` を含み、該当なしは `[null, null, response]` です。
-重複はエラーにせず指定順の先頭を返し、同値・並び順省略時は登録順、次にページIDを使います。
-CMS専用のslug設定・一意制約は設けません。slug変更後の旧URLは一致しなくなるため、
-リダイレクトはアプリで管理します。未設定は別のIDルートと既存の `get(pageId)` で補えます。
-URLを作るときはエンコードし、`where` にはデコード済みパラメーターを渡します。
-言語別slugは言語条件も指定します。[URLレシピ](/ja/examples/content-recipes)も参照してください。
+一致するページがなければ `post` は `null` です。アプリではその結果を使って404を表示できます。
+リクエスト自体の失敗は、ページなしではなくエラーとして扱います。
 
-内部では `list(options)` の先頭に対して `get(id)` を呼ぶため、一致時は2リクエスト、
-該当なしは1リクエストです。現在の一覧取得は一致するメタデータ全件を取得します。
-一連の取得はアトミックではなく、途中でページが削除された場合は詳細取得の404エラーを
-保持し、nullへ変換しません。その他のエラー・429も通常のエラータプルで、自動再試行しません。
-3番目の要素は成功時に詳細レスポンス、該当なし時に一覧レスポンス、失敗時には失敗した
-レスポンス（ネットワーク障害ならundefined）です。
+<Note>
+`findFirst` を含むリリースが必要です。0.4.0には未搭載です。
+</Note>
+
+## どの1件を選ぶか
+
+`where` と `sort` は [list()](/ja/usage/list) と同じです。複数のページが一致した場合は、
+その並び順の先頭を返します。一意性を保証する機能ではありません。
+
+```ts
+const [post, error] = await nc.query.blog.findFirst({
+  where: { published: true },
+  sort: { publishedAt: "desc" },
+});
+```
+
+「最初の1件」に意味がある場合は、並び順を指定します。slugのルートでは、編集時に重複を避け、
+変更時のリダイレクトをサイト側で管理します。言語別slugやIDによる代替は
+[URLレシピ](/ja/examples/content-recipes)を参照してください。
+
+## 結果を扱う
+
+| 結果 | `post` | `error` |
+| --- | --- | --- |
+| ページを取得できた | `properties` と `content` を含むページ | `null` |
+| `findFirst` で一致するページがない | `null` | `null` |
+| リクエストが失敗した | `undefined` | `Error` |
+
+型は生成スキーマから推論されます。ページを使う前に `error` を確認し、`findFirst` では `null` も扱います。
+再試行の判断は[エラーとレート制限](/ja/usage/errors-and-rate-limits)を参照してください。
+
+<Accordion title="リクエストと並び順の詳細">
+- `findFirst` は `list(options)` の後に `get(first.id)` を呼びます。一致時は2リクエスト、該当なしは1リクエストです。現在の一覧取得は一致するメタデータ全件を取得します。
+- 一連の取得は同一時点を保証しません。詳細取得前にページが消えた場合は、そのエラーを保持し、`null` へ変換しません。
+- 並び順の省略時や同値の場合は、登録順、次にページIDで並びます。
+- タプルの3番目は成功時に詳細レスポンス、該当なし時に一覧レスポンス、失敗時に失敗したレスポンスです。ネットワーク障害では `undefined` になります。SDKは自動再試行しません。
+</Accordion>
