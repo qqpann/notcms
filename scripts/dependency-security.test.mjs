@@ -66,7 +66,7 @@ for (const consumer of [
   });
 }
 
-test("Changesets generates the staged SDK patch without altering the checkout", async () => {
+test("Changesets generates an SDK patch using an isolated changeset", async () => {
   const fixture = await mkdtemp(path.join(tmpdir(), "notcms-changeset-"));
   try {
     const manifest = JSON.parse(
@@ -96,9 +96,11 @@ test("Changesets generates the staged SDK patch without altering the checkout", 
       path.join(fixture, ".changeset/config.json"),
       JSON.stringify(config)
     );
-    await copyFile(
-      path.join(root, ".changeset/secure-cli-dependencies.md"),
-      path.join(fixture, ".changeset/secure-cli-dependencies.md")
+    // Real changesets are consumed by version PRs; keep this regression input
+    // independent of which package version has already been released.
+    await writeFile(
+      path.join(fixture, ".changeset/secure-cli-dependencies.md"),
+      '---\n"notcms": patch\n---\n\nUpdate bundled CLI dependencies to patched versions.\n'
     );
     const result = await runCommand(
       process.execPath,

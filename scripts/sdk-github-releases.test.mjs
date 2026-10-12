@@ -115,7 +115,7 @@ test("skipped 0.2.0 changes are included once in npm 0.3.0", () => {
   assert.doesNotMatch(body, /New filters|Old CLI|Prerelease-only|## 0.2.0/);
   assert.equal(body.match(/### Minor Changes/g).length, 1);
   assert.equal(body.match(/Browser login/g).length, 1);
-  assert.match(body, /https:\/\/www.npmjs.com\/package\/notcms\/v\/0.3.0/);
+  assert.ok(body.includes("https://www.npmjs.com/package/notcms/v/0.3.0"));
 });
 test("next published version excludes already released changes", () => {
   const body = releaseNotes(changelog, "0.4.0", "0.3.0");
