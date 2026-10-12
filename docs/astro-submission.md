@@ -22,6 +22,8 @@ SDK: https://github.com/qqpann/notcms
 ## Proposed English page
 
 Proposed path: `src/content/docs/en/guides/cms/notcms.mdx` in `withastro/docs`.
+Register an approved NotCMS logo under the `notcms` key in the upstream CMS logo
+registry before adding this page; its required `logo` field must use a registered key.
 
 ```mdx
 ---
@@ -30,6 +32,7 @@ description: Fetch typed Notion content in Astro with NotCMS.
 sidebar:
   label: NotCMS
 type: cms
+logo: notcms
 i18nReady: true
 stub: true
 ---
@@ -51,8 +54,8 @@ TypeScript SDK for fetching pages and their content.
 2. Open the prepared proposal via https://github.com/withastro/docs/issues/new/choose
    or https://github.com/withastro/docs/discussions. Check for duplicates first.
 3. After maintainer feedback, submit the English page to `withastro/docs:main`,
-   following its current template and navigation conventions. Supply an approved
-   NotCMS logo if required by the CMS card component. Let upstream's
+   following its current template and navigation conventions. Register an approved
+   NotCMS logo and use its key in the required `logo` frontmatter field. Let upstream's
    translation process handle other languages. Check its rendered PR preview.
 4. Track acceptance separately; no upstream issue/PR has been sent by this change.
 
