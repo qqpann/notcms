@@ -35,7 +35,7 @@ describe("fetchSchema", () => {
 
     await expect(fetchSchema()).resolves.toEqual(schema);
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.notcms.com/v1/ws/ws_test/schema",
+      "https://api.notcms.com/v1/ws/ws_test/schema?include=options",
       {
         method: "GET",
         headers: {
@@ -59,7 +59,7 @@ describe("fetchSchema", () => {
     await fetchSchema();
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "http://127.0.0.1:12345/v1/ws/ws_test/schema",
+      "http://127.0.0.1:12345/v1/ws/ws_test/schema?include=options",
       expect.any(Object)
     );
   });
@@ -104,7 +104,7 @@ describe("fetchSchema", () => {
       fetchSchema({ secretKey: "ncsec_login", workspaceId: "ws_login" })
     ).resolves.toEqual(schema);
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.notcms.com/v1/ws/ws_login/schema",
+      "https://api.notcms.com/v1/ws/ws_login/schema?include=options",
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer ncsec_login",

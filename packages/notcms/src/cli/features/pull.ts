@@ -105,7 +105,7 @@ function createSchemaModule(schema: Schema): string {
 import { Client } from "notcms";
 import type { Schema } from "notcms";
 
-export const schema = ${serializeSchemaAsObjectLiteral(schema)} satisfies Schema;
+export const schema = ${serializeSchemaAsObjectLiteral(schema)} as const satisfies Schema;
 export const nc = new Client({ schema });
   `.trim();
 }

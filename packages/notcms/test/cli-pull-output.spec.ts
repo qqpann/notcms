@@ -92,7 +92,7 @@ describe("CLI pull output paths", () => {
 async function startSchemaServer(): Promise<{ server: Server; url: string }> {
   const server = createServer((request, response) => {
     if (
-      request.url === "/v1/ws/ws_test/schema" &&
+      request.url === "/v1/ws/ws_test/schema?include=options" &&
       request.headers.authorization === "Bearer sk_test"
     ) {
       response.writeHead(200, { "content-type": "application/json" });

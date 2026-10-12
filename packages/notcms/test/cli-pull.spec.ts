@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { pullSchema } from "../src/cli/features/pull";
+import { parseGeneratedSchema } from "../src/cli/features/schema-diff";
 import type { Schema } from "../src/types";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
@@ -44,7 +45,7 @@ describe("pullSchema", () => {
       schemaChanges: null,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining("/ws/ws_test/schema"),
+      expect.stringContaining("/ws/ws_test/schema?include=options"),
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "Bearer ncsec_test",
@@ -63,8 +64,44 @@ export const schema = {
       "Slug": "rich_text"
     }
   }
-} satisfies Schema;
+} as const satisfies Schema;
 export const nc = new Client({ schema });`);
+  });
+
+  it("preserves literal choices and reports a later option change", async () => {
+    const first = {
+      Blog: {
+        id: "blog",
+        properties: { Status: "status" },
+        options: { Status: ["Draft", "Published"] },
+      },
+    } as const satisfies Schema;
+    stubSchema(first);
+    await writeConfig("schema.ts");
+    await pullSchema({ credentials });
+    const content = await fs.readFile(path.join(dir, "schema.ts"), "utf8");
+    expect(content).toContain("as const satisfies Schema");
+    expect(parseGeneratedSchema(content)).toEqual(first);
+    stubSchema({
+      Blog: { ...first.Blog, options: { Status: ["Published", "Archived"] } },
+    });
+    const result = await pullSchema({ credentials });
+    expect(result).toMatchObject({
+      schemaChanges: [
+        {
+          kind: "option-added",
+          database: "Blog",
+          property: "Status",
+          option: "Archived",
+        },
+        {
+          kind: "option-removed",
+          database: "Blog",
+          property: "Status",
+          option: "Draft",
+        },
+      ],
+    });
   });
 
   it("returns up-to-date when check mode matches the generated schema", async () => {
@@ -246,7 +283,7 @@ export const nc = new Client({ schema });`);
     const pages = [{ id: "page_1", title: "Safe", properties: {} }];
     const fetchMock = vi.fn((url: string | URL | Request) => {
       const href = String(url);
-      if (href.endsWith("/schema")) {
+      if (href.endsWith("/schema?include=options")) {
         return Promise.resolve(
           new Response(JSON.stringify({ schema }), { status: 200 })
         );

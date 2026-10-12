@@ -71,8 +71,9 @@ export const schema = {
       author: "relation",
       tags: "multi_select",
     },
+    options: { tags: ["AI", "Web"] },
   },
-} satisfies Schema;
+} as const satisfies Schema;
 
 export const nc = new Client({ schema });
 ```
@@ -92,3 +93,13 @@ You can add a package script for later updates:
 A normal pull compares the previous generated schema and reports added or removed databases, changed database IDs, and added, removed, or changed property types. Missing or unsupported manually edited schemas are skipped for comparison and are never executed. `--check` never writes the file. It omits the summary when the file is current and prints semantic changes when it is stale.
 
 Stale `pull --check` also prints the semantic summary without writing. The first pull and an unsupported previous schema file have distinct messages. Comparison never executes the local module.
+
+## Choice types
+
+The CLI automatically requests choice metadata with `?include=options`. Older CLIs keep receiving schemas without options, so their generated modules remain compatible with older SDKs.
+
+The optional per-database `options` field contains names for `select`, `status`, and `multi_select` properties. Generated schemas use `as const satisfies Schema`, so a select or status with `options: { language: ["en", "ja"] }` becomes `"en" | "ja" | null`. A multi-select becomes `("en" | "ja")[] | null`. These choices also constrain `where` operands.
+
+A known empty option list yields `null` for select/status and `never[] | null` for multi-select. Older schemas without options retain `string | null` or `string[] | null`. The API omits options until metadata has been fetched; normal database sync or the service backfill populates it.
+
+After changing options in Notion, sync the database and run `notcms pull` again. Pull reports added and removed choices, including metadata becoming available. Types describe the pulled snapshot; the SDK does not coerce or discard an unknown runtime value.

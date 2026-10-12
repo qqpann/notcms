@@ -1,5 +1,5 @@
 import type {
-  InferProperties,
+  InferDatabaseProperties,
   Properties,
   PropertyType,
   Schema,
@@ -48,7 +48,7 @@ export type Where<TDatabase extends Schema[string]> = {
         ? WithoutIdIn<
             Condition<
               TDatabase["properties"][K],
-              NonNullable<InferProperties<TDatabase["properties"]>[K]>
+              NonNullable<InferDatabaseProperties<TDatabase>[K]>
             >
           >
         : never);

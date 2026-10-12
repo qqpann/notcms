@@ -1,6 +1,6 @@
 import type { ListOptions } from "./query";
 import { routes } from "./routes";
-import type { InferProperties, Page, Pages, Schema } from "./types";
+import type { InferDatabaseProperties, Page, Pages, Schema } from "./types";
 import { getEnv } from "./utils/env";
 
 class DatabaseHandler<TDatabase extends Schema[string]> {
@@ -15,8 +15,8 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    * Usage example:
    *   type Page = typeof nc.query.blog.$inferPage;
    */
-  declare readonly $inferPage: Page<InferProperties<TDatabase["properties"]>>;
-  declare readonly $inferPages: Pages<InferProperties<TDatabase["properties"]>>;
+  declare readonly $inferPage: Page<InferDatabaseProperties<TDatabase>>;
+  declare readonly $inferPages: Pages<InferDatabaseProperties<TDatabase>>;
 
   // common function to fetch data
   private async fetch<T>(createUrl: () => string | URL, method: string) {
@@ -57,10 +57,10 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    * Retrieves a list of pages from the database.
    *
    * @template TDatabase - The database schema.
-   * @returns {Promise<[Pages<InferProperties<TDatabase["properties"]>>, null, Response] | [undefined, Error, Response | undefined]>}
+   * @returns {Promise<[Pages<InferDatabaseProperties<TDatabase>>, null, Response] | [undefined, Error, Response | undefined]>}
    * - A Promise that resolves to either:
-   *    - `[Pages<InferProperties<TDatabase["properties"]>>, null, Response]` on success, where:
-   *      - `Pages<InferProperties<TDatabase["properties"]>>`: The retrieved pages data.
+   *    - `[Pages<InferDatabaseProperties<TDatabase>>, null, Response]` on success, where:
+   *      - `Pages<InferDatabaseProperties<TDatabase>>`: The retrieved pages data.
    *      - `null`: Indicates no error.
    *      - `Response`: The HTTP response object.
    *    - `[undefined, Error, Response | undefined]` on failure, where:
@@ -69,7 +69,7 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    *      - `Response | undefined`: The optional HTTP response object.
    */
   list(options?: ListOptions<TDatabase>) {
-    return this.fetch<Pages<InferProperties<TDatabase["properties"]>>>(() => {
+    return this.fetch<Pages<InferDatabaseProperties<TDatabase>>>(() => {
       const url = new URL(routes.pages(this.workspaceId, this.databaseId));
       if (options?.where !== undefined) {
         url.searchParams.set("filter", JSON.stringify(options.where));
@@ -86,10 +86,10 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    *
    * @template TDatabase - The database schema.
    * @param {string} pageId - The ID of the page to retrieve.
-   * @returns {Promise<[Page<InferProperties<TDatabase["properties"]>>, null, Response] | [undefined, Error, Response | undefined]>}
+   * @returns {Promise<[Page<InferDatabaseProperties<TDatabase>>, null, Response] | [undefined, Error, Response | undefined]>}
    * - A Promise that resolves to either:
-   *    - `[Page<InferProperties<TDatabase["properties"]>>, null, Response]` on success, where:
-   *      - `Page<InferProperties<TDatabase["properties"]>>`: The retrieved page data.
+   *    - `[Page<InferDatabaseProperties<TDatabase>>, null, Response]` on success, where:
+   *      - `Page<InferDatabaseProperties<TDatabase>>`: The retrieved page data.
    *      - `null`: Indicates no error.
    *      - `Response`: The HTTP response object.
    *    - `[undefined, Error, Response | undefined]` on failure, where:
@@ -98,7 +98,7 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    *      - `Response | undefined`: The optional HTTP response object.
    */
   get(pageId: string) {
-    return this.fetch<Page<InferProperties<TDatabase["properties"]>>>(
+    return this.fetch<Page<InferDatabaseProperties<TDatabase>>>(
       () => routes.page(this.workspaceId, this.databaseId, pageId),
       "GET"
     );
