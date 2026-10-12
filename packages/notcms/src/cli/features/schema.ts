@@ -37,6 +37,9 @@ function isPropertyOptions(value: unknown, properties: Properties): boolean {
 function isSchemaEntry(entry: unknown): entry is Schema[string] {
   return (
     isPlainObject(entry) &&
+    Object.keys(entry).every((key) =>
+      ["id", "properties", "options"].includes(key)
+    ) &&
     typeof entry.id === "string" &&
     isProperties(entry.properties) &&
     (entry.options === undefined ||

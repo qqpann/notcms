@@ -202,6 +202,22 @@ export const nc = new Client({ schema })
     }
   );
 
+  it("rejects unknown database fields without rewriting the checked file", async () => {
+    stubSchema({ Blog: { id: "db_blog", properties: {} } });
+    await writeConfig("schema.ts");
+    const content = `export const schema = {
+      Blog: { id: "db_blog", properties: {}, note: "stale" },
+    } as const satisfies Schema;`;
+    await fs.writeFile(path.join(dir, "schema.ts"), content);
+    expect(await pullSchema({ check: true, credentials })).toMatchObject({
+      status: "stale",
+      summary: { status: "unavailable" },
+    });
+    expect(await fs.readFile(path.join(dir, "schema.ts"), "utf8")).toBe(
+      content
+    );
+  });
+
   it("compares the previous file and prints ID and database changes after saving", async () => {
     stubSchema({ blog: { id: "old_id", properties: { title: "title" } } });
     await writeConfig("schema.ts");
