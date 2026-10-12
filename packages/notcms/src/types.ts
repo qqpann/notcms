@@ -75,7 +75,7 @@ type PropertyTypeMap = {
   rich_text: string | null;
   status: string | null;
   unique_id: string | null;
-  formula: string | null;
+  formula: string | number | null;
   //  string (Date)
   date: string | null;
   created_time: string | null;

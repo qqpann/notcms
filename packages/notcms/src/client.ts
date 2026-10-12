@@ -1,8 +1,9 @@
+import type { ListOptions } from "./query";
 import { routes } from "./routes";
 import type { InferProperties, Page, Pages, Schema } from "./types";
 import { getEnv } from "./utils/env";
 
-class DatabaseHandler<TData> {
+class DatabaseHandler<TDatabase extends Schema[string]> {
   constructor(
     private secretKey: string,
     private workspaceId: string,
@@ -14,17 +15,14 @@ class DatabaseHandler<TData> {
    * Usage example:
    *   type Page = typeof nc.query.blog.$inferPage;
    */
-  declare readonly $inferPage: Page<TData>;
-  declare readonly $inferPages: Pages<TData>;
+  declare readonly $inferPage: Page<InferProperties<TDatabase["properties"]>>;
+  declare readonly $inferPages: Pages<InferProperties<TDatabase["properties"]>>;
 
   // common function to fetch data
-  private async fetch<T>(
-    url: string | URL | globalThis.Request,
-    method: string
-  ) {
+  private async fetch<T>(createUrl: () => string | URL, method: string) {
     let response: Response | undefined;
     try {
-      response = await fetch(url, {
+      response = await fetch(createUrl(), {
         method,
         headers: {
           Authorization: `Bearer ${this.secretKey}`,
@@ -58,11 +56,11 @@ class DatabaseHandler<TData> {
   /**
    * Retrieves a list of pages from the database.
    *
-   * @template TData - The type of properties in the page.
-   * @returns {Promise<[Pages<TData>, null, Response] | [undefined, Error, Response | undefined]>}
+   * @template TDatabase - The database schema.
+   * @returns {Promise<[Pages<InferProperties<TDatabase["properties"]>>, null, Response] | [undefined, Error, Response | undefined]>}
    * - A Promise that resolves to either:
-   *    - `[Pages<TData>, null, Response]` on success, where:
-   *      - `Pages<TData>`: The retrieved pages data.
+   *    - `[Pages<InferProperties<TDatabase["properties"]>>, null, Response]` on success, where:
+   *      - `Pages<InferProperties<TDatabase["properties"]>>`: The retrieved pages data.
    *      - `null`: Indicates no error.
    *      - `Response`: The HTTP response object.
    *    - `[undefined, Error, Response | undefined]` on failure, where:
@@ -70,22 +68,28 @@ class DatabaseHandler<TData> {
    *      - `Error`: The error encountered.
    *      - `Response | undefined`: The optional HTTP response object.
    */
-  list() {
-    return this.fetch<Pages<TData>>(
-      routes.pages(this.workspaceId, this.databaseId),
-      "GET"
-    );
+  list(options?: ListOptions<TDatabase>) {
+    return this.fetch<Pages<InferProperties<TDatabase["properties"]>>>(() => {
+      const url = new URL(routes.pages(this.workspaceId, this.databaseId));
+      if (options?.where !== undefined) {
+        url.searchParams.set("filter", JSON.stringify(options.where));
+      }
+      if (options?.sort !== undefined) {
+        url.searchParams.set("sort", JSON.stringify(options.sort));
+      }
+      return url.toString();
+    }, "GET");
   }
 
   /**
    * Retrieves a page from the database.
    *
-   * @template TData - The type of properties in the page.
+   * @template TDatabase - The database schema.
    * @param {string} pageId - The ID of the page to retrieve.
-   * @returns {Promise<[Page<TData>, null, Response] | [undefined, Error, Response | undefined]>}
+   * @returns {Promise<[Page<InferProperties<TDatabase["properties"]>>, null, Response] | [undefined, Error, Response | undefined]>}
    * - A Promise that resolves to either:
-   *    - `[Page<TData>, null, Response]` on success, where:
-   *      - `Page<TData>`: The retrieved page data.
+   *    - `[Page<InferProperties<TDatabase["properties"]>>, null, Response]` on success, where:
+   *      - `Page<InferProperties<TDatabase["properties"]>>`: The retrieved page data.
    *      - `null`: Indicates no error.
    *      - `Response`: The HTTP response object.
    *    - `[undefined, Error, Response | undefined]` on failure, where:
@@ -94,8 +98,8 @@ class DatabaseHandler<TData> {
    *      - `Response | undefined`: The optional HTTP response object.
    */
   get(pageId: string) {
-    return this.fetch<Page<TData>>(
-      routes.page(this.workspaceId, this.databaseId, pageId),
+    return this.fetch<Page<InferProperties<TDatabase["properties"]>>>(
+      () => routes.page(this.workspaceId, this.databaseId, pageId),
       "GET"
     );
   }
@@ -106,9 +110,7 @@ export class Client<TSchema extends Schema> {
   private workspaceId: string;
 
   query: {
-    [K in keyof TSchema]: DatabaseHandler<
-      InferProperties<TSchema[K]["properties"]>
-    >;
+    [K in keyof TSchema]: DatabaseHandler<TSchema[K]>;
   };
 
   constructor(options?: {
@@ -131,9 +133,7 @@ export class Client<TSchema extends Schema> {
     this.secretKey = secretKey;
     this.workspaceId = workspaceId;
     this.query = Object.create(null) as {
-      [K in keyof TSchema]: DatabaseHandler<
-        InferProperties<TSchema[K]["properties"]>
-      >;
+      [K in keyof TSchema]: DatabaseHandler<TSchema[K]>;
     };
     const schema = options?.schema;
     if (!schema) {
