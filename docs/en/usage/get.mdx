@@ -63,3 +63,37 @@ async function getPostWithAuthor(postId: string) {
     Explore the complete Client API
   </Card>
 </CardGroup>
+
+## findFirst: fetch by slug or another property
+
+```typescript
+const [post, error, response] = await nc.query.blog.findFirst({
+  where: { slug: "hello-world", published: true },
+  sort: { publishedAt: "desc" },
+});
+if (error) throw error;
+if (post === null) {
+  // Your app decides whether to return HTTP 404.
+} else {
+  console.log(post.content);
+}
+```
+
+Requires the release containing `findFirst` (not available in 0.4.0).
+`where` and `sort` have exactly the same types and semantics as [list()](/en/usage/list).
+The result includes `content` like `get(id)`. No match returns `[null, null, response]`.
+Duplicates return the first match in the requested sort order; ties and omitted
+sort use registration order, then page ID. There is no CMS-level slug setting
+or uniqueness constraint. A changed slug makes the old URL stop matching;
+redirects are the application's responsibility. Missing slugs can use a separate
+ID route and the unchanged `get(pageId)` method. Encode slugs when building URLs;
+pass the decoded route parameter to `where`. For multilingual slugs, add a
+language condition to disambiguate. See the [URL recipes](/en/examples/content-recipes).
+
+Internally this performs `list(options)` then `get(first.id)`: two API requests
+for a match, one for no match. The list currently retrieves all matching metadata.
+It is not an atomic snapshot. If the selected page is deleted before detail
+retrieval, the detail error (including 404) is preserved, not converted to null.
+Other errors and HTTP 429 remain error tuples; no automatic retries occur.
+The third tuple element is the detail response on success, the list response
+for no match, or the failing response (undefined for a network failure).

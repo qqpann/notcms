@@ -50,6 +50,14 @@ describe("list query types", () => {
 
 // Checked by tsc without making network requests.
 function checkInvalidQueries(client: Client<typeof schema>) {
+  client.query.blog.findFirst({
+    where: { published: true },
+    sort: { count: "desc" },
+  });
+  // @ts-expect-error findFirst uses the same typed conditions as list
+  client.query.blog.findFirst({ where: { published: "true" } });
+  // @ts-expect-error findFirst rejects unknown sort properties
+  client.query.blog.findFirst({ sort: { missing: "asc" } });
   client.query.blog.list({ where: { id: { in: ["p1"] as const } } });
   // @ts-expect-error ID values must be strings
   client.query.blog.list({ where: { id: { in: [123] } } });

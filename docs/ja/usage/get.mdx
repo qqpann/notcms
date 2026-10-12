@@ -63,3 +63,34 @@ async function getPostWithAuthor(postId: string) {
     完全なクライアントAPIを探索
   </Card>
 </CardGroup>
+
+## findFirst: slug などのプロパティで1件取得
+
+```typescript
+const [post, error, response] = await nc.query.blog.findFirst({
+  where: { slug: "hello-world", published: true },
+  sort: { publishedAt: "desc" },
+});
+if (error) throw error;
+if (post === null) {
+  // 404 にするかは利用側で決めます。
+} else {
+  console.log(post.content);
+}
+```
+
+`findFirst` を含むリリースが必要です（0.4.0 には未搭載）。
+`where`／`sort` は [list()](/ja/usage/list) と同じ型・意味です。
+返却値は `get(id)` と同様に本文 `content` を含み、該当なしは `[null, null, response]` です。
+重複はエラーにせず指定順の先頭を返し、同値・並び順省略時は登録順、次にページIDを使います。
+CMS専用のslug設定・一意制約は設けません。slug変更後の旧URLは一致しなくなるため、
+リダイレクトはアプリで管理します。未設定は別のIDルートと既存の `get(pageId)` で補えます。
+URLを作るときはエンコードし、`where` にはデコード済みパラメーターを渡します。
+言語別slugは言語条件も指定します。[URLレシピ](/ja/examples/content-recipes)も参照してください。
+
+内部では `list(options)` の先頭に対して `get(id)` を呼ぶため、一致時は2リクエスト、
+該当なしは1リクエストです。現在の一覧取得は一致するメタデータ全件を取得します。
+一連の取得はアトミックではなく、途中でページが削除された場合は詳細取得の404エラーを
+保持し、nullへ変換しません。その他のエラー・429も通常のエラータプルで、自動再試行しません。
+3番目の要素は成功時に詳細レスポンス、該当なし時に一覧レスポンス、失敗時には失敗した
+レスポンス（ネットワーク障害ならundefined）です。

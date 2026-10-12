@@ -1,0 +1,99 @@
+---
+title: Check schemas in CI
+description: Detect schema drift on pull requests and on a daily schedule
+---
+
+`notcms pull --check` compares database names and IDs, property names and types,
+and select/status/multi-select choices with the latest schema served by NotCMS.
+It ignores whitespace, quotes, comments, object key order, and choice order.
+It never executes your schema file or writes to it. Missing or unsupported schema
+literals fail conservatively; regenerate them with `notcms pull`.
+
+## GitHub Actions
+
+Install a version of `notcms` that includes semantic checks in your project and
+commit `package.json`, `package-lock.json`, `notcms.config.json` and the generated
+schema. Use the same locked SDK/CLI locally and in CI; do not run `@latest` in CI.
+For this branch's features, wait for the release containing this change (0.4.0
+still uses byte comparison).
+
+Save this as `.github/workflows/notcms-schema.yml` in an npm project:
+
+```yaml
+name: NotCMS schema
+on:
+  pull_request:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  schema:
+    # Forks and Dependabot do not receive these secrets.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Check schema
+        run: npx --no-install notcms pull --check
+        env:
+          NOTCMS_SECRET_KEY: ${{ secrets.NOTCMS_SECRET_KEY }}
+          NOTCMS_WORKSPACE_ID: ${{ secrets.NOTCMS_WORKSPACE_ID }}
+```
+
+Create repository Actions secrets `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID`
+from the same workspace as your local configuration. Do not commit `.env.local`
+or print the key. This example assumes a root npm project; for a monorepo set the
+working directory and `cache-dependency-path`. For pnpm, install your pinned pnpm
+version, use `pnpm install --frozen-lockfile --ignore-scripts` and
+`pnpm exec notcms pull --check` instead.
+
+The daily run uses the default branch (03:17 UTC) and catches Notion changes even
+when no code changes. The workflow must first be merged into the default branch
+for schedules to run. Enable Actions failure notifications for the responsible
+maintainer. Fork and Dependabot PRs are skipped because secrets are unavailable;
+check trusted changes on a maintainer branch. Never switch this to
+`pull_request_target` to run untrusted PR code with secrets. Only allow trusted
+contributors to run same-repository PR workflows with workspace credentials.
+Schema names and choices appear in logs, so use a repository with appropriate
+access. `--ignore-scripts` avoids running dependency lifecycle scripts for this
+CLI-only check.
+
+## Read and fix a failure
+
+Exit code 0 means the schema matches; 1 means drift/missing/unreadable schema or
+an operational failure. Inspect the message to distinguish these cases:
+
+```text
+Added option: "blog"."status" = "Published"
+Changed property type: "blog"."slug"
+  "title" -> "rich_text"
+Schema at src/notcms/schema.ts is out of date.
+```
+
+After a Notion change, let the database sync finish in the dashboard first.
+The CLI reads NotCMS's synced schema, not Notion directly. Then run locally:
+
+```bash
+npx notcms pull
+git diff -- src/notcms/schema.ts
+npx notcms pull --check
+git add src/notcms/schema.ts
+git commit -m "update: refresh NotCMS schema"
+```
+
+Use your configured schema path if different. Review changes and update consumers
+before committing; formatting the file is safe. On authentication/network errors,
+fix the credentials/service and rerun instead of committing unrelated changes.

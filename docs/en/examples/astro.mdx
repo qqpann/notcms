@@ -1,0 +1,181 @@
+---
+title: Astro integration
+description: Build a static blog with typed Notion content and images
+---
+
+This guide uses Node.js 24, Astro 6.4.8 and the `notcms` package (SDK and CLI in
+one package). The static ID-based example works with NotCMS 0.4.0. The optional
+`findFirst` example needs the release containing that method; it is not in 0.4.0.
+
+## 1. Prepare content
+
+Create a Notion database named `blog` with these exact property names and types:
+`title` (Title), `published` (Checkbox), `slug` (Text), `cover` (Files & media).
+Create one checked post with text in its page body and an uploaded cover image;
+create an unchecked draft too. Connect the database in the NotCMS dashboard,
+select it for synchronization, and wait for a successful sync, including images.
+The database key in the generated schema must be `blog`; adapt all examples if
+your actual key or property names differ.
+
+`published` is an application rule, not an automatic NotCMS access restriction.
+Your key can retrieve other synchronized pages too. Only sync content intended
+for this workspace's consumers. Keep the key server-side and never prefix it
+with `PUBLIC_`, import the client into a browser script, or serialize it into HTML.
+Image URLs returned by the API are public URLs: never upload private media for
+this example. A frontend filter is not a security boundary for those assets.
+
+## 2. Create and initialize the project
+
+```bash
+npm create astro@latest -- astro-notcms --template minimal --no-install --no-git
+cd astro-notcms
+npm install astro@6.4.8 notcms@0.4.0
+npm install --save-dev vite@7.3.5
+npx notcms init
+```
+
+Choose `src/notcms/schema.ts`. Log in through the browser and select the workspace
+containing `blog`. The CLI writes `.env.local`, config and schema. Confirm that
+`.env.local` is ignored by Git; commit the config, generated schema and lockfile.
+To configure without browser login, set `NOTCMS_SECRET_KEY` and
+`NOTCMS_WORKSPACE_ID` in `.env.local`, then run `npx notcms init`.
+
+## 3. Load server credentials
+
+Replace `astro.config.mjs` with:
+
+```javascript astro.config.mjs
+import { defineConfig } from "astro/config";
+import { loadEnv } from "vite";
+
+// Load the CLI's .env.local before importing the generated client.
+// Deployment environment values take precedence over local files.
+const local = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "NOTCMS_");
+for (const [key, value] of Object.entries(local)) {
+  process.env[key] ??= value;
+}
+export default defineConfig({});
+```
+
+Vite exposes `.env` values as `import.meta.env`, while the generated client reads
+`process.env`. Loading the `NOTCMS_` prefix in config bridges this for Node builds
+and development, without changing the generated file. Do not add `NOTCMS_` to
+Vite's browser `envPrefix`.
+
+## 4. List posts
+
+```astro src/pages/blog/index.astro
+---
+import { nc } from "../../notcms/schema";
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+});
+if (error) throw new Error("Could not load blog posts");
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Blog</title></head>
+  <body>
+    <h1>Blog</h1>
+    <ul>
+      {posts.map((post) => (
+        <li><a href={`/blog/${encodeURIComponent(post.id)}/`}>{post.title}</a></li>
+      ))}
+    </ul>
+  </body>
+</html>
+```
+
+## 5. Static detail pages and images
+
+```astro src/pages/blog/[id].astro
+---
+import { nc } from "../../notcms/schema";
+
+export async function getStaticPaths() {
+  const [posts, error] = await nc.query.blog.list({
+    where: { published: true },
+  });
+  if (error) throw new Error("Could not load blog paths");
+  return posts.map((post) => ({ params: { id: post.id } }));
+}
+
+const { id } = Astro.params;
+if (!id) throw new Error("Missing page ID");
+const [post, error] = await nc.query.blog.get(id);
+if (error) throw new Error("Could not load blog post");
+// Recheck in case publication changed after path generation.
+if (post.properties.published !== true) throw new Error("Post is no longer published");
+const cover = post.properties.cover?.[0];
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>{post.title}</title></head>
+  <body>
+    <a href="/blog/">All posts</a>
+    <h1>{post.title}</h1>
+    {cover && <img src={cover} alt={`Cover for ${post.title}`} width="800" loading="lazy" />}
+    <pre>{post.content}</pre>
+  </body>
+</html>
+```
+
+The `files` property returns a nullable array of URL strings; the first is used
+as the cover. A regular `<img>` needs no image optimization configuration or
+API key in the browser. This minimal example displays Markdown as escaped text
+in `<pre>`. For formatted HTML, use a Markdown renderer with HTML sanitization;
+do not pass untrusted raw Markdown/HTML directly to `set:html`.
+
+```bash
+npm run build
+npm run preview
+```
+
+Open `/blog/`, follow the published post's link, and check its title, body and
+cover. The unchecked draft must not appear, and its ID URL must be a 404.
+Any API failure aborts the build instead of publishing an empty blog. Non-generated
+routes are served as 404s by your static host. Changing content or unpublishing a
+post requires a rebuild and deployment; deploy a fresh output directory so old
+HTML does not remain. Run `npx notcms pull` after schema changes and use
+[scheduled schema checks](/en/cli-commands/schema-ci).
+
+## Optional: request-time rendering and slugs
+
+Static builds need credentials only at build time. For request-time pages, install
+an adapter for your host and set `output: "server"`; for a Node host run
+`npx astro add node` and choose standalone mode. Keep the config's local environment
+loading for development, and provide both `NOTCMS_` variables to the production
+Node process at runtime. Other adapters have their own secret/runtime bindings;
+this `process.env` recipe targets Node, not edge runtimes.
+
+Replace the ID detail route with `src/pages/blog/[slug].astro` below (do not keep
+two competing dynamic routes). Upgrade NotCMS to a release with `findFirst` first.
+Change list links to `/blog/${encodeURIComponent(post.properties.slug)}/` and skip
+posts with an empty slug. For an ID fallback use a distinct `/blog/id/[id]` route.
+The router supplies a decoded parameter: do not decode it a second time.
+
+```astro src/pages/blog/[slug].astro
+---
+import { nc } from "../../notcms/schema";
+export const prerender = false;
+const slug = Astro.params.slug;
+if (!slug) return new Response("Not found", { status: 404 });
+const [post, error] = await nc.query.blog.findFirst({
+  where: { slug, published: true },
+});
+if (error) return new Response("Content temporarily unavailable", { status: 503 });
+if (post === null || post.properties.published !== true) {
+  return new Response("Not found", { status: 404 });
+}
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>{post.title}</title></head>
+  <body><h1>{post.title}</h1><pre>{post.content}</pre></body>
+</html>
+```
+
+Missing posts return 404 and API failures return 503. Duplicate slugs select the
+first registered page unless you specify `sort`; keep slugs unique in editorial
+practice. Changed slugs need application-managed redirects. Add a language
+condition for language-specific slugs. See [findFirst](/en/usage/get) for ordering,
+two-request behavior and errors.
+
+[Astro environment variables](https://docs.astro.build/en/guides/environment-variables/) · [Routing](https://docs.astro.build/en/guides/routing/) · [On-demand rendering](https://docs.astro.build/en/guides/on-demand-rendering/)

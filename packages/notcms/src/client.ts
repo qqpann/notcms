@@ -82,6 +82,21 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
   }
 
   /**
+   * Retrieve the first matching page, including content, or null when empty.
+   * Uses the same filters and ordering as list(). A match requires two requests:
+   * list() followed by get(). Errors (including a page deleted between those
+   * requests) retain the usual error tuple and the failing response.
+   */
+  async findFirst(options?: ListOptions<TDatabase>) {
+    const result = await this.list(options);
+    const [pages, error, response] = result;
+    if (error !== null) return result;
+    const first = pages[0];
+    if (first === undefined) return [null, null, response] as const;
+    return this.get(first.id);
+  }
+
+  /**
    * Retrieves a page from the database.
    *
    * @template TDatabase - The database schema.

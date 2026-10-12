@@ -221,6 +221,8 @@ describe("schema diff", () => {
       const variants = [
         `${declaration}\nexport const nc = new Client({ schema })\n`,
         declaration,
+        `${declaration}; export const nc = new Client({ schema, },);`,
+        `${declaration}\nexport const nc = new Client({\n schema,\n},)\n`,
       ];
 
       for (const [index, content] of variants.entries()) {

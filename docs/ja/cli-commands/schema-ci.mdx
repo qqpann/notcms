@@ -1,0 +1,93 @@
+---
+title: CI でスキーマを確認する
+description: PR と定期実行で Notion と生成型のずれを検知する
+---
+
+`notcms pull --check` はデータベース名・ID、プロパティ名・型、
+select/status/multi_select の選択肢を、NotCMS が配信する最新スキーマと比較します。
+空白、引用符、コメント、キーや選択肢の順序だけの差では失敗しません。
+ファイルを実行・上書きせず、未生成または解析できないファイルは失敗にします。
+
+## GitHub Actions
+
+意味的な比較に対応した `notcms` を導入し、`package.json`、`package-lock.json`、
+`notcms.config.json`、生成スキーマをコミットします。CI とローカルは同じ固定版を使い、
+CI で `@latest` を実行しないでください。この変更を含むリリースが必要です
+（0.4.0 はまだ文字列比較です）。
+
+npm のルートプロジェクトで `.github/workflows/notcms-schema.yml` に保存します。
+
+```yaml
+name: NotCMS schema
+on:
+  pull_request:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  schema:
+    # Forks and Dependabot do not receive these secrets.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Check schema
+        run: npx --no-install notcms pull --check
+        env:
+          NOTCMS_SECRET_KEY: ${{ secrets.NOTCMS_SECRET_KEY }}
+          NOTCMS_WORKSPACE_ID: ${{ secrets.NOTCMS_WORKSPACE_ID }}
+```
+
+同じワークスペースの `NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` を
+リポジトリの Actions secrets に登録します。`.env.local` やキーをコミット・出力しません。
+モノレポは作業ディレクトリと `cache-dependency-path` を合わせてください。
+pnpm なら固定版の pnpm をセットアップし、`pnpm install --frozen-lockfile --ignore-scripts`
+と `pnpm exec notcms pull --check` に置き換えます。
+
+定期実行は毎日03:17 UTC（12:17 JST）、デフォルトブランチが対象です。
+先にワークフローをデフォルトブランチへマージし、担当者の Actions 失敗通知を有効にします。
+secrets を使えない fork・Dependabot の PR はスキップするため、信頼できる変更を
+メンテナーのブランチに取り込んで確認します。`pull_request_target` へ変更して
+未信頼の PR コードに秘密情報を渡さないでください。同一リポジトリの PR も信頼できる
+作成者に限定します。差分ログにはスキーマの名前・選択肢が出るため、公開範囲にも注意します。
+`--ignore-scripts` はこのCLI専用検査で依存のライフサイクルスクリプトを実行しない指定です。
+
+## 失敗の読み方と修正
+
+終了コード0は一致、1は差分・ファイル不足・解析不能または通信／認証等の失敗です。
+メッセージで原因を区別します。
+
+```text
+Added option: "blog"."status" = "Published"
+Changed property type: "blog"."slug"
+  "title" -> "rich_text"
+Schema at src/notcms/schema.ts is out of date.
+```
+
+Notion を変更したらダッシュボードで同期完了を待ちます。
+CLI の比較対象は NotCMS に同期済みのスキーマで、Notion への直接照会ではありません。
+その後ローカルで次を実行します。
+
+```bash
+npx notcms pull
+git diff -- src/notcms/schema.ts
+npx notcms pull --check
+git add src/notcms/schema.ts
+git commit -m "update: refresh NotCMS schema"
+```
+
+出力先を変更した場合はパスを合わせます。差分と利用側の型エラーを確認してコミットします。
+生成ファイルの整形は問題ありません。認証・通信エラーは設定やサービスを確認して再実行します。

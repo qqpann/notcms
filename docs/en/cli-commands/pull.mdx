@@ -103,3 +103,6 @@ The optional per-database `options` field contains names for `select`, `status`,
 A known empty option list yields `null` for select/status and `never[] | null` for multi-select. Older schemas without options retain `string | null` or `string[] | null`. The API omits options until metadata has been fetched; normal database sync or the service backfill populates it.
 
 After changing options in Notion, sync the database and run `notcms pull` again. Pull reports added and removed choices, including metadata becoming available. Types describe the pulled snapshot; the SDK does not coerce or discard an unknown runtime value.
+
+
+[Check schemas in CI](/en/cli-commands/schema-ci)

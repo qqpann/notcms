@@ -1,0 +1,172 @@
+---
+title: Astro 連携ガイド
+description: 型付きスキーマから一覧・詳細・画像表示まで作る
+---
+
+Node.js 24、Astro 6.4.8、SDKとCLIを含む `notcms` パッケージを使用します。
+静的なIDルートの例はNotCMS 0.4.0で動きます。後半の `findFirst` はその機能を含む
+リリースが必要で、0.4.0には含まれません。
+
+## 1. コンテンツを用意する
+
+Notionで `blog` データベースに `title`（タイトル）、`published`（チェックボックス）、
+`slug`（テキスト）、`cover`（ファイル＆メディア）をこの名前で作ります。
+本文とアップロード画像のあるチェック済み記事と、チェックなしの下書きを1件ずつ用意します。
+NotCMSのダッシュボードで接続・同期対象へ追加し、画像を含め同期完了を待ちます。
+生成スキーマのキーが `blog` であることを確認し、実際の名前が異なる場合は例を置き換えます。
+
+`published` は利用側の公開条件です。NotCMSが自動的に非公開データへのアクセスを禁止する
+ものではなく、キーは他の同期済みページも取得できます。ワークスペースの利用者へ渡せる
+内容だけを同期してください。キーを `PUBLIC_` 変数、ブラウザーのスクリプト、HTMLへ
+含めません。画像URLは公開URLなので機密画像を同期せず、表示側のフィルターを画像の
+アクセス制御として扱わないでください。
+
+## 2. 新規プロジェクトと初期化
+
+```bash
+npm create astro@latest -- astro-notcms --template minimal --no-install --no-git
+cd astro-notcms
+npm install astro@6.4.8 notcms@0.4.0
+npm install --save-dev vite@7.3.5
+npx notcms init
+```
+
+出力先は `src/notcms/schema.ts` を選び、ブラウザーでログインして `blog` のある
+ワークスペースを選択します。CLIは `.env.local`、設定、スキーマを生成します。
+`.env.local` がGitで無視されることを確認し、設定・生成スキーマ・lockfileをコミットします。
+ブラウザーログインを使わない場合は `.env.local` に `NOTCMS_SECRET_KEY` と
+`NOTCMS_WORKSPACE_ID` を設定して `npx notcms init` を実行します。
+
+## 3. サーバー用の環境変数
+
+`astro.config.mjs` を次の内容にします。
+
+```javascript astro.config.mjs
+import { defineConfig } from "astro/config";
+import { loadEnv } from "vite";
+
+// Load the CLI's .env.local before importing the generated client.
+// Deployment environment values take precedence over local files.
+const local = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "NOTCMS_");
+for (const [key, value] of Object.entries(local)) {
+  process.env[key] ??= value;
+}
+export default defineConfig({});
+```
+
+生成クライアントは `process.env` を読むため、Viteの `import.meta.env` に任せず
+設定ファイルで `NOTCMS_` の変数を読み込みます。生成ファイルの手修正は不要です。
+ブラウザーへ公開するViteの `envPrefix` に `NOTCMS_` を追加しないでください。
+
+## 4. 一覧
+
+```astro src/pages/blog/index.astro
+---
+import { nc } from "../../notcms/schema";
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+});
+if (error) throw new Error("Could not load blog posts");
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Blog</title></head>
+  <body>
+    <h1>Blog</h1>
+    <ul>
+      {posts.map((post) => (
+        <li><a href={`/blog/${encodeURIComponent(post.id)}/`}>{post.title}</a></li>
+      ))}
+    </ul>
+  </body>
+</html>
+```
+
+## 5. 静的な詳細ページと画像
+
+```astro src/pages/blog/[id].astro
+---
+import { nc } from "../../notcms/schema";
+
+export async function getStaticPaths() {
+  const [posts, error] = await nc.query.blog.list({
+    where: { published: true },
+  });
+  if (error) throw new Error("Could not load blog paths");
+  return posts.map((post) => ({ params: { id: post.id } }));
+}
+
+const { id } = Astro.params;
+if (!id) throw new Error("Missing page ID");
+const [post, error] = await nc.query.blog.get(id);
+if (error) throw new Error("Could not load blog post");
+// Recheck in case publication changed after path generation.
+if (post.properties.published !== true) throw new Error("Post is no longer published");
+const cover = post.properties.cover?.[0];
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>{post.title}</title></head>
+  <body>
+    <a href="/blog/">All posts</a>
+    <h1>{post.title}</h1>
+    {cover && <img src={cover} alt={`Cover for ${post.title}`} width="800" loading="lazy" />}
+    <pre>{post.content}</pre>
+  </body>
+</html>
+```
+
+`files` はURL文字列の配列またはnullです。先頭をカバーに使い、通常の `<img>` で表示する
+ため画像最適化の設定やブラウザー内のAPIキーは不要です。最小例ではMarkdown本文を
+`<pre>` のエスケープ済みテキストとして表示します。装飾する場合はMarkdown変換後の
+HTMLをサニタイズし、未信頼の本文をそのまま `set:html` に渡さないでください。
+
+```bash
+npm run build
+npm run preview
+```
+
+`/blog/` から記事を開き、タイトル・本文・画像を確認します。下書きは一覧に出ず、
+そのIDルートは404になることを確認します。API失敗はビルドを停止し、空のブログを
+公開しません。生成されないルートは静的ホストで404にします。更新・公開停止の反映は
+再ビルドと再配置が必要です。古いHTMLを残さないよう新しい出力一式を配置します。
+スキーマ変更時は `npx notcms pull` と [CIの定期検査](/ja/cli-commands/schema-ci)を使います。
+
+## 任意: SSR と slug
+
+静的生成ではビルド時だけ秘密値が必要です。SSRはホストに応じたadapterを導入し、
+`output: "server"` にします。Nodeホストなら `npx astro add node` でstandaloneを選びます。
+開発用の環境読み込みは設定に残し、本番ではNodeプロセスの実行環境に2つの `NOTCMS_`
+変数を設定します。その他のadapterは実行環境の秘密値bindingに合わせる必要があります。
+この `process.env` の手順はNode向けです。
+
+NotCMSを `findFirst` 対応版へ更新してからID詳細を `src/pages/blog/[slug].astro` に
+置き換えます。競合する動的ルートを2つ残さないでください。一覧リンクは
+`/blog/${encodeURIComponent(post.properties.slug)}/` にし、slugなしの記事は除外します。
+IDフォールバックは別の `/blog/id/[id]` ルートを使います。ルーターからの値は
+デコード済みなので二重にデコードしません。
+
+```astro src/pages/blog/[slug].astro
+---
+import { nc } from "../../notcms/schema";
+export const prerender = false;
+const slug = Astro.params.slug;
+if (!slug) return new Response("Not found", { status: 404 });
+const [post, error] = await nc.query.blog.findFirst({
+  where: { slug, published: true },
+});
+if (error) return new Response("Content temporarily unavailable", { status: 503 });
+if (post === null || post.properties.published !== true) {
+  return new Response("Not found", { status: 404 });
+}
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>{post.title}</title></head>
+  <body><h1>{post.title}</h1><pre>{post.content}</pre></body>
+</html>
+```
+
+該当なしは404、API障害は503です。重複slugは `sort` がなければ登録順の先頭を返すため、
+編集時に一意にします。変更後の旧URLリダイレクトは利用側で管理し、多言語slugは
+言語条件も指定します。並び順・2回のAPI呼び出し・エラーの詳細は
+[findFirst](/ja/usage/get)を参照してください。
+
+[Astro environment variables](https://docs.astro.build/en/guides/environment-variables/) · [Routing](https://docs.astro.build/en/guides/routing/) · [On-demand rendering](https://docs.astro.build/en/guides/on-demand-rendering/)

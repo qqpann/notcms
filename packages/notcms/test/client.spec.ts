@@ -182,6 +182,78 @@ describe("DatabaseHandler", () => {
     ).toEqual({ id: { in: [] } });
   });
 
+  it("finds the first server-ordered match with content and forwards filters and sort", async () => {
+    const page = {
+      id: "p2",
+      title: "Second",
+      properties: { slug: "日本語 & more" },
+      content: "# Body",
+    };
+    const detailResponse = jsonResponse({ data: page });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({ data: [{ id: "p2" }, { id: "p1" }] })
+      )
+      .mockResolvedValueOnce(detailResponse);
+    vi.stubGlobal("fetch", fetchMock);
+    const [data, error, response] = await createClient().query.abc.findFirst({
+      where: { slug: "日本語 & more" },
+      sort: { publishedAt: "desc" },
+    });
+    const url = new URL(fetchMock.mock.calls[0][0]);
+    expect(JSON.parse(url.searchParams.get("filter") ?? "null")).toEqual({
+      slug: "日本語 & more",
+    });
+    expect(JSON.parse(url.searchParams.get("sort") ?? "null")).toEqual({
+      publishedAt: "desc",
+    });
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      `${HOST}/ws/ws_test/db/abc/pages/p2`,
+      expect.objectContaining({ method: "GET" })
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(data).toEqual(page);
+    expect(error).toBeNull();
+    expect(response).toBe(detailResponse);
+  });
+
+  it("returns null and the list response without a detail request when no match exists", async () => {
+    const response = jsonResponse({ data: [] });
+    const fetchMock = vi.fn().mockResolvedValue(response);
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await createClient().query.abc.findFirst()).toEqual([
+      null,
+      null,
+      response,
+    ]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe(`${HOST}/ws/ws_test/db/abc/pages`);
+  });
+
+  it.each(["list", "detail"])(
+    "preserves %s failures instead of returning null or retrying",
+    async (stage) => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      const response = new Response("Unavailable", {
+        status: stage === "list" ? 429 : 404,
+        headers: { "Retry-After": "60" },
+      });
+      const fetchMock = vi.fn();
+      if (stage === "detail")
+        fetchMock.mockResolvedValueOnce(jsonResponse({ data: [{ id: "p1" }] }));
+      fetchMock.mockResolvedValueOnce(response);
+      vi.stubGlobal("fetch", fetchMock);
+      const [data, error, actualResponse] =
+        await createClient().query.abc.findFirst();
+      expect(data).toBeUndefined();
+      expect(error).toBeInstanceOf(Error);
+      expect(actualResponse).toBe(response);
+      expect(actualResponse?.headers.get("Retry-After")).toBe("60");
+      expect(fetchMock).toHaveBeenCalledTimes(stage === "list" ? 1 : 2);
+    }
+  );
+
   it("gets a single page by id", async () => {
     const page = { id: "p1", title: "Hello", properties: {} };
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: page }));
