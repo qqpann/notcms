@@ -11,6 +11,18 @@ import {
 export const REPOSITORY = "qqpann/notcms";
 const STABLE = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const SHA = /^[a-f0-9]{40}$/;
+// npm omitted gitHead for these two historical publications. Preserve the
+// manually reviewed release tags; these are not inferred npm provenance.
+const HISTORICAL_RELEASES = {
+  "0.0.13": {
+    tag: "v0.0.13",
+    commit: "5fbf0e4c8f9c6c28a2456ddbcbd5c3c3d751d740",
+  },
+  "0.1.0": {
+    tag: "notcms@0.1.0",
+    commit: "2258723e1ffa7c27ea3507f6380ae352784a06ea",
+  },
+};
 
 export function compareVersions(a, b) {
   for (let i = 0; i < 3; i++) {
@@ -115,21 +127,44 @@ export async function planReleases({ registry, releases, run = runCommand }) {
       ) {
         throw new Error(`Review existing GitHub releases for ${version}`);
       }
-      continue; // Preserve existing release notes, assets and historical tags.
     }
-    if (typeof gitHead !== "string" || !SHA.test(gitHead)) {
-      throw new Error(`npm ${version} has no valid gitHead; backfill manually`);
+    let sourceCommit = gitHead;
+    if (typeof sourceCommit !== "string" || !SHA.test(sourceCommit)) {
+      const historical = HISTORICAL_RELEASES[version];
+      if (
+        gitHead !== undefined ||
+        !historical ||
+        existing[0]?.tagName !== historical.tag
+      ) {
+        throw new Error(
+          `npm ${version} has no valid gitHead; backfill manually`
+        );
+      }
+      sourceCommit = historical.commit;
     }
     await checked(
       "git",
-      ["merge-base", "--is-ancestor", gitHead, "origin/main"],
+      ["merge-base", "--is-ancestor", sourceCommit, "origin/main"],
       run
     );
     const manifest = JSON.parse(
-      await checked("git", ["show", `${gitHead}:${PACKAGE_JSON_PATH}`], run)
+      await checked(
+        "git",
+        ["show", `${sourceCommit}:${PACKAGE_JSON_PATH}`],
+        run
+      )
     );
     if (manifest.name !== "notcms" || manifest.version !== version) {
       throw new Error(`npm gitHead does not match notcms@${version}`);
+    }
+    if (existing.length) {
+      const tagCommit = await remoteTagCommit(existing[0].tagName, run);
+      if (tagCommit !== sourceCommit) {
+        throw new Error(
+          `Existing tag ${existing[0].tagName} does not match expected published commit`
+        );
+      }
+      continue; // Preserve verified existing notes, assets and tags.
     }
     const changelog = await checked(
       "git",
@@ -149,16 +184,16 @@ export async function planReleases({ registry, releases, run = runCommand }) {
   return plans;
 }
 
-export async function publishRelease(plan, run = runCommand) {
-  // Check the remote ref, including annotated tags, before creating a release.
+async function remoteTagCommit(tag, run) {
+  // Peel annotated tags before comparing their commits.
   const refs = await checked(
     "git",
     [
       "ls-remote",
       "--tags",
       "origin",
-      `refs/tags/${plan.tag}`,
-      `refs/tags/${plan.tag}^{}`,
+      `refs/tags/${tag}`,
+      `refs/tags/${tag}^{}`,
     ],
     run
   );
@@ -167,9 +202,14 @@ export async function publishRelease(plan, run = runCommand) {
     .filter(Boolean)
     .map((line) => line.split(/\s+/));
   const ref =
-    entries.find((entry) => entry[1] === `refs/tags/${plan.tag}^{}`) ??
-    entries.find((entry) => entry[1] === `refs/tags/${plan.tag}`);
-  if (ref && ref[0] !== plan.commit) {
+    entries.find((entry) => entry[1] === `refs/tags/${tag}^{}`) ??
+    entries.find((entry) => entry[1] === `refs/tags/${tag}`);
+  return ref?.[0];
+}
+
+export async function publishRelease(plan, run = runCommand) {
+  const ref = await remoteTagCommit(plan.tag, run);
+  if (ref && ref !== plan.commit) {
     throw new Error(
       `Tag ${plan.tag} does not match npm gitHead; refusing to move it`
     );

@@ -10,6 +10,7 @@ import {
 import { CHANGELOG_PATH, PACKAGE_JSON_PATH } from "./staged-publish.mjs";
 
 const commit = "a".repeat(40);
+const previousCommit = "b".repeat(40);
 
 test("release job stays on main with a separate GitHub-only token", async () => {
   const workflow = await readFile(
@@ -60,7 +61,7 @@ function registry(versions = ["0.1.0", "0.3.0"]) {
         {
           name: "notcms",
           version,
-          gitHead: commit,
+          gitHead: version === "0.1.0" ? previousCommit : commit,
         },
       ])
     ),
@@ -77,11 +78,24 @@ function gitFixture({
   manifestVersion = "0.3.0",
   ancestor = true,
   notes = changelog,
+  refs,
 } = {}) {
   return async (command, args) => {
     assert.equal(command, "git");
     if (args[0] === "merge-base")
       return { exitCode: ancestor ? 0 : 1, stdout: "", stderr: "not on main" };
+    if (args[0] === "ls-remote")
+      return {
+        exitCode: 0,
+        stdout:
+          refs ??
+          `${args[3].endsWith("0.1.0") ? previousCommit : commit}\t${args[3]}`,
+      };
+    if (args[1] === `${previousCommit}:${PACKAGE_JSON_PATH}`)
+      return {
+        exitCode: 0,
+        stdout: JSON.stringify({ name: "notcms", version: "0.1.0" }),
+      };
     if (args[1] === `${commit}:${PACKAGE_JSON_PATH}`)
       return {
         exitCode: 0,
@@ -152,17 +166,92 @@ test("plan uses the npm commit even when main contains a newer unreleased versio
   assert.equal(plans[0].latest, true);
   assert.doesNotMatch(plans[0].body, /New filters/);
 });
-test("existing canonical and legacy releases are preserved without creating duplicates", async () => {
-  const plans = await planReleases({
-    registry: registry(["0.0.13", "0.1.0"]),
-    releases: [{ tagName: "v0.0.13" }, ...existing],
-    run: () => assert.fail("Existing releases require no git lookup"),
-  });
-  assert.deepEqual(plans, []);
+test("existing canonical and legacy releases verify their commits without writes", async () => {
+  for (const tagName of ["notcms@0.3.0", "v0.3.0"]) {
+    for (const refs of [
+      `${commit}\trefs/tags/${tagName}`,
+      `${previousCommit}\trefs/tags/${tagName}\n${commit}\trefs/tags/${tagName}^{}`,
+    ]) {
+      assert.deepEqual(
+        await planReleases({
+          registry: registry(["0.3.0"]),
+          releases: [{ tagName }],
+          run: gitFixture({ refs }),
+        }),
+        []
+      );
+    }
+  }
+});
+test("existing releases fail on missing or mismatched tags, manifest, or ancestry", async () => {
+  for (const options of [
+    { refs: "" },
+    { refs: `${previousCommit}\trefs/tags/notcms@0.3.0` },
+    {
+      refs: `${commit}\trefs/tags/notcms@0.3.0\n${previousCommit}\trefs/tags/notcms@0.3.0^{}`,
+    },
+    { manifestVersion: "0.4.0" },
+    { ancestor: false },
+  ]) {
+    await assert.rejects(
+      planReleases({
+        registry: registry(["0.3.0"]),
+        releases: [{ tagName: "notcms@0.3.0" }],
+        run: gitFixture(options),
+      })
+    );
+  }
+});
+test("only reviewed historical releases allow missing npm gitHead with pinned tags", async () => {
+  for (const [version, tagName, expected] of [
+    ["0.0.13", "v0.0.13", "5fbf0e4c8f9c6c28a2456ddbcbd5c3c3d751d740"],
+    ["0.1.0", "notcms@0.1.0", "2258723e1ffa7c27ea3507f6380ae352784a06ea"],
+  ]) {
+    const data = registry([version]);
+    delete data.versions[version].gitHead;
+    for (const actual of [expected, commit]) {
+      const result = planReleases({
+        registry: data,
+        releases: [{ tagName }],
+        run: async (command, args) => {
+          assert.equal(command, "git");
+          if (args[0] === "merge-base") {
+            assert.equal(args[2], expected);
+            return { exitCode: 0, stdout: "" };
+          }
+          if (args[0] === "show") {
+            assert.equal(args[1], `${expected}:${PACKAGE_JSON_PATH}`);
+            return {
+              exitCode: 0,
+              stdout: JSON.stringify({ name: "notcms", version }),
+            };
+          }
+          assert.equal(args[0], "ls-remote");
+          return { exitCode: 0, stdout: `${actual}\trefs/tags/${tagName}` };
+        },
+      });
+      if (actual === expected) assert.deepEqual(await result, []);
+      else await assert.rejects(result, /does not match/);
+    }
+    await assert.rejects(
+      planReleases({ registry: data, releases: [] }),
+      /no valid gitHead/
+    );
+  }
+  const data = registry(["0.3.0"]);
+  delete data.versions["0.3.0"].gitHead;
+  await assert.rejects(
+    planReleases({ registry: data, releases: [{ tagName: "notcms@0.3.0" }] }),
+    /no valid gitHead/
+  );
 });
 test("staged or rejected versions absent from npm do not get a release", async () => {
   assert.deepEqual(
-    await planReleases({ registry: registry(["0.1.0"]), releases: existing }),
+    await planReleases({
+      registry: registry(["0.1.0"]),
+      releases: existing,
+      run: gitFixture(),
+    }),
     []
   );
 });
@@ -182,7 +271,7 @@ test("missing gitHead, unrelated commit and wrong manifest fail closed", async (
   const data = registry();
   delete data.versions["0.3.0"].gitHead;
   await assert.rejects(
-    planReleases({ registry: data, releases: existing }),
+    planReleases({ registry: data, releases: existing, run: gitFixture() }),
     /no valid gitHead/
   );
   for (const options of [{ ancestor: false }, { manifestVersion: "0.4.0" }]) {
