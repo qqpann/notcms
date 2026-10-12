@@ -22,6 +22,7 @@ describe("list query types", () => {
   it("infers operands from property types and preserves page inference", () => {
     const options: ListOptions<typeof schema.blog> = {
       where: {
+        id: { in: ["p1", "p2"] as const },
         published: true,
         language: { not_equals: "en" },
         count: 0,
@@ -49,6 +50,9 @@ describe("list query types", () => {
 
 // Checked by tsc without making network requests.
 function checkInvalidQueries(client: Client<typeof schema>) {
+  client.query.blog.list({ where: { id: { in: ["p1"] as const } } });
+  // @ts-expect-error ID values must be strings
+  client.query.blog.list({ where: { id: { in: [123] } } });
   // @ts-expect-error unknown property
   client.query.blog.list({ where: { missing: true } });
   // @ts-expect-error checkbox requires a boolean
@@ -67,3 +71,22 @@ function checkInvalidQueries(client: Client<typeof schema>) {
   client.query.blog.list({ sort: { tags: "asc" } });
 }
 void checkInvalidQueries;
+
+function checkIdPropertyQueries(
+  client: Client<{
+    records: { id: "records"; properties: { id: "title" } };
+  }>
+) {
+  client.query.records.list({ where: { id: "external-id" } });
+  client.query.records.list({ where: { id: { equals: "external-id" } } });
+  client.query.records.list({ where: { id: { in: ["page-id"] } } });
+  client.query.records.list({
+    // @ts-expect-error page IDs and property operators cannot be mixed
+    where: { id: { in: ["page-id"], equals: "external-id" } },
+  });
+  client.query.records.list({
+    // @ts-expect-error page IDs and empty checks cannot be mixed
+    where: { id: { in: ["page-id"], is_empty: true } },
+  });
+}
+void checkIdPropertyQueries;

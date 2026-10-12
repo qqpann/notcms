@@ -24,12 +24,34 @@ type Condition<TType extends PropertyType, TValue> =
           ? never
           : Equality<TValue>);
 
+type PageIdCondition = { in: readonly string[] } & Partial<
+  Record<
+    | "equals"
+    | "not_equals"
+    | "is_empty"
+    | "is_not_empty"
+    | "contains"
+    | "before"
+    | "after"
+    | "on_or_before"
+    | "on_or_after",
+    never
+  >
+>;
+type WithoutIdIn<T> = T extends object ? T & { in?: never } : T;
+
 /** Conditions on different properties are combined with AND. */
 export type Where<TDatabase extends Schema[string]> = {
-  [K in keyof TDatabase["properties"]]?: Condition<
-    TDatabase["properties"][K],
-    NonNullable<InferProperties<TDatabase["properties"]>[K]>
-  >;
+  [K in keyof TDatabase["properties"] | "id"]?:
+    | (K extends "id" ? PageIdCondition : never)
+    | (K extends keyof TDatabase["properties"]
+        ? WithoutIdIn<
+            Condition<
+              TDatabase["properties"][K],
+              NonNullable<InferProperties<TDatabase["properties"]>[K]>
+            >
+          >
+        : never);
 };
 
 type SortableKeys<T extends Properties> = {
