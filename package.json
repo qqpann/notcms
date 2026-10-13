@@ -9,6 +9,7 @@
     "check": "biome check --write .",
     "prepare": "husky",
     "test:staged-publish": "node --test scripts/staged-publish.test.mjs",
+    "test:sdk-releases": "node --test scripts/sdk-github-releases.test.mjs",
     "test:sync-release": "node --test scripts/sync-action-release.test.mjs",
     "test:dependency-security": "node --test scripts/dependency-security.test.mjs"
   },
