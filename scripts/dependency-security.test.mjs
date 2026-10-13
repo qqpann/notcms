@@ -66,7 +66,7 @@ for (const consumer of [
   });
 }
 
-test("Changesets generates an SDK patch using an isolated changeset", async () => {
+test("Changesets generates a fixture SDK patch without altering the checkout", async () => {
   const fixture = await mkdtemp(path.join(tmpdir(), "notcms-changeset-"));
   try {
     const manifest = JSON.parse(
@@ -96,11 +96,10 @@ test("Changesets generates an SDK patch using an isolated changeset", async () =
       path.join(fixture, ".changeset/config.json"),
       JSON.stringify(config)
     );
-    // Real changesets are consumed by version PRs; keep this regression input
-    // independent of which package version has already been released.
+    // Release changesets are consumed on versioning; keep this fixture independent.
     await writeFile(
-      path.join(fixture, ".changeset/secure-cli-dependencies.md"),
-      '---\n"notcms": patch\n---\n\nUpdate bundled CLI dependencies to patched versions.\n'
+      path.join(fixture, ".changeset/fixture-sdk-patch.md"),
+      '---\n"notcms": patch\n---\n\nFixture SDK patch for Changesets integration.\n'
     );
     const result = await runCommand(
       process.execPath,
@@ -121,10 +120,10 @@ test("Changesets generates an SDK patch using an isolated changeset", async () =
         path.join(fixture, "packages/notcms/CHANGELOG.md"),
         "utf8"
       ),
-      /Update bundled CLI dependencies to patched versions/
+      /Fixture SDK patch for Changesets integration/
     );
     await assert.rejects(
-      stat(path.join(fixture, ".changeset/secure-cli-dependencies.md")),
+      stat(path.join(fixture, ".changeset/fixture-sdk-patch.md")),
       { code: "ENOENT" }
     );
   } finally {

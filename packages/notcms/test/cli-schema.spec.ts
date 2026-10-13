@@ -151,6 +151,8 @@ describe("fetchSchema", () => {
     const malformedPayloads = [
       { schema: null },
       { schema: ["not", "a", "map"] },
+      // unknown database field
+      { schema: { blog: { id: "db_1", properties: {}, note: "stale" } } },
       // missing id
       { schema: { blog: { properties: {} } } },
       // missing properties

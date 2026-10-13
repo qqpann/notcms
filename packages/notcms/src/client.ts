@@ -69,16 +69,42 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    *      - `Response | undefined`: The optional HTTP response object.
    */
   list(options?: ListOptions<TDatabase>) {
-    return this.fetch<Pages<InferDatabaseProperties<TDatabase>>>(() => {
-      const url = new URL(routes.pages(this.workspaceId, this.databaseId));
-      if (options?.where !== undefined) {
-        url.searchParams.set("filter", JSON.stringify(options.where));
-      }
-      if (options?.sort !== undefined) {
-        url.searchParams.set("sort", JSON.stringify(options.sort));
-      }
-      return url.toString();
-    }, "GET");
+    return this.fetch<Pages<InferDatabaseProperties<TDatabase>>>(
+      () => this.pagesUrl(options).toString(),
+      "GET"
+    );
+  }
+
+  /**
+   * Retrieve the first matching page, including content, or null when none match.
+   * Uses the same filters and ordering as list() in a single request
+   * (`limit=1&include=content`), so content comes from the synchronized data
+   * that list() reads. Errors retain the usual error tuple and response.
+   */
+  async getFirst(options?: ListOptions<TDatabase>) {
+    const result = await this.fetch<Page<InferDatabaseProperties<TDatabase>>[]>(
+      () => {
+        const url = this.pagesUrl(options);
+        url.searchParams.set("include", "content");
+        url.searchParams.set("limit", "1");
+        return url.toString();
+      },
+      "GET"
+    );
+    const [pages, error, response] = result;
+    if (error !== null) return result;
+    return [pages.length > 0 ? pages[0] : null, null, response] as const;
+  }
+
+  private pagesUrl(options?: ListOptions<TDatabase>) {
+    const url = new URL(routes.pages(this.workspaceId, this.databaseId));
+    if (options?.where !== undefined) {
+      url.searchParams.set("filter", JSON.stringify(options.where));
+    }
+    if (options?.sort !== undefined) {
+      url.searchParams.set("sort", JSON.stringify(options.sort));
+    }
+    return url;
   }
 
   /**

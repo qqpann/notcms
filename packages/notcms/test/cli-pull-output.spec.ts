@@ -73,6 +73,11 @@ describe("CLI pull output paths", () => {
         );
         expect(repeated.code, `${repeated.stdout}\n${repeated.stderr}`).toBe(0);
         expect(repeated.stdout).toContain("No schema changes detected.");
+        const formatted =
+          (await readFile(path.join(project, schemaPath), "utf8"))
+            .replace(/"/g, "'")
+            .replace(/;/g, "") + "\n";
+        await writeFile(path.join(project, schemaPath), formatted);
         const checked = await runProcess(
           process.execPath,
           [cliPath, "pull", "--check"],
@@ -81,6 +86,23 @@ describe("CLI pull output paths", () => {
         expect(checked.code, `${checked.stdout}\n${checked.stderr}`).toBe(0);
         expect(checked.stdout).toContain("is up to date.");
         expect(checked.stdout).not.toContain("Schema changes:");
+        expect(await readFile(path.join(project, schemaPath), "utf8")).toBe(
+          formatted
+        );
+        const stale = formatted.replace("db_1", "db_old");
+        await writeFile(path.join(project, schemaPath), stale);
+        const drift = await runProcess(
+          process.execPath,
+          [cliPath, "pull", "--check"],
+          options
+        );
+        expect(drift.code).toBe(1);
+        expect(drift.stdout).toContain('Changed database ID: "blog"');
+        expect(drift.stdout).toContain("npx notcms pull");
+        expect(drift.stdout).toContain("commit the updated schema");
+        expect(await readFile(path.join(project, schemaPath), "utf8")).toBe(
+          stale
+        );
       } finally {
         await closeServer(server.server);
         await rm(project, { recursive: true, force: true });

@@ -1,0 +1,120 @@
+---
+title: Astro integration
+description: Write articles in Notion and build your own blog with Astro
+---
+
+[Astro](https://docs.astro.build/en/concepts/why-astro/) is a web framework for
+content-focused sites such as blogs and documentation. It serves articles as HTML,
+so you can build a fast site without running lots of JavaScript in the browser.
+
+If you want to write in Notion while choosing your own site's design and URLs,
+Astro and NotCMS work together for that workflow. NotCMS lets you fetch your
+Notion articles and display them in pages built with Astro. Writers can keep
+editing in Notion, while developers control the site's appearance and features.
+
+This guide walks through turning Notion articles into a blog with a list and
+individual article pages. To try it from a new project, follow the
+[Astro example setup](https://github.com/qqpann/notcms/tree/main/examples/astro).
+
+## How articles reach your site
+
+By default, Astro uses static generation: it creates HTML for each page at build
+time. This blog fetches articles from NotCMS during that build. Readers receive
+the resulting HTML, without a new content request for every visit.
+
+Publishing an update takes three steps:
+
+1. Write or edit an article in Notion.
+2. Synchronize the change to NotCMS.
+3. Build and deploy the Astro site.
+
+Unpublishing an article also requires a rebuild and deployment to remove it from
+the site. A later section covers updates without waiting for a build.
+
+## Create the article list
+
+First, choose which articles to publish from your Notion database. A checkbox
+called `published`, for example, lets you show only articles you have checked.
+
+The `nc` client below is generated during [NotCMS setup](/en/cli-commands/init)
+and lets you fetch articles. The examples call the synchronized database `blog`;
+replace it with your own database name. Place this code in an `.astro` file's
+frontmatter, the section between the opening `---` markers.
+
+```ts
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+});
+if (error) throw error;
+```
+
+Loop over `posts` in your Astro template to display the article list. Use
+`post.title` for the title and `post.id` to link to its detail page.
+
+## Create individual article pages
+
+Next, create a page for reading each article. A file at
+`src/pages/blog/[id].astro` can produce a URL like `/blog/article-id` for each
+article. `getStaticPaths` tells Astro which URLs to build by returning the IDs
+from your published article list:
+
+```ts
+export async function getStaticPaths() {
+  const [posts, error] = await nc.query.blog.list({ where: { published: true } });
+  if (error) throw error;
+  return posts.map((post) => ({ params: { id: post.id } }));
+}
+```
+
+Inside `src/pages/blog/[id].astro`, use that ID to fetch the page and its body:
+
+```ts
+const [post, error] = await nc.query.blog.get(Astro.params.id!);
+if (error) throw error;
+```
+
+Recheck publication before rendering the detail page: content can change between
+the list and detail requests. In a static build, let an API failure stop the build
+rather than publishing an incomplete site.
+
+## Render the body and images
+
+`post.content` contains Markdown. Choose a Markdown renderer for your site and
+sanitize any HTML it produces. The complete example displays escaped text so
+that content fetching can be tried without choosing a renderer.
+
+Add a Files & media property called `cover` in Notion to fetch cover images too.
+Here is how to display the first image:
+
+```astro
+{post.properties.cover?.[0] && (
+  <img src={post.properties.cover[0]} alt={post.title} />
+)}
+```
+
+Use these URLs with Astro's image tools if you need optimization. Image processing
+is a site-level choice; the SDK does not require a particular renderer or layout.
+
+## Update articles without waiting for a build
+
+On-demand rendering fetches articles from NotCMS on each visit. Once a change is
+synchronized to NotCMS, it can appear without rebuilding the entire site. This
+requires an [Astro adapter](https://docs.astro.build/en/guides/on-demand-rendering/)
+for your deployment host.
+
+For a URL like `/blog/hello-world`, you can use a Text property called `slug` and
+find the article with `getFirst({ where: { slug, published: true } })`.
+See [fetching one page](/en/usage/get) for details.
+
+<Accordion title="Publishing and deployment considerations">
+  - Keep credentials on the server. Static generation needs them in the build environment; on-demand rendering also needs them in the deployed runtime. See [environment variables](https://docs.astro.build/en/guides/environment-variables/) and the example.
+  - Apply publication rules to both list and detail pages. Filters do not restrict what the workspace key can read. Synchronize only content intended for its consumers. Media URLs are public.
+  - Keep slugs unique and provide redirects from old URLs when they change.
+  - For on-demand pages, treat a missing article as a 404 and an API failure as a service error.
+</Accordion>
+
+## When you change Notion properties
+
+After changing Notion properties, wait for synchronization, then run
+`npx notcms pull` and review the generated types. [Schema checks in CI](/en/cli-commands/schema-ci)
+help catch changes before the next deployment.

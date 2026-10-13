@@ -62,3 +62,16 @@ When changes with changesets are merged to `main`:
 1. A "Version Packages" PR is automatically created
 2. This PR updates versions and CHANGELOGs
 3. After merge, packages are staged; an owner must approve npm publication as described in [staged publishing](./docs/npm-staged-publishing.md).
+
+
+## Documentation
+
+- Start with the concept or decision the reader needs to understand.
+- Show the smallest example that explains that point. Omit unrelated setup and page boilerplate.
+- Introduce the common case before alternatives and edge cases. Link to setup guides and references instead of repeating them.
+- Keep runnable applications in `examples/` and verify those source files. Do not couple their tests to prose or section order.
+- Use bullets for independent changes in PR descriptions and changesets. Add a short code example when an API change affects how users write code.
+- Keep English and Japanese guidance aligned in meaning; examples should use the same API.
+
+For structure, see Drizzle's [schema](https://orm.drizzle.team/docs/sql-schema-declaration),
+[select](https://orm.drizzle.team/docs/select), and [migrations](https://orm.drizzle.team/docs/migrations) guides.

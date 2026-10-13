@@ -82,6 +82,9 @@ export async function init() {
   if (credentials) {
     const { ensureNotcmsDependency } = await import("./features/dependency.js");
     const dependencySetup = await ensureNotcmsDependency();
+    console.log(
+      "Check for schema drift in pull requests and on a schedule with npx notcms pull --check: https://docs.notcms.com/en/cli-commands/schema-ci"
+    );
     await runPull({ credentials });
     if (dependencySetup.status === "manual") {
       printManualDependencyGuidance(dependencySetup);
@@ -279,6 +282,8 @@ function printPullResult(result: PullSchemaResult) {
           Run the following to update it:
 
             ${chalk.blue("$ npx notcms pull")}
+
+          Review the changes and commit the updated schema file.
         `,
         {
           padding: 1,

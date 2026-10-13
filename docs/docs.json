@@ -65,7 +65,8 @@
             "pages": [
               "en/cli-commands/init",
               "en/cli-commands/pull",
-              "en/cli-commands/migration"
+              "en/cli-commands/migration",
+              "en/cli-commands/schema-ci"
             ]
           },
           {
@@ -73,7 +74,8 @@
             "pages": [
               "en/examples/nextjs",
               "en/examples/blog-releases",
-              "en/examples/content-recipes"
+              "en/examples/content-recipes",
+              "en/examples/astro"
             ]
           }
         ]
@@ -99,7 +101,8 @@
             "pages": [
               "ja/cli-commands/init",
               "ja/cli-commands/pull",
-              "ja/cli-commands/migration"
+              "ja/cli-commands/migration",
+              "ja/cli-commands/schema-ci"
             ]
           },
           {
@@ -107,7 +110,8 @@
             "pages": [
               "ja/examples/nextjs",
               "ja/examples/blog-releases",
-              "ja/examples/content-recipes"
+              "ja/examples/content-recipes",
+              "ja/examples/astro"
             ]
           }
         ]

@@ -1,0 +1,68 @@
+---
+title: Check schemas in CI
+description: Keep generated types aligned with synchronized Notion properties
+---
+
+Your generated schema is the shape of the content your code expects. Notion can
+change independently of that code. `pull --check` makes that mismatch visible
+before you ship a query based on outdated types.
+
+```sh
+npx notcms pull --check
+```
+
+The command compares the local schema with the latest schema synchronized into
+NotCMS. It does not query Notion directly or update the local file.
+
+## What counts as a change?
+
+- Database names and IDs.
+- Property names and types.
+- Select, status, and multi-select choices.
+
+Formatting, key order, and choice order do not change the schema's meaning.
+A missing or unsupported generated file also fails the check rather than being
+assumed correct. Semantic comparison requires the release after 0.4.0 containing
+this feature; 0.4.0 compares file text.
+
+## Choose when to check
+
+| Trigger | What it catches |
+| --- | --- |
+| Pull request | A code change using a stale schema |
+| Scheduled run | Notion changes made while no code is being changed |
+
+Use both when editors and developers work independently. Check the same workspace
+that supplies the application, and wait for synchronization to finish first.
+
+## Add the check to your workflow
+
+Commit your generated schema, CLI configuration, and package lockfile. Install
+from that lockfile in CI so local development and CI use the same SDK/CLI version.
+Then run the check with credentials supplied as CI secrets:
+
+```yaml
+- name: Check NotCMS schema
+  run: npx --no-install notcms pull --check
+  env:
+    NOTCMS_SECRET_KEY: ${{ secrets.NOTCMS_SECRET_KEY }}
+    NOTCMS_WORKSPACE_ID: ${{ secrets.NOTCMS_WORKSPACE_ID }}
+```
+
+A [complete GitHub Actions workflow](https://github.com/qqpann/notcms/blob/main/examples/schema-ci/notcms-schema.yml)
+includes installation, PR checks, a daily schedule, and manual execution.
+Fork and Dependabot PRs do not receive these secrets, so the check fails there.
+Do not switch to `pull_request_target` to work around that; it would expose credentials to untrusted code.
+Schema names and choices can appear in logs, so choose an appropriately restricted repository.
+
+## When the check fails
+
+Exit code `0` means a match; `1` means drift or a failed check. Use the reported
+message to decide the next step:
+
+- **Schema changed:** finish synchronization, run `npx notcms pull` locally, and review the diff alongside affected queries before committing.
+- **File missing or unsupported:** regenerate it with `npx notcms pull`.
+- **Authentication or network error:** fix the connection and rerun; regenerating types will not solve it.
+
+CI should report the mismatch. Keep schema updates as a reviewed code change
+rather than automatically accepting every change made in Notion.

@@ -1,65 +1,73 @@
 ---
-title: 単一アイテムの取得
-description: Notionデータベースから個別のアイテムを取得
+title: 1件のページを取得する
+description: ページIDによる取得と、プロパティによる検索を使い分ける
 ---
 
-## 基本的な使用方法
+ページIDが分かっているなら `get`、slugなどのプロパティで探すなら `getFirst` を使います。
+どちらもページのプロパティとMarkdownの本文 `content` を返します。
+以下のデータベース名・プロパティ名は、生成したスキーマに合わせてください。
 
-IDで単一のアイテムを取得：
+## IDで取得する
 
-```typescript
-const [post, error] = await nc.query.blog.get('page-id-123');
+IDは特定のページを指します。タイトルやslugが変わっても同じページを参照したい場合に使います。
 
-if (!error) {
-  console.log(post.title, post.content);
-}
+```ts
+const [post, error] = await nc.query.blog.get("page-id-123");
+if (error) throw error;
+console.log(post.content);
 ```
 
-## 型安全性
+ページが存在しなければ `get` はエラーを返します。空のページとしては扱いません。
 
-NotCMSは取得したアイテムに対して完全な型推論を提供します：
+## プロパティで探す
 
-```typescript
-// 単一ページ型を推論
-type BlogPost = typeof nc.query.blog.$inferPage;
+プロパティによる検索は、サイトの条件に合うページを探します。たとえば、公開済みの記事をslugで取得します。
 
-// 関数で使用
-function processBlogPost(post: BlogPost) {
-  // 完全な型安全性とIDEの自動補完
-  console.log(post.title);
-  console.log(post.published);
-  console.log(post.author);
-}
+```ts
+const [post, error] = await nc.query.blog.getFirst({
+  where: { slug: "hello-world", published: true },
+});
+if (error) throw error;
+console.log(post?.content);
 ```
 
-## 関連アイテム
+一致するページがなければ `post` は `null` です。アプリではその結果を使って404を表示できます。
+リクエスト自体の失敗は、ページなしではなくエラーとして扱います。
 
-複数のクエリを使用して関連アイテムを取得：
+<Note>
+`getFirst` を含むリリースが必要です。0.4.0には未搭載です。
+</Note>
 
-```typescript
-async function getPostWithAuthor(postId: string) {
-  // 記事を取得
-  const [post, postError] = await nc.query.blog.get(postId);
-  if (postError) throw postError;
-  
-  // 著者を取得
-  const [author, authorError] = await nc.query.authors.get(post.properties.authors[0]);
-  if (authorError) throw authorError;
-  
-  return {
-    ...post,
-    author
-  };
-}
+## どの1件を選ぶか
+
+`where` と `sort` は [list()](/ja/usage/list) と同じです。複数のページが一致した場合は、
+その並び順の先頭を返します。一意性を保証する機能ではありません。
+
+```ts
+const [post, error] = await nc.query.blog.getFirst({
+  where: { published: true },
+  sort: { publishedAt: "desc" },
+});
 ```
 
-## 次のステップ
+「最初の1件」に意味がある場合は、並び順を指定します。slugのルートでは、編集時に重複を避け、
+変更時のリダイレクトをサイト側で管理します。言語別slugやIDによる代替は
+[URLレシピ](/ja/examples/content-recipes)を参照してください。
 
-<CardGroup cols={2}>
-  <Card title="アイテムの一覧取得" icon="list" href="/ja/usage/list">
-    複数アイテムのクエリ方法を学ぶ
-  </Card>
-  <Card title="クライアントAPI" icon="code" href="/ja/usage/client">
-    完全なクライアントAPIを探索
-  </Card>
-</CardGroup>
+## 結果を扱う
+
+| 結果 | `post` | `error` |
+| --- | --- | --- |
+| ページを取得できた | `properties` と `content` を含むページ | `null` |
+| `getFirst` で一致するページがない | `null` | `null` |
+| リクエストが失敗した | `undefined` | `Error` |
+
+型は生成スキーマから推論されます。ページを使う前に `error` を確認し、`getFirst` では `null` も扱います。
+再試行の判断は[エラーとレート制限](/ja/usage/errors-and-rate-limits)を参照してください。
+
+<Accordion title="リクエストと並び順の詳細">
+- `getFirst` は `limit=1&include=content` を付けた一覧取得を1回だけ送ります。転送するのは先頭の1件とその本文だけです。
+- `getFirst` は `list` と同じく、NotCMSへ同期済みの内容を返します。`get` と違いNotionへは問い合わせないため、最後の同期より後の変更（アクセスできなくなったページなど）は次の同期後に反映されます。
+- 並び順の省略時や同値の場合は、登録順、次にページIDで並びます。
+- タプルの3番目は成功時と該当なし時に一覧レスポンス、失敗時に失敗したレスポンスです。ネットワーク障害では `undefined` になります。SDKは自動再試行しません。
+</Accordion>

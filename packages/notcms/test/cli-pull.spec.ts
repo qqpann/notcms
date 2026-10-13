@@ -119,6 +119,105 @@ export const nc = new Client({ schema });`);
     });
   });
 
+  it("ignores formatting, key order and option order without rewriting the file", async () => {
+    stubSchema({
+      Blog: {
+        id: "db_blog",
+        properties: { Title: "title", Status: "select" },
+        options: { Status: ["Draft", "Published"] },
+      },
+    });
+    await writeConfig("schema.ts");
+    const formatted = `import { Client, type Schema } from 'notcms'
+// Formatted by the consuming project.
+export const schema = {
+  Blog: {
+    options: { Status: ['Published', 'Draft',], },
+    properties: { Status: 'select', Title: 'title', },
+    id: 'db_blog',
+  },
+} as const satisfies Schema
+export const nc = new Client({ schema })
+`;
+    await fs.writeFile(path.join(dir, "schema.ts"), formatted);
+    expect(await pullSchema({ check: true, credentials })).toMatchObject({
+      status: "up-to-date",
+    });
+    expect(await fs.readFile(path.join(dir, "schema.ts"), "utf8")).toBe(
+      formatted
+    );
+  });
+
+  const changedSchemas: Schema[] = [
+    {
+      Blog: {
+        id: "db_changed",
+        properties: { Title: "title", Status: "select" },
+        options: { Status: ["Draft"] },
+      },
+    },
+    {
+      Blog: {
+        id: "db_blog",
+        properties: { Title: "rich_text", Status: "select" },
+        options: { Status: ["Draft"] },
+      },
+    },
+    {
+      Blog: {
+        id: "db_blog",
+        properties: { Title: "title", Status: "select" },
+        options: { Status: ["Published"] },
+      },
+    },
+    {
+      Blog: { id: "db_blog", properties: { Title: "title", Status: "select" } },
+    },
+    {},
+  ];
+  it.each(changedSchemas)(
+    "detects semantic drift in check mode: %j",
+    async (updated) => {
+      await writeConfig("schema.ts");
+      stubSchema({
+        Blog: {
+          id: "db_blog",
+          properties: { Title: "title", Status: "select" },
+          options: { Status: ["Draft"] },
+        },
+      });
+      await pullSchema({ credentials });
+      const before = await fs.readFile(path.join(dir, "schema.ts"), "utf8");
+      stubSchema(updated);
+      expect(await pullSchema({ check: true, credentials })).toMatchObject({
+        status: "stale",
+        summary: {
+          status: "compared",
+          changes: expect.arrayContaining([expect.any(String)]),
+        },
+      });
+      expect(await fs.readFile(path.join(dir, "schema.ts"), "utf8")).toBe(
+        before
+      );
+    }
+  );
+
+  it("rejects unknown database fields without rewriting the checked file", async () => {
+    stubSchema({ Blog: { id: "db_blog", properties: {} } });
+    await writeConfig("schema.ts");
+    const content = `export const schema = {
+      Blog: { id: "db_blog", properties: {}, note: "stale" },
+    } as const satisfies Schema;`;
+    await fs.writeFile(path.join(dir, "schema.ts"), content);
+    expect(await pullSchema({ check: true, credentials })).toMatchObject({
+      status: "stale",
+      summary: { status: "unavailable" },
+    });
+    expect(await fs.readFile(path.join(dir, "schema.ts"), "utf8")).toBe(
+      content
+    );
+  });
+
   it("compares the previous file and prints ID and database changes after saving", async () => {
     stubSchema({ blog: { id: "old_id", properties: { title: "title" } } });
     await writeConfig("schema.ts");

@@ -50,6 +50,14 @@ describe("list query types", () => {
 
 // Checked by tsc without making network requests.
 function checkInvalidQueries(client: Client<typeof schema>) {
+  client.query.blog.getFirst({
+    where: { published: true },
+    sort: { count: "desc" },
+  });
+  // @ts-expect-error getFirst uses the same typed conditions as list
+  client.query.blog.getFirst({ where: { published: "true" } });
+  // @ts-expect-error getFirst rejects unknown sort properties
+  client.query.blog.getFirst({ sort: { missing: "asc" } });
   client.query.blog.list({ where: { id: { in: ["p1"] as const } } });
   // @ts-expect-error ID values must be strings
   client.query.blog.list({ where: { id: { in: [123] } } });
@@ -90,3 +98,13 @@ function checkIdPropertyQueries(
   });
 }
 void checkIdPropertyQueries;
+
+// Checked by tsc without making network requests.
+async function checkGetFirstResult(client: Client<typeof schema>) {
+  const [page, error] = await client.query.blog.getFirst();
+  if (error) return;
+  expectTypeOf(page).toEqualTypeOf<
+    typeof client.query.blog.$inferPage | null
+  >();
+}
+void checkGetFirstResult;
