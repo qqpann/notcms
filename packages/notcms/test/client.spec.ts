@@ -182,6 +182,79 @@ describe("DatabaseHandler", () => {
     ).toEqual({ id: { in: [] } });
   });
 
+  it("gets the first server-ordered match with content in one request", async () => {
+    const page = {
+      id: "p2",
+      title: "Second",
+      properties: { slug: "日本語 & more" },
+      content: "# Body",
+    };
+    const response = jsonResponse({ data: [page] });
+    const fetchMock = vi.fn().mockResolvedValue(response);
+    vi.stubGlobal("fetch", fetchMock);
+    const [data, error, actualResponse] =
+      await createClient().query.abc.getFirst({
+        where: { slug: "日本語 & more" },
+        sort: { publishedAt: "desc" },
+      });
+    const url = new URL(fetchMock.mock.calls[0][0]);
+    expect(`${url.origin}${url.pathname}`).toBe(
+      `${HOST}/ws/ws_test/db/abc/pages`
+    );
+    expect(JSON.parse(url.searchParams.get("filter") ?? "null")).toEqual({
+      slug: "日本語 & more",
+    });
+    expect(JSON.parse(url.searchParams.get("sort") ?? "null")).toEqual({
+      publishedAt: "desc",
+    });
+    expect(url.searchParams.get("include")).toBe("content");
+    expect(url.searchParams.get("limit")).toBe("1");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(data).toEqual(page);
+    expect(error).toBeNull();
+    expect(actualResponse).toBe(response);
+  });
+
+  it("uses only the first page when the API returns more than the limit", async () => {
+    const first = { id: "p1", title: "First", properties: {}, content: "1" };
+    const second = { id: "p2", title: "Second", properties: {}, content: "2" };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse({ data: [first, second] }))
+    );
+    const [data] = await createClient().query.abc.getFirst();
+    expect(data).toEqual(first);
+  });
+
+  it("returns null with the list response when no match exists", async () => {
+    const response = jsonResponse({ data: [] });
+    const fetchMock = vi.fn().mockResolvedValue(response);
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await createClient().query.abc.getFirst()).toEqual([
+      null,
+      null,
+      response,
+    ]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves request failures instead of returning null or retrying", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const response = new Response("Unavailable", {
+      status: 429,
+      headers: { "Retry-After": "60" },
+    });
+    const fetchMock = vi.fn().mockResolvedValue(response);
+    vi.stubGlobal("fetch", fetchMock);
+    const [data, error, actualResponse] =
+      await createClient().query.abc.getFirst();
+    expect(data).toBeUndefined();
+    expect(error).toBeInstanceOf(Error);
+    expect(actualResponse).toBe(response);
+    expect(actualResponse?.headers.get("Retry-After")).toBe("60");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it("gets a single page by id", async () => {
     const page = { id: "p1", title: "Hello", properties: {} };
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: page }));

@@ -1,0 +1,23 @@
+name: NotCMS schema
+on:
+  pull_request:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Check schema
+        run: npx --no-install notcms pull --check
+        env:
+          NOTCMS_SECRET_KEY: ${{ secrets.NOTCMS_SECRET_KEY }}
+          NOTCMS_WORKSPACE_ID: ${{ secrets.NOTCMS_WORKSPACE_ID }}

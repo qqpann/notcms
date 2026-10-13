@@ -1,0 +1,114 @@
+---
+title: Astroとの連携
+description: Notionで記事を書き、Astroで自分のブログを作る
+---
+
+[Astro](https://docs.astro.build/ja/concepts/why-astro/)は、ブログやドキュメントなど、
+コンテンツを読むためのWebサイト作りに適したフレームワークです。
+記事をHTMLとして配信できるので、ブラウザで大量のJavaScriptを動かさずに、軽快なサイトを作れます。
+
+Notionで記事を書きながら、サイトのデザインやURLは自分で決めたい。
+そんなブログを作るときに、AstroとNotCMSを組み合わせられます。
+NotCMSを通じてNotionの記事を取得し、Astroで作ったページに表示します。
+記事の編集は使い慣れたNotionで続けられ、開発者はサイトの見た目や機能を自由に作れます。
+
+ここでは、Notionの記事からブログの一覧・詳細ページを作る流れを紹介します。
+プロジェクトの作成から試したい場合は、[Astroサンプルのセットアップ手順](https://github.com/qqpann/notcms/tree/main/examples/astro)を参照してください。
+
+## 記事をサイトに反映する流れ
+
+Astroは標準で、ビルド時に各ページのHTMLを作る「静的生成」を使います。
+このブログも、ビルド時にNotCMSから記事を取得してページを作ります。
+読者には作成済みのHTMLを配信するため、アクセスのたびに記事を取得する必要がありません。
+
+記事を更新して公開するまでの流れは次のとおりです。
+
+1. Notionで記事を書く・編集する。
+2. 変更をNotCMSに同期する。
+3. Astroのサイトをビルドし、デプロイする。
+
+記事を非公開にした場合も、サイトから取り除くには再ビルド・デプロイが必要です。
+ビルドを待たずに更新を反映したい場合の方法は、後半で紹介します。
+
+## ブログの一覧を作る
+
+まず、Notionのデータベースから公開する記事を選びます。
+たとえば `published` というチェックボックスを用意すると、チェックを入れた記事だけを一覧に出せます。
+
+以下の `nc` は、[NotCMSの初期設定](/ja/cli-commands/init)で生成する、記事を取得するためのクライアントです。
+例ではNotCMSに同期したデータベースを `blog` と呼んでいます。自分のデータベース名に置き換えてください。
+これらのコードは、`.astro` ファイルのフロントマター（冒頭の `---` で囲まれた部分）に書きます。
+
+```ts
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+});
+if (error) throw error;
+```
+
+取得した `posts` をAstroのテンプレートで繰り返し表示すれば、記事一覧になります。
+記事のタイトルは `post.title`、詳細ページへのリンクには `post.id` を使えます。
+
+## 記事の詳細ページを作る
+
+一覧の次は、記事を読むためのページを作ります。
+`src/pages/blog/[id].astro` を用意すると、記事のIDごとに `/blog/記事のID` というURLを作れます。
+Astroに作成するURLを伝えるのが `getStaticPaths` です。公開記事の一覧から、各記事のIDを渡します。
+
+```ts
+export async function getStaticPaths() {
+  const [posts, error] = await nc.query.blog.list({ where: { published: true } });
+  if (error) throw error;
+  return posts.map((post) => ({ params: { id: post.id } }));
+}
+```
+
+`src/pages/blog/[id].astro` では、そのIDから本文を含むページを取得します。
+
+```ts
+const [post, error] = await nc.query.blog.get(Astro.params.id!);
+if (error) throw error;
+```
+
+一覧取得後に内容が変わることもあるため、詳細を表示する前にも公開状態を確認します。
+静的生成中にAPI取得が失敗した場合は、不完全なサイトを公開せずビルドを止めます。
+
+## 本文と画像を表示する
+
+`post.content` にはMarkdownが入ります。サイトに合ったMarkdownレンダラーを選び、
+生成したHTMLをサニタイズして表示します。実行サンプルでは、レンダラーを決める前でも取得を試せるよう、
+エスケープしたテキストを表示しています。
+
+Notionに `cover` というファイル＆メディアのプロパティを用意すると、カバー画像も取得できます。
+先頭の画像を表示する例です。
+
+```astro
+{post.properties.cover?.[0] && (
+  <img src={post.properties.cover[0]} alt={post.title} />
+)}
+```
+
+最適化が必要なら、このURLをAstroの画像機能で扱います。
+画像処理はサイト側で選択でき、SDKが特定のレンダラーやレイアウトを要求することはありません。
+
+## ビルドを待たずに記事を更新したい場合
+
+アクセスのたびにNotCMSから記事を取得する「オンデマンドレンダリング」も選べます。
+この方式では、NotCMSへの同期後、サイト全体を再ビルドせずに更新を反映できます。
+配備先に合う[Astroアダプター](https://docs.astro.build/ja/guides/on-demand-rendering/)が必要です。
+
+たとえば `/blog/hello-world` のようなURLなら、テキストの `slug` プロパティから
+`getFirst({ where: { slug, published: true } })` で記事を探せます。
+詳しくは[1件のページ取得](/ja/usage/get)を参照してください。
+
+<Accordion title="公開・運用時に確認すること">
+  - 認証情報はサーバー側だけで扱います。静的生成ではビルド環境、オンデマンドでは配備先の実行環境にも設定します。[環境変数の設定](https://docs.astro.build/ja/guides/environment-variables/)とサンプルを参照してください。
+  - 公開条件は一覧と詳細の両方に適用します。フィルターはワークスペースのキーが読める範囲を制限しません。その利用者へ提供するコンテンツだけを同期してください。メディアのURLは公開URLです。
+  - slugは記事ごとに一意にし、変更するときは旧URLからのリダイレクトを用意します。
+  - オンデマンドでは、記事が見つからない場合は404、APIの取得失敗はサービスエラーとして扱います。
+</Accordion>
+
+## Notionのプロパティを変更したら
+
+Notionのプロパティを変えたら、同期完了後に `npx notcms pull` を実行し、生成された型を確認します。
+[CIでのスキーマ確認](/ja/cli-commands/schema-ci)を使うと、次のデプロイまでにずれを見つけられます。

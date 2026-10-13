@@ -270,6 +270,9 @@ describe("init command", () => {
       await init();
 
       expect(output()).toContain("Next.js project detected");
+      expect(output()).toContain(
+        "https://docs.notcms.com/en/cli-commands/schema-ci"
+      );
       const lastLog = logSpy.mock.calls[logSpy.mock.calls.length - 1]?.[0];
       expect(String(lastLog)).toContain(finalGuidance);
     }

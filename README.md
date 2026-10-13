@@ -198,3 +198,7 @@ See individual directories for specific license details.
 [commitizen-url]: http://commitizen.github.io/cz-cli/
 [deepwiki-img]: https://img.shields.io/badge/deepwiki-qqpann%2Fnotcms-blue
 [deepwiki-url]: https://deepwiki.com/qqpann/notcms
+
+Keep generated types in sync with [PR and scheduled schema checks](https://docs.notcms.com/en/cli-commands/schema-ci).
+
+Build a blog with the [Astro guide](https://docs.notcms.com/en/examples/astro).

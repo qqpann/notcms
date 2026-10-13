@@ -1,0 +1,18 @@
+---
+import { nc } from "../../notcms/schema";
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+});
+if (error) throw new Error("Could not load blog posts");
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Blog</title></head>
+  <body>
+    <h1>Blog</h1>
+    <ul>
+      {posts.map((post) => (
+        <li><a href={`/blog/${encodeURIComponent(post.id)}/`}>{post.title}</a></li>
+      ))}
+    </ul>
+  </body>
+</html>

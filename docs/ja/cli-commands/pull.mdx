@@ -103,3 +103,6 @@ CLIは `?include=options` を自動で指定して選択肢を取得します。
 取得済みの空配列はselect/statusが `null`、multi-selectが `never[] | null` になります。`options` のない旧スキーマは従来の `string | null`／`string[] | null` を維持します。APIはメタデータ取得までoptionsを省略し、通常のDB同期またはサービス側のバックフィルで補完します。
 
 Notionで選択肢を変更した後は、DBを同期してから `notcms pull` を再実行してください。選択肢の追加・削除やメタデータの取得状態の変化も差分に表示します。型はpull時点の内容を表し、SDKは実行時の未知の値を変換・破棄しません。
+
+
+[CI でスキーマを確認する](/ja/cli-commands/schema-ci)

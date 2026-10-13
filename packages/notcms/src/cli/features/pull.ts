@@ -72,7 +72,7 @@ export async function pullSchema(
   const summary = summarizeSchema(existing, schema);
 
   if (options.check) {
-    if (existing === content) {
+    if (summary.status === "compared" && summary.changes.length === 0) {
       return { status: "up-to-date", schemaPath, firstDatabaseName };
     }
     return {

@@ -1,0 +1,28 @@
+---
+import { nc } from "../../notcms/schema";
+
+export async function getStaticPaths() {
+  const [posts, error] = await nc.query.blog.list({
+    where: { published: true },
+  });
+  if (error) throw new Error("Could not load blog paths");
+  return posts.map((post) => ({ params: { id: post.id } }));
+}
+
+const { id } = Astro.params;
+if (!id) throw new Error("Missing page ID");
+const [post, error] = await nc.query.blog.get(id);
+if (error) throw new Error("Could not load blog post");
+// Recheck in case publication changed after path generation.
+if (post.properties.published !== true) throw new Error("Post is no longer published");
+const cover = post.properties.cover?.[0];
+---
+<html lang="en">
+  <head><meta charset="utf-8" /><title>{post.title}</title></head>
+  <body>
+    <a href="/blog/">All posts</a>
+    <h1>{post.title}</h1>
+    {cover && <img src={cover} alt={`Cover for ${post.title}`} width="800" loading="lazy" />}
+    <pre>{post.content}</pre>
+  </body>
+</html>

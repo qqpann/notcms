@@ -226,6 +226,7 @@ function hasGeneratedClientWrapper(
   previous: Token
 ): boolean {
   if (
+    tokenText(source, offset, previous) !== ";" &&
     !hasLineBreak(source, offset + previous.end, offset + tokens[start].start)
   ) {
     return false;
@@ -244,14 +245,22 @@ function hasGeneratedClientWrapper(
     "}",
     ")",
   ];
-  const end = start + expected.length;
-  if (tokens.length !== end && tokens.length !== end + 1) {
-    return false;
-  }
-
-  for (let index = 0; index < expected.length; index += 1) {
-    if (tokenText(source, offset, tokens[start + index]) !== expected[index]) {
+  let end = start;
+  for (const text of expected) {
+    if (
+      end >= tokens.length ||
+      tokenText(source, offset, tokens[end]) !== text
+    ) {
       return false;
+    }
+    end += 1;
+    // Formatters may add trailing commas in the object and argument list.
+    if (
+      (text === "schema" || text === "}") &&
+      end < tokens.length &&
+      tokenText(source, offset, tokens[end]) === ","
+    ) {
+      end += 1;
     }
   }
 
