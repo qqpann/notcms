@@ -19,7 +19,7 @@ const failure = (stderr = "failed") => ({ exitCode: 1, stdout: "", stderr });
 test("extracts only the target section while retaining code examples", () => {
   const notes = releaseNotes(changelog, "0.5.0");
   assert.match(notes, /- Current\n\n```md\n## 99.0.0\n```/);
-  assert.match(notes, /https:\/\/www.npmjs.com\/package\/notcms\/v\/0.5.0/);
+  assert.match(notes, /https:\/\/www\.npmjs\.com\/package\/notcms\/v\/0.5.0/);
   assert.doesNotMatch(notes, /Future|Past/);
 });
 
