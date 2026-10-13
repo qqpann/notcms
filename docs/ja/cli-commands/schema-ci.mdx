@@ -48,8 +48,8 @@ Notionへの直接問い合わせや、ローカルファイルの更新は行�
 
 [GitHub Actionsの完全な例](https://github.com/qqpann/notcms/blob/main/examples/schema-ci/notcms-schema.yml)には、
 インストール、PR確認、日次実行、手動実行をまとめています。
-シークレットを使えないfork・DependabotのPRはスキップします。認証情報は信頼できるコードだけに渡し、
-この制限を回避するために `pull_request_target` へ切り替えないでください。
+fork・DependabotのPRにはシークレットが渡されないため、チェックは失敗します。
+これを回避するために `pull_request_target` へ切り替えないでください。信頼できないコードに認証情報を渡すことになります。
 ログにはスキーマ名や選択肢が出るため、適切なアクセス範囲のリポジトリで実行します。
 
 ## チェックが失敗したら

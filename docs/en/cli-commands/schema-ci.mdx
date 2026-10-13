@@ -51,8 +51,8 @@ Then run the check with credentials supplied as CI secrets:
 
 A [complete GitHub Actions workflow](https://github.com/qqpann/notcms/blob/main/examples/schema-ci/notcms-schema.yml)
 includes installation, PR checks, a daily schedule, and manual execution.
-It skips fork and Dependabot PRs, which cannot access these secrets. Run credentials
-only with trusted code; do not switch to `pull_request_target` to bypass that restriction.
+Fork and Dependabot PRs do not receive these secrets, so the check fails there.
+Do not switch to `pull_request_target` to work around that; it would expose credentials to untrusted code.
 Schema names and choices can appear in logs, so choose an appropriately restricted repository.
 
 ## When the check fails
