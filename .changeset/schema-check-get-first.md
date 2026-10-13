@@ -2,10 +2,10 @@
 "notcms": minor
 ---
 
-- Add `findFirst` with typed filters and sorting. Return full page content, or `null` when no page matches.
+- Add `getFirst` with typed filters and sorting. Return the first matching page with content in one request, or `null` when no page matches.
 
   ```ts
-  const [post, error] = await nc.query.blog.findFirst({
+  const [post, error] = await nc.query.blog.getFirst({
     where: { slug: "hello-world" },
   });
   if (error) throw error;

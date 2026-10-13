@@ -50,7 +50,7 @@ TypeScript SDK for fetching pages and their content.
 ## Submission order
 
 1. Merge and publish this guide; verify the public guide URL and the SDK release
-   containing findFirst and semantic checks before proposing it upstream.
+   containing getFirst and semantic checks before proposing it upstream.
 2. Open the prepared proposal via https://github.com/withastro/docs/issues/new/choose
    or https://github.com/withastro/docs/discussions. Check for duplicates first.
 3. After maintainer feedback, submit the English page to `withastro/docs:main`,

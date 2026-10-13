@@ -3,7 +3,7 @@ title: Fetch one page
 description: Choose between a known page ID and a property-based lookup
 ---
 
-Use `get` when you already have a page ID, and `findFirst` when you have a property
+Use `get` when you already have a page ID, and `getFirst` when you have a property
 such as a slug. Both return the page's properties and Markdown `content`.
 Database and property names below come from your generated schema.
 
@@ -27,7 +27,7 @@ A property lookup finds a page that matches your site's rule. For example, find
 a published post by its slug:
 
 ```ts
-const [post, error] = await nc.query.blog.findFirst({
+const [post, error] = await nc.query.blog.getFirst({
   where: { slug: "hello-world", published: true },
 });
 if (error) throw error;
@@ -38,16 +38,16 @@ console.log(post?.content);
 show a 404. A failed request is an error, not a missing page.
 
 <Note>
-`findFirst` requires the release containing this method; it is not available in 0.4.0.
+`getFirst` requires the release containing this method; it is not available in 0.4.0.
 </Note>
 
 ## Decide which match to use
 
 `where` and `sort` work like [list()](/en/usage/list). If several pages match,
-`findFirst` returns the first one in that order; it does not enforce uniqueness.
+`getFirst` returns the first one in that order; it does not enforce uniqueness.
 
 ```ts
-const [post, error] = await nc.query.blog.findFirst({
+const [post, error] = await nc.query.blog.getFirst({
   where: { published: true },
   sort: { publishedAt: "desc" },
 });
@@ -62,16 +62,16 @@ your content workflow, and manage redirects when they change. See the
 | Outcome | `post` | `error` |
 | --- | --- | --- |
 | A page was fetched | Page with `properties` and `content` | `null` |
-| No `findFirst` match | `null` | `null` |
+| No `getFirst` match | `null` | `null` |
 | A request failed | `undefined` | `Error` |
 
 Types are inferred from the generated schema. Check `error` before using the
-page; for `findFirst`, also handle `null`. See [errors and rate limits](/en/usage/errors-and-rate-limits)
+page; for `getFirst`, also handle `null`. See [errors and rate limits](/en/usage/errors-and-rate-limits)
 for retry decisions.
 
 <Accordion title="Request and ordering details">
-- `findFirst` calls `list(options)` and then `get(first.id)`: two requests for a match, one for no match. The list currently retrieves all matching metadata.
-- The reads are not an atomic snapshot. If the page disappears before detail retrieval, the detail error is preserved; it is not converted to `null`.
+- `getFirst` sends one list request with `limit=1&include=content`, so only the first match and its content are transferred.
+- Like `list`, `getFirst` returns content already synchronized into NotCMS. Unlike `get`, it does not contact Notion, so changes after the last synchronization, such as a page that is no longer accessible, appear after the next sync.
 - With no sort, or when sort values tie, ordering uses registration order followed by page ID.
-- The optional third tuple value is the detail response on success, the list response for no match, or the failed response on error. It is `undefined` for a network failure. The SDK does not retry automatically.
+- The optional third tuple value is the list response on success or no match, or the failed response on error. It is `undefined` for a network failure. The SDK does not retry automatically.
 </Accordion>

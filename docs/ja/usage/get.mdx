@@ -3,7 +3,7 @@ title: 1件のページを取得する
 description: ページIDによる取得と、プロパティによる検索を使い分ける
 ---
 
-ページIDが分かっているなら `get`、slugなどのプロパティで探すなら `findFirst` を使います。
+ページIDが分かっているなら `get`、slugなどのプロパティで探すなら `getFirst` を使います。
 どちらもページのプロパティとMarkdownの本文 `content` を返します。
 以下のデータベース名・プロパティ名は、生成したスキーマに合わせてください。
 
@@ -24,7 +24,7 @@ console.log(post.content);
 プロパティによる検索は、サイトの条件に合うページを探します。たとえば、公開済みの記事をslugで取得します。
 
 ```ts
-const [post, error] = await nc.query.blog.findFirst({
+const [post, error] = await nc.query.blog.getFirst({
   where: { slug: "hello-world", published: true },
 });
 if (error) throw error;
@@ -35,7 +35,7 @@ console.log(post?.content);
 リクエスト自体の失敗は、ページなしではなくエラーとして扱います。
 
 <Note>
-`findFirst` を含むリリースが必要です。0.4.0には未搭載です。
+`getFirst` を含むリリースが必要です。0.4.0には未搭載です。
 </Note>
 
 ## どの1件を選ぶか
@@ -44,7 +44,7 @@ console.log(post?.content);
 その並び順の先頭を返します。一意性を保証する機能ではありません。
 
 ```ts
-const [post, error] = await nc.query.blog.findFirst({
+const [post, error] = await nc.query.blog.getFirst({
   where: { published: true },
   sort: { publishedAt: "desc" },
 });
@@ -59,15 +59,15 @@ const [post, error] = await nc.query.blog.findFirst({
 | 結果 | `post` | `error` |
 | --- | --- | --- |
 | ページを取得できた | `properties` と `content` を含むページ | `null` |
-| `findFirst` で一致するページがない | `null` | `null` |
+| `getFirst` で一致するページがない | `null` | `null` |
 | リクエストが失敗した | `undefined` | `Error` |
 
-型は生成スキーマから推論されます。ページを使う前に `error` を確認し、`findFirst` では `null` も扱います。
+型は生成スキーマから推論されます。ページを使う前に `error` を確認し、`getFirst` では `null` も扱います。
 再試行の判断は[エラーとレート制限](/ja/usage/errors-and-rate-limits)を参照してください。
 
 <Accordion title="リクエストと並び順の詳細">
-- `findFirst` は `list(options)` の後に `get(first.id)` を呼びます。一致時は2リクエスト、該当なしは1リクエストです。現在の一覧取得は一致するメタデータ全件を取得します。
-- 一連の取得は同一時点を保証しません。詳細取得前にページが消えた場合は、そのエラーを保持し、`null` へ変換しません。
+- `getFirst` は `limit=1&include=content` を付けた一覧取得を1回だけ送ります。転送するのは先頭の1件とその本文だけです。
+- `getFirst` は `list` と同じく、NotCMSへ同期済みの内容を返します。`get` と違いNotionへは問い合わせないため、最後の同期より後の変更（アクセスできなくなったページなど）は次の同期後に反映されます。
 - 並び順の省略時や同値の場合は、登録順、次にページIDで並びます。
-- タプルの3番目は成功時に詳細レスポンス、該当なし時に一覧レスポンス、失敗時に失敗したレスポンスです。ネットワーク障害では `undefined` になります。SDKは自動再試行しません。
+- タプルの3番目は成功時と該当なし時に一覧レスポンス、失敗時に失敗したレスポンスです。ネットワーク障害では `undefined` になります。SDKは自動再試行しません。
 </Accordion>

@@ -98,7 +98,7 @@ Notionに `cover` というファイル＆メディアのプロパティを用�
 配備先に合う[Astroアダプター](https://docs.astro.build/ja/guides/on-demand-rendering/)が必要です。
 
 たとえば `/blog/hello-world` のようなURLなら、テキストの `slug` プロパティから
-`findFirst({ where: { slug, published: true } })` で記事を探せます。
+`getFirst({ where: { slug, published: true } })` で記事を探せます。
 詳しくは[1件のページ取得](/ja/usage/get)を参照してください。
 
 <Accordion title="公開・運用時に確認すること">
