@@ -1,357 +1,220 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import {
-  planReleases,
+  REPOSITORY,
+  planRelease,
   publishRelease,
-  publishedVersions,
   releaseNotes,
 } from "./sdk-github-releases.mjs";
 import { CHANGELOG_PATH, PACKAGE_JSON_PATH } from "./staged-publish.mjs";
 
 const commit = "a".repeat(40);
-const previousCommit = "b".repeat(40);
+const tag = "notcms@0.5.0";
+const changelog =
+  "# notcms\n\n## 0.6.0\n\n### Minor Changes\n\n- Future\n\n## 0.5.0\n\n### Patch Changes\n\n- Current\n\n```md\n## 99.0.0\n```\n\n## 0.4.0\n\n### Minor Changes\n\n- Past\n";
+const ok = (stdout = "") => ({ exitCode: 0, stdout, stderr: "" });
+const failure = (stderr = "failed") => ({ exitCode: 1, stdout: "", stderr });
 
-test("release job stays on main with a separate GitHub-only token", async () => {
+test("extracts only the target section while retaining code examples", () => {
+  const notes = releaseNotes(changelog, "0.5.0");
+  assert.match(notes, /- Current\n\n```md\n## 99.0.0\n```/);
+  assert.match(notes, /https:\/\/www.npmjs.com\/package\/notcms\/v\/0.5.0/);
+  assert.doesNotMatch(notes, /Future|Past/);
+});
+
+test("rejects missing, duplicate and empty target notes", () => {
+  for (const text of [
+    "## 0.4.0\n- Old",
+    "## 0.5.0\n",
+    "## 0.5.0\n### Patch Changes",
+    "## 0.5.0\n- One\n## 0.5.0\n- Two",
+  ])
+    assert.throws(() => releaseNotes(text, "0.5.0"), /changelog/);
+});
+
+test("plans from the original commit with no npm or GitHub lookup", async () => {
+  const calls = [];
+  const run = async (command, args) => {
+    calls.push([command, ...args]);
+    if (args[0] === "merge-base") return ok();
+    if (args[1] === `${commit}:${PACKAGE_JSON_PATH}`)
+      return ok(JSON.stringify({ name: "notcms", version: "0.5.0" }));
+    if (args[1] === `${commit}:${CHANGELOG_PATH}`) return ok(changelog);
+    throw new Error("Unexpected command");
+  };
+  const plan = await planRelease(commit, run);
+  assert.equal(plan.tag, tag);
+  assert.equal(plan.commit, commit);
+  assert.equal(calls.length, 3);
+  assert.deepEqual(calls[0], [
+    "git",
+    "merge-base",
+    "--is-ancestor",
+    commit,
+    "origin/main",
+  ]);
+});
+
+test("rejects invalid commits, off-main commits and nonstable packages", async () => {
+  await assert.rejects(planRelease("main"), /full release commit/);
+  await assert.rejects(planRelease(undefined), /full release commit/);
+  await assert.rejects(
+    planRelease(commit, async () => failure()),
+    /failed/
+  );
+  for (const manifest of [
+    { name: "other", version: "0.5.0" },
+    { name: "notcms", version: "0.5.0-rc.1" },
+  ]) {
+    await assert.rejects(
+      planRelease(commit, async (_cmd, args) =>
+        args[0] === "merge-base" ? ok() : ok(JSON.stringify(manifest))
+      ),
+      /stable notcms/
+    );
+  }
+});
+
+function fixture({ ref, existing, lookupFailure, failCreate = false } = {}) {
+  const calls = [];
+  const plan = { tag, commit, body: "### Patch Changes\n\n- Current\n" };
+  let tagRef = ref;
+  let release = existing;
+  const run = async (command, args) => {
+    calls.push([command, ...args]);
+    if (command === "git")
+      return ok(tagRef ? `${tagRef}\trefs/tags/${tag}\n` : "");
+    if (args[1].endsWith(`/releases/tags/${tag}`)) {
+      if (lookupFailure) return lookupFailure;
+      return release
+        ? ok(
+            `HTTP/2.0 200 OK\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(release)}`
+          )
+        : {
+            exitCode: 1,
+            stdout: 'HTTP/2.0 404 Not Found\r\n\r\n{"message":"Not Found"}',
+            stderr: "HTTP 404",
+          };
+    }
+    if (args[1].endsWith("/git/refs")) {
+      tagRef = commit;
+      return ok("{}");
+    }
+    if (args[1] === `repos/${REPOSITORY}/releases`) {
+      if (failCreate) {
+        failCreate = false;
+        return failure("temporary server error");
+      }
+      release = { tag_name: tag, draft: false, prerelease: false };
+      return ok(JSON.stringify(release));
+    }
+    throw new Error("Unexpected command");
+  };
+  return { calls, plan, run };
+}
+const writes = (calls) => calls.filter((call) => call.includes("POST"));
+
+test("creates only the staged version and is idempotent without npm approval", async () => {
+  const { calls, plan, run } = fixture();
+  assert.equal(await publishRelease(plan, run), "created");
+  const posts = writes(calls);
+  assert.equal(posts.length, 2);
+  assert.ok(posts[0].includes(`sha=${commit}`));
+  assert.ok(posts[1].includes(`body=${plan.body}`));
+  assert.ok(posts[1].includes("make_latest=legacy"));
+  assert.equal(await publishRelease(plan, run), "existing");
+  assert.equal(writes(calls).length, 2);
+  assert.ok(calls.every(([command]) => command === "git" || command === "gh"));
+});
+
+test("retries after tag creation without duplicating or moving the tag", async () => {
+  const { calls, plan, run } = fixture({ failCreate: true });
+  await assert.rejects(publishRelease(plan, run), /temporary server error/);
+  assert.equal(await publishRelease(plan, run), "created");
+  assert.equal(
+    writes(calls).filter((call) => call[2].endsWith("/git/refs")).length,
+    1
+  );
+});
+
+test("preserves existing notes and assets and rejects conflicting tags", async () => {
+  const existing = {
+    tag_name: tag,
+    draft: false,
+    prerelease: false,
+    body: "Edited notes",
+    assets: [{ name: "asset.zip" }],
+  };
+  const f = fixture({ ref: commit, existing });
+  assert.equal(await publishRelease(f.plan, f.run), "existing");
+  assert.equal(writes(f.calls).length, 0);
+  const conflict = fixture({ ref: "b".repeat(40) });
+  await assert.rejects(
+    publishRelease(conflict.plan, conflict.run),
+    /refusing to move/
+  );
+  assert.equal(writes(conflict.calls).length, 0);
+});
+
+test("peels annotated tags when checking their release commit", async () => {
+  const f = fixture({ ref: commit });
+  const run = (command, args) =>
+    command === "git"
+      ? ok(
+          `${"b".repeat(40)}\trefs/tags/${tag}\n${commit}\trefs/tags/${tag}^{}\n`
+        )
+      : f.run(command, args);
+  assert.equal(await publishRelease(f.plan, run), "created");
+  assert.equal(writes(f.calls).length, 1);
+});
+
+test("fails closed on invalid existing releases and API errors", async () => {
+  for (const options of [
+    { ref: commit, existing: { tag_name: tag, draft: true } },
+    { ref: commit, existing: { tag_name: tag, prerelease: true } },
+    { existing: { tag_name: tag, draft: false, prerelease: false } },
+    { lookupFailure: failure("HTTP 401") },
+    { lookupFailure: failure("connection reset") },
+    {
+      lookupFailure: {
+        exitCode: 1,
+        stdout: "HTTP/2.0 500 Internal Server Error\n\n{}",
+        stderr: "server failure",
+      },
+    },
+  ]) {
+    const f = fixture(options);
+    await assert.rejects(publishRelease(f.plan, f.run));
+    assert.equal(writes(f.calls).length, 0);
+  }
+});
+
+test("gates the lightweight release job on successful staging of this exact commit", async () => {
   const workflow = await readFile(
-    new URL("../.github/workflows/sdk-github-releases.yml", import.meta.url),
+    new URL("../.github/workflows/publish.yml", import.meta.url),
     "utf8"
   );
-  assert.match(workflow, /github\.ref == 'refs\/heads\/main'/);
-  assert.match(workflow, /github\.repository == 'qqpann\/notcms'/);
-  assert.match(workflow, /ref: main/);
-  assert.match(workflow, /persist-credentials: false/);
-  assert.match(workflow, /contents: write/);
-  assert.doesNotMatch(workflow, /id-token:|NPM_TOKEN|NODE_AUTH_TOKEN/);
-});
-
-const changelog = `# notcms
-
-## 0.4.0
-### Minor Changes
-- New filters.
-
-## 0.3.0
-### Minor Changes
-- Complete initialization.
-### Patch Changes
-- Fix output paths.
-
-## 0.3.0-beta.1
-### Minor Changes
-- Prerelease-only entry.
-
-## 0.2.0
-### Minor Changes
-- Browser login.
-### Patch Changes
-- Remove environment fallback.
-
-## 0.1.0
-### Minor Changes
-- Old CLI.
-`;
-
-function registry(versions = ["0.1.0", "0.3.0"]) {
-  return {
-    name: "notcms",
-    versions: Object.fromEntries(
-      versions.map((version) => [
-        version,
-        {
-          name: "notcms",
-          version,
-          gitHead: version === "0.1.0" ? previousCommit : commit,
-        },
-      ])
-    ),
-    time: Object.fromEntries(
-      versions.map((version) => [version, "2026-10-11T00:00:00Z"])
-    ),
-    "dist-tags": { latest: versions.at(-1) },
-  };
-}
-const existing = [
-  { tagName: "notcms@0.1.0", isDraft: false, isPrerelease: false },
-];
-function gitFixture({
-  manifestVersion = "0.3.0",
-  ancestor = true,
-  notes = changelog,
-  refs,
-} = {}) {
-  return async (command, args) => {
-    assert.equal(command, "git");
-    if (args[0] === "merge-base")
-      return { exitCode: ancestor ? 0 : 1, stdout: "", stderr: "not on main" };
-    if (args[0] === "ls-remote")
-      return {
-        exitCode: 0,
-        stdout:
-          refs ??
-          `${args[3].endsWith("0.1.0") ? previousCommit : commit}\t${args[3]}`,
-      };
-    if (args[1] === `${previousCommit}:${PACKAGE_JSON_PATH}`)
-      return {
-        exitCode: 0,
-        stdout: JSON.stringify({ name: "notcms", version: "0.1.0" }),
-      };
-    if (args[1] === `${commit}:${PACKAGE_JSON_PATH}`)
-      return {
-        exitCode: 0,
-        stdout: JSON.stringify({ name: "notcms", version: manifestVersion }),
-      };
-    if (args[1] === `${commit}:${CHANGELOG_PATH}`)
-      return { exitCode: 0, stdout: notes };
-    throw new Error(`Unexpected git call: ${args}`);
-  };
-}
-
-test("public stable npm versions define the release set, in numeric order", () => {
-  assert.deepEqual(
-    publishedVersions(
-      registry(["0.10.0", "0.2.0", "0.3.0-beta.1", "0.0.12-development"])
-    ).map((entry) => entry.version),
-    ["0.2.0", "0.10.0"]
+  const release = workflow.slice(workflow.indexOf("\n  release:"));
+  assert.match(
+    workflow,
+    /should_release: \$\{\{ steps.stage-decision.outputs.should_stage \}\}/
   );
-});
-test("invalid publication metadata is not accepted", () => {
-  const data = registry();
-  delete data.time["0.3.0"];
-  assert.throws(() => publishedVersions(data), /Invalid published metadata/);
-  assert.throws(() => publishedVersions({}), /Unexpected npm registry/);
-});
-test("skipped 0.2.0 changes are included once in npm 0.3.0", () => {
-  const body = releaseNotes(changelog, "0.3.0", "0.1.0");
-  assert.match(body, /Complete initialization/);
-  assert.match(body, /Browser login/);
-  assert.match(body, /Remove environment fallback/);
-  assert.doesNotMatch(body, /New filters|Old CLI|Prerelease-only|## 0.2.0/);
-  assert.equal(body.match(/### Minor Changes/g).length, 1);
-  assert.equal(body.match(/Browser login/g).length, 1);
-  assert.ok(body.includes("https://www.npmjs.com/package/notcms/v/0.3.0"));
-});
-test("next published version excludes already released changes", () => {
-  const body = releaseNotes(changelog, "0.4.0", "0.3.0");
-  assert.match(body, /New filters/);
-  assert.doesNotMatch(body, /Browser login|Complete initialization/);
-});
-test("missing, empty or ambiguous changelog fails instead of releasing empty notes", () => {
-  assert.throws(
-    () => releaseNotes(changelog, "0.5.0", "0.3.0"),
-    /Missing changelog/
-  );
-  assert.throws(
-    () => releaseNotes("## 0.4.0\n### Patch Changes\n", "0.4.0", "0.3.0"),
-    /Empty changelog/
-  );
-  assert.throws(
-    () => releaseNotes(`${changelog}\n## 0.3.0\ntext`, "0.3.0", "0.1.0"),
-    /Duplicate/
-  );
-  assert.throws(
-    () => releaseNotes("## 0.4.0\nmanual text", "0.4.0", "0.3.0"),
-    /Unsupported/
-  );
-});
-test("plan uses the npm commit even when main contains a newer unreleased version", async () => {
-  const plans = await planReleases({
-    registry: registry(),
-    releases: existing,
-    run: gitFixture(),
-  });
-  assert.equal(plans.length, 1);
-  assert.equal(plans[0].version, "0.3.0");
-  assert.equal(plans[0].commit, commit);
-  assert.equal(plans[0].latest, true);
-  assert.doesNotMatch(plans[0].body, /New filters/);
-});
-test("existing canonical and legacy releases verify their commits without writes", async () => {
-  for (const tagName of ["notcms@0.3.0", "v0.3.0"]) {
-    for (const refs of [
-      `${commit}\trefs/tags/${tagName}`,
-      `${previousCommit}\trefs/tags/${tagName}\n${commit}\trefs/tags/${tagName}^{}`,
-    ]) {
-      assert.deepEqual(
-        await planReleases({
-          registry: registry(["0.3.0"]),
-          releases: [{ tagName }],
-          run: gitFixture({ refs }),
-        }),
-        []
-      );
-    }
-  }
-});
-test("existing releases fail on missing or mismatched tags, manifest, or ancestry", async () => {
-  for (const options of [
-    { refs: "" },
-    { refs: `${previousCommit}\trefs/tags/notcms@0.3.0` },
-    {
-      refs: `${commit}\trefs/tags/notcms@0.3.0\n${previousCommit}\trefs/tags/notcms@0.3.0^{}`,
-    },
-    { manifestVersion: "0.4.0" },
-    { ancestor: false },
-  ]) {
-    await assert.rejects(
-      planReleases({
-        registry: registry(["0.3.0"]),
-        releases: [{ tagName: "notcms@0.3.0" }],
-        run: gitFixture(options),
-      })
-    );
-  }
-});
-test("only reviewed historical releases allow missing npm gitHead with pinned tags", async () => {
-  for (const [version, tagName, expected] of [
-    ["0.0.13", "v0.0.13", "5fbf0e4c8f9c6c28a2456ddbcbd5c3c3d751d740"],
-    ["0.1.0", "notcms@0.1.0", "2258723e1ffa7c27ea3507f6380ae352784a06ea"],
-  ]) {
-    const data = registry([version]);
-    delete data.versions[version].gitHead;
-    for (const actual of [expected, commit]) {
-      const result = planReleases({
-        registry: data,
-        releases: [{ tagName }],
-        run: async (command, args) => {
-          assert.equal(command, "git");
-          if (args[0] === "merge-base") {
-            assert.equal(args[2], expected);
-            return { exitCode: 0, stdout: "" };
-          }
-          if (args[0] === "show") {
-            assert.equal(args[1], `${expected}:${PACKAGE_JSON_PATH}`);
-            return {
-              exitCode: 0,
-              stdout: JSON.stringify({ name: "notcms", version }),
-            };
-          }
-          assert.equal(args[0], "ls-remote");
-          return { exitCode: 0, stdout: `${actual}\trefs/tags/${tagName}` };
-        },
-      });
-      if (actual === expected) assert.deepEqual(await result, []);
-      else await assert.rejects(result, /does not match/);
-    }
-    await assert.rejects(
-      planReleases({ registry: data, releases: [] }),
-      /no valid gitHead/
-    );
-  }
-  const data = registry(["0.3.0"]);
-  delete data.versions["0.3.0"].gitHead;
+  assert.match(release, /needs: stage/);
+  assert.match(release, /needs.stage.result == 'success'/);
+  assert.match(release, /needs.stage.outputs.should_release == 'true'/);
+  assert.match(release, /github.repository == 'qqpann\/notcms'/);
+  assert.match(release, /github.ref == 'refs\/heads\/main'/);
+  assert.match(release, /ref: \$\{\{ github.sha \}\}/);
+  assert.match(release, /contents: write/);
+  assert.match(release, /persist-credentials: false/);
+  assert.match(release, /run: node scripts\/sdk-github-releases.mjs publish/);
+  assert.doesNotMatch(release, /id-token|pnpm|npm|--test|always\(\)/);
+  assert.doesNotMatch(workflow, /schedule:|workflow_run:|workflow_dispatch:/);
   await assert.rejects(
-    planReleases({ registry: data, releases: [{ tagName: "notcms@0.3.0" }] }),
-    /no valid gitHead/
+    access(
+      new URL("../.github/workflows/sdk-github-releases.yml", import.meta.url)
+    ),
+    { code: "ENOENT" }
   );
-});
-test("staged or rejected versions absent from npm do not get a release", async () => {
-  assert.deepEqual(
-    await planReleases({
-      registry: registry(["0.1.0"]),
-      releases: existing,
-      run: gitFixture(),
-    }),
-    []
-  );
-});
-test("a draft, prerelease or duplicate existing release requires manual review", async () => {
-  for (const releases of [
-    [{ ...existing[0], isDraft: true }],
-    [{ ...existing[0], isPrerelease: true }],
-    [...existing, { tagName: "v0.1.0" }],
-  ]) {
-    await assert.rejects(
-      planReleases({ registry: registry(), releases }),
-      /Review existing/
-    );
-  }
-});
-test("missing gitHead, unrelated commit and wrong manifest fail closed", async () => {
-  const data = registry();
-  delete data.versions["0.3.0"].gitHead;
-  await assert.rejects(
-    planReleases({ registry: data, releases: existing, run: gitFixture() }),
-    /no valid gitHead/
-  );
-  for (const options of [{ ancestor: false }, { manifestVersion: "0.4.0" }]) {
-    await assert.rejects(
-      planReleases({
-        registry: registry(),
-        releases: existing,
-        run: gitFixture(options),
-      })
-    );
-  }
-});
-test("backfills do not become latest unless npm latest points at that version", async () => {
-  const data = registry();
-  data["dist-tags"].latest = "0.1.0";
-  const plans = await planReleases({
-    registry: data,
-    releases: existing,
-    run: gitFixture(),
-  });
-  assert.equal(plans[0].latest, false);
-});
-
-const plan = {
-  tag: "notcms@0.3.0",
-  commit,
-  body: "### Minor Changes\n\n- Login.\n",
-  latest: true,
-};
-function publishFixture(refs = "", failRelease = false) {
-  const calls = [];
-  return {
-    calls,
-    run: async (command, args) => {
-      calls.push([command, args]);
-      if (command === "git") return { exitCode: 0, stdout: refs };
-      if (args[0] === "release") {
-        assert.equal(
-          await readFile(args[args.indexOf("--notes-file") + 1], "utf8"),
-          plan.body
-        );
-        return {
-          exitCode: failRelease ? 1 : 0,
-          stdout: "",
-          stderr: "release failure",
-        };
-      }
-      return { exitCode: 0, stdout: "" };
-    },
-  };
-}
-test("creates an exact commit tag then a release using that tag and the prepared notes", async () => {
-  const fixture = publishFixture();
-  await publishRelease(plan, fixture.run);
-  assert.ok(fixture.calls[1][1].includes(`sha=${commit}`));
-  assert.ok(fixture.calls[1][1].includes(`ref=refs/tags/${plan.tag}`));
-  assert.ok(fixture.calls[2][1].includes("--verify-tag"));
-  assert.ok(fixture.calls[2][1].includes("--latest=true"));
-});
-test("retry after tag creation reuses the existing matching tag", async () => {
-  for (const refs of [
-    `${commit}\trefs/tags/${plan.tag}`,
-    `${"b".repeat(40)}\trefs/tags/${plan.tag}\n${commit}\trefs/tags/${plan.tag}^{}`,
-  ]) {
-    const fixture = publishFixture(refs);
-    await publishRelease(plan, fixture.run);
-    assert.equal(
-      fixture.calls.filter(
-        ([command, args]) => command === "gh" && args[0] === "api"
-      ).length,
-      0
-    );
-  }
-});
-test("conflicting immutable tag blocks all GitHub writes", async () => {
-  const fixture = publishFixture(`${"b".repeat(40)}\trefs/tags/${plan.tag}`);
-  await assert.rejects(publishRelease(plan, fixture.run), /refusing to move/);
-  assert.equal(fixture.calls.length, 1);
-});
-test("release API errors propagate as failures", async () => {
-  const fixture = publishFixture(`${commit}\trefs/tags/${plan.tag}`, true);
-  await assert.rejects(publishRelease(plan, fixture.run), /release failure/);
 });

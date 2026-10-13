@@ -553,7 +553,7 @@ export async function stagePackage(options = {}) {
   }
 
   console.log(
-    "notcms was staged on npm. A maintainer must review and approve it manually; no approval, tag, or GitHub Release was created by this workflow."
+    "notcms was staged on npm. A maintainer must review and approve it with 2FA. The subsequent release job creates the GitHub Release."
   );
 }
 

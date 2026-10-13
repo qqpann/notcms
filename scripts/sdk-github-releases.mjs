@@ -1,6 +1,4 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   CHANGELOG_PATH,
@@ -11,181 +9,92 @@ import {
 export const REPOSITORY = "qqpann/notcms";
 const STABLE = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const SHA = /^[a-f0-9]{40}$/;
-// npm omitted gitHead for these two historical publications. Preserve the
-// manually reviewed release tags; these are not inferred npm provenance.
-const HISTORICAL_RELEASES = {
-  "0.0.13": {
-    tag: "v0.0.13",
-    commit: "5fbf0e4c8f9c6c28a2456ddbcbd5c3c3d751d740",
-  },
-  "0.1.0": {
-    tag: "notcms@0.1.0",
-    commit: "2258723e1ffa7c27ea3507f6380ae352784a06ea",
-  },
-};
 
-export function compareVersions(a, b) {
-  for (let i = 0; i < 3; i++) {
-    const difference = BigInt(a.split(".")[i]) - BigInt(b.split(".")[i]);
-    if (difference !== 0n) return difference > 0n ? 1 : -1;
-  }
-  return 0;
-}
-
-export function publishedVersions(registry) {
-  if (registry.name !== "notcms" || !registry.versions || !registry.time) {
-    throw new Error("Unexpected npm registry metadata for notcms");
-  }
-  return Object.keys(registry.versions)
-    .filter((version) => STABLE.test(version))
-    .sort(compareVersions)
-    .map((version) => {
-      const metadata = registry.versions[version];
-      const publishedAt = registry.time[version];
-      if (
-        metadata.name !== "notcms" ||
-        metadata.version !== version ||
-        !publishedAt ||
-        !Number.isFinite(Date.parse(publishedAt))
-      ) {
-        throw new Error(`Invalid published metadata for notcms@${version}`);
-      }
-      return { version, gitHead: metadata.gitHead, publishedAt };
-    });
-}
-
-// Include skipped npm versions in the next published version, without presenting
-// them as separate releases. Only the changelog at the published commit is read.
-export function releaseNotes(changelog, version, previousVersion) {
-  const headings = [...changelog.matchAll(/^## ([^\n]+)$/gm)];
-  const sections = new Map();
-  for (let i = 0; i < headings.length; i++) {
-    const heading = headings[i];
-    if (!STABLE.test(heading[1])) continue;
-    if (sections.has(heading[1]))
-      throw new Error("Duplicate changelog version");
-    sections.set(
-      heading[1],
-      changelog
-        .slice(heading.index + heading[0].length, headings[i + 1]?.index)
-        .trim()
-    );
-  }
-  if (!sections.get(version)) {
-    throw new Error(`Missing changelog for ${version}; backfill manually`);
-  }
-  const selected = [...sections].filter(
-    ([entry]) =>
-      compareVersions(entry, version) <= 0 &&
-      (!previousVersion || compareVersions(entry, previousVersion) > 0)
-  );
-  const groups = new Map();
-  for (const [, section] of selected) {
-    const categories = [...section.matchAll(/^### (.+)$/gm)];
-    if (!categories.length || section.slice(0, categories[0].index).trim()) {
-      throw new Error(`Unsupported changelog format for ${version}`);
+export function releaseNotes(changelog, version) {
+  const lines = changelog.split(/\r?\n/);
+  const headings = [];
+  let fence;
+  for (const [index, line] of lines.entries()) {
+    if (fence) {
+      if (new RegExp(`^ {0,3}${fence[0]}{${fence.length},}\\s*$`).test(line))
+        fence = undefined;
+      continue;
     }
-    for (let i = 0; i < categories.length; i++) {
-      const heading = categories[i];
-      const body = section
-        .slice(heading.index + heading[0].length, categories[i + 1]?.index)
-        .trim();
-      if (body) {
-        groups.set(heading[1], [...(groups.get(heading[1]) ?? []), body]);
-      }
+    const opening = line.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (opening) {
+      fence = opening[1];
+      continue;
     }
+    const heading = line.match(/^## (.+)$/);
+    if (heading) headings.push({ index, version: heading[1].trim() });
   }
-  if (!groups.size) throw new Error(`Empty changelog for ${version}`);
-  const notes = [...groups]
-    .map(([category, bodies]) => `### ${category}\n\n${bodies.join("\n\n")}`)
-    .join("\n\n");
-  return `${notes}\n\n[npm: notcms@${version}](https://www.npmjs.com/package/notcms/v/${version})\n`;
+  const matches = headings.filter((heading) => heading.version === version);
+  if (matches.length !== 1)
+    throw new Error(`Expected one changelog section for ${version}`);
+  const start = matches[0];
+  const end = headings[headings.indexOf(start) + 1]?.index;
+  const body = lines
+    .slice(start.index + 1, end)
+    .join("\n")
+    .trim();
+  if (
+    !body ||
+    !body.split("\n").some((line) => line.trim() && !/^#+ /.test(line))
+  )
+    throw new Error(`Empty changelog for ${version}`);
+  return `${body}\n\n[npm: notcms@${version}](https://www.npmjs.com/package/notcms/v/${version})\n`;
 }
 
 async function checked(command, args, run) {
   const result = await run(command, args);
-  if (result.exitCode !== 0) {
+  if (result.exitCode !== 0)
     throw new Error(`${command} ${args[0]} failed: ${result.stderr}`);
-  }
   return result.stdout.trim();
 }
 
-export async function planReleases({ registry, releases, run = runCommand }) {
-  const versions = publishedVersions(registry);
-  const plans = [];
-  for (let index = 0; index < versions.length; index++) {
-    const { version, gitHead, publishedAt } = versions[index];
-    const tag = `notcms@${version}`;
-    const existing = releases.filter(
-      (release) => release.tagName === tag || release.tagName === `v${version}`
-    );
-    if (existing.length) {
-      if (
-        existing.length > 1 ||
-        existing[0].isDraft ||
-        existing[0].isPrerelease
-      ) {
-        throw new Error(`Review existing GitHub releases for ${version}`);
-      }
-    }
-    let sourceCommit = gitHead;
-    if (typeof sourceCommit !== "string" || !SHA.test(sourceCommit)) {
-      const historical = HISTORICAL_RELEASES[version];
-      if (
-        gitHead !== undefined ||
-        !historical ||
-        existing[0]?.tagName !== historical.tag
-      ) {
-        throw new Error(
-          `npm ${version} has no valid gitHead; backfill manually`
-        );
-      }
-      sourceCommit = historical.commit;
-    }
-    await checked(
-      "git",
-      ["merge-base", "--is-ancestor", sourceCommit, "origin/main"],
-      run
-    );
-    const manifest = JSON.parse(
-      await checked(
-        "git",
-        ["show", `${sourceCommit}:${PACKAGE_JSON_PATH}`],
-        run
-      )
-    );
-    if (manifest.name !== "notcms" || manifest.version !== version) {
-      throw new Error(`npm gitHead does not match notcms@${version}`);
-    }
-    if (existing.length) {
-      const tagCommit = await remoteTagCommit(existing[0].tagName, run);
-      if (tagCommit !== sourceCommit) {
-        throw new Error(
-          `Existing tag ${existing[0].tagName} does not match expected published commit`
-        );
-      }
-      continue; // Preserve verified existing notes, assets and tags.
-    }
-    const changelog = await checked(
-      "git",
-      ["show", `${gitHead}:${CHANGELOG_PATH}`],
-      run
-    );
-    const body = releaseNotes(changelog, version, versions[index - 1]?.version);
-    plans.push({
-      version,
-      tag,
-      commit: gitHead,
-      publishedAt,
-      body,
-      latest: registry["dist-tags"]?.latest === version,
-    });
+// Read the original workflow commit, including on retries after main advances.
+export async function planRelease(commit, run = runCommand) {
+  if (!SHA.test(commit ?? ""))
+    throw new Error("A full release commit SHA is required");
+  await checked(
+    "git",
+    ["merge-base", "--is-ancestor", commit, "origin/main"],
+    run
+  );
+  const manifest = JSON.parse(
+    await checked("git", ["show", `${commit}:${PACKAGE_JSON_PATH}`], run)
+  );
+  if (manifest.name !== "notcms" || !STABLE.test(manifest.version))
+    throw new Error("Expected a stable notcms package version");
+  const changelog = await checked(
+    "git",
+    ["show", `${commit}:${CHANGELOG_PATH}`],
+    run
+  );
+  return {
+    tag: `notcms@${manifest.version}`,
+    commit,
+    body: releaseNotes(changelog, manifest.version),
+  };
+}
+
+async function existingRelease(tag, run) {
+  const result = await run("gh", [
+    "api",
+    `repos/${REPOSITORY}/releases/tags/${tag}`,
+    "--include",
+  ]);
+  // Only an explicit HTTP 404 means absent; auth, transport and server errors fail.
+  if (result.exitCode !== 0) {
+    if (/^HTTP\/[\d.]+ 404\b/m.test(result.stdout)) return null;
+    throw new Error(`GitHub release lookup failed: ${result.stderr}`);
   }
-  return plans;
+  const separator = result.stdout.match(/\r?\n\r?\n/);
+  if (!separator) throw new Error("Missing GitHub response headers");
+  return JSON.parse(result.stdout.slice(separator.index + separator[0].length));
 }
 
 async function remoteTagCommit(tag, run) {
-  // Peel annotated tags before comparing their commits.
   const refs = await checked(
     "git",
     [
@@ -209,10 +118,20 @@ async function remoteTagCommit(tag, run) {
 
 export async function publishRelease(plan, run = runCommand) {
   const ref = await remoteTagCommit(plan.tag, run);
-  if (ref && ref !== plan.commit) {
+  if (ref && ref !== plan.commit)
     throw new Error(
-      `Tag ${plan.tag} does not match npm gitHead; refusing to move it`
+      `Tag ${plan.tag} does not match the staged commit; refusing to move it`
     );
+  const existing = await existingRelease(plan.tag, run);
+  if (existing) {
+    if (
+      !ref ||
+      existing.tag_name !== plan.tag ||
+      existing.draft ||
+      existing.prerelease
+    )
+      throw new Error(`Review existing GitHub release ${plan.tag}`);
+    return "existing"; // Preserve notes, assets and Latest selection on retries.
   }
   if (!ref) {
     await checked(
@@ -230,79 +149,44 @@ export async function publishRelease(plan, run = runCommand) {
       run
     );
   }
-  const directory = await mkdtemp(join(tmpdir(), "notcms-release-"));
-  try {
-    const notesPath = join(directory, "notes.md");
-    await writeFile(notesPath, plan.body);
-    await checked(
-      "gh",
-      [
-        "release",
-        "create",
-        plan.tag,
-        "--repo",
-        REPOSITORY,
-        "--verify-tag",
-        "--title",
-        plan.tag,
-        "--notes-file",
-        notesPath,
-        `--latest=${plan.latest}`,
-      ],
-      run
-    );
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
+  await checked(
+    "gh",
+    [
+      "api",
+      `repos/${REPOSITORY}/releases`,
+      "--method",
+      "POST",
+      "-f",
+      `tag_name=${plan.tag}`,
+      "-f",
+      `name=${plan.tag}`,
+      "-f",
+      `target_commitish=${plan.commit}`,
+      "-f",
+      `body=${plan.body}`,
+      // Let GitHub consider semantic versions instead of forcing an old retry Latest.
+      "-f",
+      "make_latest=legacy",
+    ],
+    run
+  );
+  return "created";
 }
 
 async function main() {
   const mode = process.argv[2];
-  if (!["plan", "publish"].includes(mode)) {
+  if (!["plan", "publish"].includes(mode))
     throw new Error(
-      "Usage: node scripts/sdk-github-releases.mjs <plan|publish>"
+      "Usage: GITHUB_SHA=<release commit> node scripts/sdk-github-releases.mjs <plan|publish>"
     );
-  }
   if (
     process.env.GITHUB_REPOSITORY &&
     process.env.GITHUB_REPOSITORY !== REPOSITORY
-  ) {
+  )
     throw new Error(`This workflow only manages ${REPOSITORY}`);
-  }
-  const response = await fetch("https://registry.npmjs.org/notcms", {
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!response.ok) throw new Error(`npm registry returned ${response.status}`);
-  const registry = await response.json();
-  const releases = JSON.parse(
-    await checked(
-      "gh",
-      [
-        "release",
-        "list",
-        "--repo",
-        REPOSITORY,
-        "--limit",
-        "1000",
-        "--json",
-        "tagName,isDraft,isPrerelease",
-      ],
-      runCommand
-    )
-  );
-  if (releases.length === 1000)
-    throw new Error("Release list may be truncated");
-  const plans = await planReleases({ registry, releases });
-  if (mode === "plan") {
-    console.log(JSON.stringify(plans, null, 2));
-    return;
-  }
-  for (const plan of plans) {
-    await publishRelease(plan);
-    console.log(`Created ${plan.tag} from npm publication ${plan.publishedAt}`);
-  }
-  if (!plans.length)
-    console.log("All npm stable versions already have GitHub Releases.");
+  const plan = await planRelease(process.env.GITHUB_SHA);
+  if (mode === "plan") console.log(JSON.stringify(plan, null, 2));
+  else console.log(`${plan.tag}: ${await publishRelease(plan)}`);
 }
 
 if (

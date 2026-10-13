@@ -1,36 +1,37 @@
 # SDK GitHub Releases
 
-The Changesets **Version Packages** PR is the review point for the SDK version and `packages/notcms/CHANGELOG.md`. Review the generated changelog in that PR along with the package version. After merge, `Publish` stages the package on npm; a maintainer still reviews and approves the staged package with 2FA. GitHub Releases are created only after the version is publicly available on npm.
+The Changesets **Version Packages** PR is the review point for the SDK version and `packages/notcms/CHANGELOG.md`. Merging it confirms the intent to release. The `Publish` workflow builds, tests and stages the package on npm, then creates its GitHub Release in a dependent job. npm approval remains a separate maintainer action with 2FA. The GitHub Release can therefore appear before the package is installable from npm.
 
-`SDK GitHub Releases` reconciles public npm versions after a successful `Publish` run, hourly at minute 23, or through **Run workflow**. Approval often happens after the staging workflow finishes, so the scheduled run catches it later. Scheduled runs can be delayed by GitHub; use the manual run on main for immediate reconciliation. No additional npm token or approval bypass is introduced. GitHub's normal `GITHUB_TOKEN` needs `contents: write` in the release job.
+## CI flow
 
-## What gets published
+1. Changesets creates or updates the Version Packages PR.
+2. After merge, the stage job requires a stable version increase and a changelog update. Ordinary pushes skip staging and release creation.
+3. After successful staging, the release job reads the package version and **only that version's section** from the changelog at the original workflow commit (`github.sha`). A failed stage blocks release creation. An already-public exact npm version is a successful stage skip, allowing recovery after approval.
+4. The job creates `notcms@<version>` at that exact commit and publishes the notes. Existing tags must point to that commit; existing public releases keep their notes, assets and Latest selection. New releases use GitHub's `make_latest=legacy` semantic-version/date selection rather than forcing every retry to Latest.
+5. A maintainer reviews and approves the staged package on npm.
 
-- Each public stable `notcms` version gets one release named and tagged `notcms@X.Y.Z`. Development/prerelease versions and Sync Action tags are outside this workflow.
-- The commit comes from the published version's npm `gitHead`, not the current tip of main. It must be an ancestor of main, and its package manifest must match the published name and version.
-- Notes come from the changelog at that commit. All stable changelog sections after the previous **npm-published** stable version through the target version are combined by change category. For example, npm skipped `0.2.0`, so `0.3.0` includes both the `0.2.0` and `0.3.0` changes. No standalone `0.2.0` GitHub Release is created.
-- Existing releases and manually edited notes are preserved. Historical `vX.Y.Z` release names are recognized, including `v0.0.13`, to avoid duplicate releases. Their remote tags (peeled for annotated tags), main ancestry and manifests are verified against npm `gitHead` on every run. Missing or mismatched tags, drafts, prerelease flags on stable versions, and duplicate canonical/legacy releases require manual review.
-- Missing changelogs or `gitHead` values fail with a request for manual backfill. Do not guess a commit or write generic release notes. Only the existing, manually reviewed `v0.0.13` and `notcms@0.1.0` releases are exceptions to missing npm `gitHead`: their historical tag commits are pinned in the script and still checked for tag, ancestry and manifest consistency. These pins preserve reviewed history; they do not claim npm provenance that the registry omitted. Missing releases cannot use this exception. The historical `0.0.13` notes were reconstructed from published package differences because that release predates the Changesets changelog.
-- New version tags point to the exact npm commit. A conflicting tag is never moved. A retry can complete release creation when the correct tag already exists. Only a newly created version that is npm's `latest` is marked latest on GitHub.
+Everything runs in `publish.yml`. There is no periodic polling, `workflow_run`, full npm history scan, or second dependency installation/build/test for release creation. The release job uses Node and the runner's `gh` CLI with `contents: write`; the npm staging job retains only `contents: read` and `id-token: write`. No additional npm token or approval bypass is introduced.
 
-## Validation and recovery
+## Recovery
 
-Run `pnpm test:sdk-releases` for offline release selection, note grouping, publication boundary and immutable-tag tests. The regular PR CI and release job both run these tests.
+If only **Create SDK GitHub Release** fails, rerun that failed job in the original `Publish` run. This does not restage npm and keeps the original commit even after main advances. A retry reuses a matching tag and leaves an existing public release untouched. Authentication, network and GitHub errors fail the job; only an explicit release-lookup HTTP 404 means the release is absent. Conflicting tags or unexpected draft/prerelease releases require maintainer review.
 
-After fetching `origin/main` and tags, inspect missing releases without writing to GitHub:
+Avoid **Re-run all jobs** while the same npm version is awaiting approval: OIDC cannot inspect private pending stages, so duplicate staging deliberately fails. Once approved, a full rerun can skip the already-public npm version and recover the GitHub Release. If npm staging itself failed, follow [npm staged publishing recovery](./npm-staged-publishing.md).
 
-```sh
-node scripts/sdk-github-releases.mjs plan
-```
-
-This command reads the public npm registry and GitHub Releases using the authenticated `gh` CLI. It prints the commit, npm publication timestamp and complete release notes for each missing version. If no versions are missing, it prints an empty array.
-
-To publish a reviewed plan, rerun the workflow on main, or run:
+For a read-only preview, use the original release commit from the workflow run:
 
 ```sh
-node scripts/sdk-github-releases.mjs publish
+GITHUB_SHA=<full-release-commit-sha> node scripts/sdk-github-releases.mjs plan
 ```
 
-The script rechecks npm and GitHub before publishing. Runs are serialized by the workflow; avoid a concurrent local publish. Registry, Git, or GitHub errors fail the run rather than being interpreted as “no release.” Existing GitHub Releases make later runs a no-op, so retry after resolving transient failures. Conflicting tags, missing historical metadata, or existing drafts require a maintainer to inspect the affected version before retrying.
+After verifying successful staging (or npm publication) and the preview, a maintainer can recover that single release locally with the authenticated `gh` CLI:
 
-GitHub records the time a Release is created; a historical backfill does not change npm's original publication date. The public website's editorial release notes remain separate from this developer changelog.
+```sh
+GITHUB_SHA=<full-release-commit-sha> node scripts/sdk-github-releases.mjs publish
+```
+
+Use a current checkout with `origin/main` fetched and avoid concurrent local publishing. Normal workflow runs are serialized by the Publish concurrency group. These commands do not stage or approve npm packages.
+
+## Historical releases
+
+The past npm releases were backfilled separately at npm-published version granularity. For example, unpublished `0.2.0` changes belong to the published `0.3.0` release. Historical exceptions and scans are not part of ongoing CI. If a future staged version is deliberately abandoned, review and carry its user-facing changes into the next release's changelog in the Version Packages PR; reconcile any already-announced release manually.

@@ -31,7 +31,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          # Staging is not publication. sdk-github-releases.yml waits for npm approval.
+          # The release job below creates GitHub Releases after successful staging.
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,6 +40,8 @@ jobs:
     name: Stage notcms package
     if: needs.version.outputs.has_changesets == 'false'
     needs: version
+    outputs:
+      should_release: ${{ steps.stage-decision.outputs.should_stage }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -80,3 +82,29 @@ jobs:
       - name: Stage notcms for owner approval
         if: steps.stage-decision.outputs.should_stage == 'true'
         run: node scripts/staged-publish.mjs stage
+
+  release:
+    name: Create SDK GitHub Release
+    needs: stage
+    if: >-
+      needs.stage.result == 'success' &&
+      needs.stage.outputs.should_release == 'true' &&
+      github.repository == 'qqpann/notcms' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Create release from the staged version changelog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/sdk-github-releases.mjs publish
