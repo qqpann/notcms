@@ -9,7 +9,9 @@
   "favicon": "/assets/notcms-icon.png",
   "theme": "mint",
   "colors": {
-    "primary": "#000000"
+    "primary": "#BE185D",
+    "light": "#FF5CAD",
+    "dark": "#BE185D"
   },
   "modeToggle": {
     "default": "dark"
