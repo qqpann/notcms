@@ -1,21 +1,21 @@
 <div align="center">
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     <picture>
       <img alt="NotCMS logo" src="/docs/assets/notcms-icon.png" height="128">
     </picture>
   </a>
   <h1>NotCMS</h1>
 
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     Website
   </a> · 
   <a href="https://dash.notcms.com">
     Dashboard
   </a> · 
-  <a href="https://notcms.com/templates">
+  <a href="https://www.notcms.com/templates">
     Templates
   </a> · 
-  <a href="https://notcms.com/blog">
+  <a href="https://www.notcms.com/blog">
     Blog
   </a>
 

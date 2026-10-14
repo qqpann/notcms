@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     <picture>
       <img alt="NotCMS ロゴ" src="./docs/assets/notcms-icon.png" height="128">
     </picture>
@@ -8,16 +8,16 @@
 
   <a href="https://docs.notcms.com/ja/introduction">ドキュメント</a> ·
 
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     ウェブサイト
   </a> ·
   <a href="https://dash.notcms.com">
     ダッシュボード
   </a> ·
-  <a href="https://notcms.com/templates">
+  <a href="https://www.notcms.com/templates">
     テンプレート
   </a> ·
-  <a href="https://notcms.com/blog">
+  <a href="https://www.notcms.com/blog">
     ブログ
   </a>
 
@@ -136,7 +136,7 @@ npx notcms pull --check
 
 - ブログやリリースノート向けの[公開状態・言語・安定した URL の実装例](examples/content-recipes/README.md)
 - 📚 [Next.js シンプルブログのテンプレート](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
-- 🎨 [ウェブサイトで公開しているその他のテンプレート](https://notcms.com/templates)
+- 🎨 [ウェブサイトで公開しているその他のテンプレート](https://www.notcms.com/templates)
 
 実行可能なサンプルのソースは [`examples/`](examples/) にあります。
 

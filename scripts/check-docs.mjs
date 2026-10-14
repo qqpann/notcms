@@ -60,6 +60,10 @@ export async function auditDocs(directory) {
       url,
       `https://docs.notcms.com/${from.replace(/\.mdx$/, "")}`
     );
+    if (resolved.hostname === "notcms.com") {
+      errors.push(`${from}: use https://www.notcms.com instead of ${url}`);
+      return;
+    }
     if (resolved.origin !== "https://docs.notcms.com" || url.startsWith("#"))
       return;
     const target = decodeURIComponent(resolved.pathname).replace(
@@ -74,6 +78,22 @@ export async function auditDocs(directory) {
       errors.push(`${from}: missing link target ${url}`);
     }
   }
+  function checkConfigLinks(value, location = "docs.json") {
+    if (typeof value === "string") {
+      if (/^https?:\/\//.test(value) || value.startsWith("/")) {
+        checkLink(value, location);
+      }
+    } else if (Array.isArray(value)) {
+      value.forEach((item, index) =>
+        checkConfigLinks(item, `${location}[${index}]`)
+      );
+    } else if (value && typeof value === "object") {
+      for (const [key, item] of Object.entries(value)) {
+        checkConfigLinks(item, `${location}.${key}`);
+      }
+    }
+  }
+  checkConfigLinks(config);
   for (const language of languages) {
     // Navigation groups may be nested; only page strings represent local routes.
     function checkNavigation(value) {

@@ -93,7 +93,7 @@ pnpm test:docs
 pnpm check:docs
 ```
 
-`check:docs` checks page/navigation links against local files, language parity,
+`check:docs` checks page/navigation links and site configuration assets against local files, language parity,
 and selected code examples against the SDK source. Put the invisible MDX comment
 `{/* docs-check */}` immediately before a self-contained `ts` or `typescript`
 fence to include it. Core guides must retain at least one checked example.
@@ -101,6 +101,11 @@ Examples may import `./notcms/schema`; the checker supplies the illustrative
 schema from `scripts/docs-schema.ts`. Add real properties to that fixture only
 when the guide explains them. Other imports must resolve normally; do not stub
 SDK methods or weaken types to pass the check. Examples are compiled, never run.
+
+Use `https://www.notcms.com` for marketing-site links. The checker rejects the
+bare `notcms.com` host in public MDX and site configuration, including logo and
+navigation URLs. As of 2026-10-14, Vercel returns `DEPLOYMENT_NOT_FOUND` for the root domain;
+its DNS/redirect setup is managed separately from Mintlify and this repository.
 
 This check does not validate external websites, fragments, Markdown rendering,
 framework-specific route behavior, or every unmarked code fence. Keep complete
