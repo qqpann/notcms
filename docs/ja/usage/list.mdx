@@ -7,7 +7,10 @@ description: Notionデータベースから複数のアイテムをクエリし�
 
 データベースからすべてのアイテムを取得：
 
+{/* docs-check */}
 ```typescript
+import { nc } from "./notcms/schema";
+
 const [posts, error] = await nc.query.blog.list();
 
 if (!error) {
@@ -92,7 +95,7 @@ const orderedWriters = ids.flatMap(id => {
   <Card title="単一アイテムの取得" icon="file" href="/ja/usage/get">
     個別アイテムの取得方法を学ぶ
   </Card>
-  <Card title="クライアントAPI" icon="code" href="/ja/usage/client">
-    完全なクライアントAPIを探索
+  <Card title="クライアントの初期化" icon="code" href="/ja/usage/initializing-client">
+    スキーマとサーバー側の認証情報を設定する
   </Card>
 </CardGroup>

@@ -75,3 +75,36 @@ When changes with changesets are merged to `main`:
 
 For structure, see Drizzle's [schema](https://orm.drizzle.team/docs/sql-schema-declaration),
 [select](https://orm.drizzle.team/docs/select), and [migrations](https://orm.drizzle.team/docs/migrations) guides.
+
+### Publishing and checking documentation
+
+The public site at `https://docs.notcms.com` is built by Mintlify from this
+repository's `main` branch, with `docs` as the configured subdirectory.
+`docs/docs.json` owns navigation and site settings; `docs/en/` and `docs/ja/`
+own the public prose. The private NotCMSApp repository owns the marketing
+site's links, not these pages. A documentation PR merged here can publish
+independently of an npm release. Do not describe an unreleased API as available;
+state the first published version when introducing a new feature.
+
+Update English and Japanese together. Before opening a PR, run:
+
+```sh
+pnpm test:docs
+pnpm check:docs
+```
+
+`check:docs` checks page/navigation links against local files, language parity,
+and selected code examples against the SDK source. Put the invisible MDX comment
+`{/* docs-check */}` immediately before a self-contained `ts` or `typescript`
+fence to include it. Core guides must retain at least one checked example.
+Examples may import `./notcms/schema`; the checker supplies the illustrative
+schema from `scripts/docs-schema.ts`. Add real properties to that fixture only
+when the guide explains them. Other imports must resolve normally; do not stub
+SDK methods or weaken types to pass the check. Examples are compiled, never run.
+
+This check does not validate external websites, fragments, Markdown rendering,
+framework-specific route behavior, or every unmarked code fence. Keep complete
+applications in `examples/` and run their checks when changing them. In the
+Mintlify PR preview, confirm navigation, code blocks, and both languages. After
+merging, confirm the deployment in Mintlify Activity and open the published
+pages. An HTTP 200 alone does not prove that the latest content was deployed.

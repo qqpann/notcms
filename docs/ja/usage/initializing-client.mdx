@@ -7,6 +7,7 @@ description: NotCMSクライアントのセットアップと設定方法
 
 NotCMSを使用するには、スキーマと認証情報を使用してクライアントを初期化する必要があります：
 
+{/* docs-check */}
 ```typescript
 import { Client } from 'notcms';
 import { schema } from './notcms/schema';
@@ -40,7 +41,7 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
 <Tabs>
   <Tab title="Next.js">
     ```typescript
-    // Next.jsは.envを自動的に読み込みます
+    // Next.jsは.env.localを自動的に読み込みます
     import { Client } from 'notcms';
     ```
   </Tab>
@@ -48,9 +49,9 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
   <Tab title="Node.js">
     ```typescript
     import dotenv from 'dotenv';
-    dotenv.config();
+    dotenv.config({ path: ".env.local" });
     
-    import { Client } from 'notcms';
+    const { nc } = await import('./notcms/schema');
     ```
   </Tab>
   
@@ -117,8 +118,8 @@ export const nc = new Client({
 
 <AccordionGroup>
   <Accordion title="環境変数が読み込まれない">
-    - プロジェクトルートに `.env` ファイルが存在することを確認
-    - `dotenv` などのローダーを使用していることを確認
+    - プロジェクトルートに `.env.local` ファイルが存在することを確認
+    - `dotenv` などのローダーで `.env.local` を明示的に読み込んでいることを確認
     - 変数名が正確に一致していることを確認
   </Accordion>
   

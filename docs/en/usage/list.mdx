@@ -7,7 +7,10 @@ description: Query and list multiple items from your Notion databases
 
 Fetch all items from a database:
 
+{/* docs-check */}
 ```typescript
+import { nc } from "./notcms/schema";
+
 const [posts, error] = await nc.query.blog.list();
 
 if (!error) {
@@ -92,7 +95,7 @@ For error tuples, HTTP 429, and retry guidance, see [Errors and Rate Limits](/en
   <Card title="Get Single Item" icon="file" href="/en/usage/get">
     Learn to fetch individual items
   </Card>
-  <Card title="Client API" icon="code" href="/en/usage/client">
-    Explore the complete Client API
+  <Card title="Initializing Client" icon="code" href="/en/usage/initializing-client">
+    Set up your schema and server-side credentials
   </Card>
 </CardGroup>

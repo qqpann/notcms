@@ -1,435 +1,83 @@
 ---
-title: Next.js統合
-description: Next.jsとNotCMSでブログを構築
+title: Next.jsとの連携
+description: サーバーで描画するNext.jsページからNotCMSのコンテンツを取得する
 ---
 
-公開条件・言語・ID URL・CMS 取得失敗を組み合わせる場合は、[検証済みの実装レシピ](/ja/examples/content-recipes)を参照してください。
+NotCMSはNext.jsのサーバー側で使い、シークレットキーをブラウザへ渡さないようにします。
+Next.js App Routerのプロジェクト内で[クイックスタート](/ja/quickstart)を進めてください。
+以下はNotCMS 0.5.0以降と、`published` チェックボックスを持つ `blog` データベースの例です。
+名前は生成されたスキーマに合わせて置き換えてください。
 
+## 生成されたクライアントを使う
 
-# Next.js統合
+`notcms init` はスキーマを作り、`nc` をexportします。Next.jsはサーバー側で `.env.local` を読み込むので、
+サーバーコンポーネントやサーバー専用の関数からそのクライアントをimportします。
+`"use client"` を指定したコンポーネントにはimportしないでください。
+自分でクライアントを作る場合は `new Client({ schema })` のように `schema` を渡します。
+認証情報だけでは型付きのクエリを定義できません。
 
-Next.js App RouterとNotCMSを統合して、フル機能のブログを構築する方法を学びます。
+## 公開するページの一覧を取得する
 
-## セットアップ
+非同期のサーバーコンポーネントから、次のような関数を呼びます。
+相対importは、生成したスキーマの保存先に合わせて変更してください。
 
-### 1. Next.jsプロジェクトを作成
-
-```bash
-npx create-next-app@latest my-blog --typescript --app
-cd my-blog
-```
-
-### 2. NotCMSをインストール
-
-```bash
-npm install notcms
-```
-
-### 3. NotCMSを初期化
-
-```bash
-npx notcms init
-```
-
-### 4. Next.jsを設定
-
-`next.config.js`を更新：
-
-```javascript
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.notcms.com',
-      }
-    ]
-  }
-}
-
-module.exports = nextConfig
-```
-
-## プロジェクト構造
-
-```
-my-blog/
-├── app/
-│   ├── page.tsx           # ブログ一覧
-│   └── [id]/
-│       └── page.tsx       # ブログ記事
-├── components/
-│   ├── BlogCard.tsx
-│   ├── BlogPost.tsx
-│   └── Pagination.tsx
-└── src/
-    └── notcms/
-        └── schema.ts      # 生成されたスキーマ
-```
-
-## ブログ一覧ページ
-
-### `app/page.tsx`
-
+{/* docs-check */}
 ```typescript
-import { Client } from 'notcms';
-import { schema } from '@/notcms/schema';
-import BlogCard from '@/components/BlogCard';
+import { nc } from "./notcms/schema";
 
-const nc = new Client({
-  secretKey: process.env.NOTCMS_SECRET_KEY,
-  workspaceId: process.env.NOTCMS_WORKSPACE_ID,
-});
-
-export default async function BlogPage() {
-  const [posts] = await nc.query.blog.list();
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">ブログ</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <BlogCard key={post.id} post={post} />
-        ))}
-      </div>
-    </div>
-  );
+export async function getPublishedPosts() {
+  const [posts, error] = await nc.query.blog.list({
+    where: { published: true },
+  });
+  if (error) throw error;
+  return posts;
 }
 
-// 10分ごとに再検証
-export const revalidate = 600;
+export type BlogSummary = (typeof nc.query.blog.$inferPages)[number];
 ```
 
-## ブログ記事ページ
+`post.title` を表示し、`/blog/${post.id}` へリンクします。Notionで定義したプロパティは
+`post.properties` に、ページのタイトルとIDはトップレベルにあります。
+取得エラーをthrowすると、Next.jsのエラー境界でサービス障害を扱えます。
+障害を、取得に成功した空の一覧として表示しないようにします。
 
-### `app/[id]/page.tsx`
+## 個別ページを取得する
 
+プロパティで検索すると、公開条件を適用しながら本文を取得できます。
+
+{/* docs-check */}
 ```typescript
-import { notFound } from 'next/navigation';
-import { Client } from 'notcms';
-import { schema } from '@/notcms/schema';
-import BlogPost from '@/components/BlogPost';
-import type { Metadata } from 'next';
+import { nc } from "./notcms/schema";
 
-interface PageProps {
-  params: {
-    id: string;
-  };
+export async function getPublishedPost(id: string) {
+  const [post, error] = await nc.query.blog.getFirst({
+    where: { id: { in: [id] }, published: true },
+  });
+  if (error) throw error;
+  return post;
 }
 
-const nc = new Client({
-  secretKey: process.env.NOTCMS_SECRET_KEY,
-  workspaceId: process.env.NOTCMS_WORKSPACE_ID,
-});
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const [post] = await nc.query.blog.get(params.id);
-  
-  if (!post) {
-    return {
-      title: '記事が見つかりません',
-    };
-  }
-  
-  return {
-    title: post.title,
-    description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: post.coverImage ? [post.coverImage] : [],
-    },
-  };
-}
-
-export default async function BlogPostPage({ params }: PageProps) {
-  const [post] = await nc.query.blog.get(params.id);
-  
-  if (!post) {
-    notFound();
-  }
-  
-  return <BlogPost post={post} />;
-}
-
-// 10分ごとに再検証
-export const revalidate = 600;
+export type BlogPage = typeof nc.query.blog.$inferPage;
 ```
 
-## コンポーネント
+`app/blog/[id]/page.tsx` で `params` をawaitしてIDを取り出し、この関数を呼びます。
+結果が `null` の場合にだけNext.jsの `notFound()` を呼んでください。サービスの障害はエラーとして扱います。
+`getFirst` は同期済みの本文を読むため、Notionの変更は次の同期後に反映されます。
+`get(id)` との違いは[1ページの取得](/ja/usage/get)を参照してください。
 
-### `components/BlogCard.tsx`
+Markdown本文は `post.content` にあります。`post.properties.content` ではありません。
+コンテンツの信頼度に合ったMarkdownレンダラーで描画してください。
+HTMLを許可する場合、信頼できないHTMLはページへ挿入する前にサニタイズします。
 
-```typescript
-import Link from 'next/link';
-import Image from 'next/image';
-import { Client } from 'notcms';
-import { schema } from '@/notcms/schema';
+## 公開条件と更新方法を決める
 
-const nc = new Client({
-  schema,
-});
+予約公開、言語のフォールバック、一覧と個別ページそれぞれの確認には、
+[検証済みのコンテンツレシピ](/ja/examples/content-recipes)を利用できます。
+このガイドには、非同期の `params` を使ったNext.jsルートの例があります。
+再利用できるクエリと公開判定のコードは
+[`examples/content-recipes`](https://github.com/qqpann/notcms/tree/main/examples/content-recipes)
+で管理し、SDKのテストで検証しています。
 
-type BlogPosts = typeof schema.blog.pages.$inferPages;
-type BlogPost = BlogPosts[number];
-// BlogPost: {
-//   id: string;
-//   title: string;
-//   properties: {
-//     coverImage: string;
-//     publishDate: string;
-//     authors: string[];
-//     tags: string[];
-//   }
-// }
-// 注: 上記は例です。実際のスキーマはあなたのデータベーススキーマを反映します。
-
-interface BlogCardProps {
-  post: BlogPost;
-}
-
-export default function BlogCard({ post }: BlogCardProps) {
-  return (
-    <article className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      {post.properties.coverImage && (
-        <Link href={`/blog/${post.id}`}>
-          <Image
-            src={post.properties.coverImage}
-            alt={post.properties.title}
-            width={400}
-            height={250}
-            className="w-full h-48 object-cover"
-          />
-        </Link>
-      )}
-      
-      <div className="p-4">
-        <Link href={`/blog/${post.id}`}>
-          <h2 className="text-xl font-semibold mb-2 hover:text-blue-600">
-            {post.properties.title}
-          </h2>
-        </Link>
-        
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <span>{post.properties.publishDate}</span>
-        </div>
-        
-        {post.properties.tags.length > 0 && (
-          <div className="mt-3 flex gap-2 flex-wrap">
-            {post.properties.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-1 bg-gray-100 rounded-md text-xs"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-    </article>
-  );
-}
-```
-
-### `components/BlogPost.tsx`
-
-```typescript
-import Image from 'next/image';
-import { RichText } from '@/components/RichText';
-import { Client } from 'notcms';
-import { schema } from '@/notcms/schema';
-
-const nc = new Client({
-  schema,
-});
-
-type BlogPost = typeof schema.blog.pages.$inferPage;
-// BlogPost: {
-//   id: string;
-//   title: string;
-//   properties: {
-//     coverImage: string;
-//     publishDate: string;
-//     authors: string[];
-//     tags: string[];
-//   }
-//   content: string; // Markdown
-// }
-// 注: 上記は例です。実際のスキーマはあなたのデータベーススキーマを反映します。
-
-interface BlogPostProps {
-  post: BlogPost;
-}
-
-export default function BlogPost({ post }: BlogPostProps) {
-  return (
-    <article className="max-w-4xl mx-auto px-4 py-8">
-      {post.properties.coverImage && (
-        <Image
-          src={post.properties.coverImage}
-          alt={post.properties.title}
-          width={1200}
-          height={600}
-          className="w-full h-96 object-cover rounded-lg mb-8"
-        />
-      )}
-      
-      <header className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">{post.properties.title}</h1>
-        
-        <div className="flex items-center gap-4 text-gray-600">
-          <time>{post.properties.publishDate}</time>
-        </div>
-        
-        {post.properties.tags.length > 0 && (
-          <div className="mt-4 flex gap-2 flex-wrap">
-            {post.properties.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </header>
-      
-      <div className="prose prose-lg max-w-none">
-        <RichText content={post.properties.content} />
-      </div>
-    </article>
-  );
-}
-```
-
-## リッチテキストレンダリング
-
-### `components/RichText.tsx`
-
-お好みのmarkdownパーサーを使用してコンテンツをHTMLに変換します。
-
-```typescript
-import { marked } from 'marked';
-
-interface RichTextProps {
-  content: string;
-}
-
-export function RichText({ content }: RichTextProps) {
-  if (!content) return null;
-  return <div dangerouslySetInnerHTML={{ __html: marked(content) }} />;
-}
-```
-
-## パフォーマンス最適化
-
-### 静的生成
-
-```typescript
-// ビルド時に静的ページを生成
-export async function generateStaticParams() {
-  const [posts] = await nc.query.blog.list();
-
-  return posts.map((post) => ({
-    id: post.id,
-  }));
-}
-```
-
-### 画像最適化
-
-```typescript
-import Image from 'next/image';
-
-// Next.js Imageコンポーネントを使用
-<Image
-  src={post.properties.coverImage}
-  alt={post.properties.title}
-  width={1200}
-  height={600}
-  priority={isAboveFold}
-  placeholder="blur"
-  blurDataURL={post.properties.coverImage}
-/>
-```
-
-`next.config.js`ファイルにドメインを追加することを忘れないでください。
-
-```javascript
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.notcms.com',
-      }
-    ]
-  }
-}
-
-module.exports = nextConfig
-```
-
-## SEO最適化
-
-### メタデータAPI
-
-```typescript
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const [post] = await nc.query.blog.get(params.id);
-  
-  return {
-    title: post.title,
-    description: post.properties.excerpt,
-    authors: [{ name: post.properties.authors.join(', ') }],
-    openGraph: {
-      title: post.title,
-      description: post.properties.excerpt,
-      type: 'article',
-      publishedTime: post.properties.publishDate,
-      authors: [post.properties.authors.join(', ')],
-      images: [
-        {
-          url: post.properties.coverImage,
-          width: 1200,
-          height: 600,
-          alt: post.properties.title,
-        }
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: post.properties.excerpt,
-      images: [post.properties.coverImage],
-    },
-  };
-}
-```
-
-## デプロイメント
-
-### 環境変数
-
-デプロイメントプラットフォームで設定：
-
-```env
-NOTCMS_SECRET_KEY=your-secret-key
-NOTCMS_WORKSPACE_ID=your-workspace-id
-```
-
-## 次のステップ
-
-<CardGroup cols={2}>
-  <Card title="ブログテンプレート" icon="template" href="/ja/examples/blog-template">
-    既製のブログテンプレートを使用
-  </Card>
-  <Card title="使い方を探る" icon="gear" href="/ja/usage/list">
-    NotCMSの使い方を探る
-  </Card>
-</CardGroup>
+Notionの同期後は、アプリで設定したキャッシュも更新してください。
+静的にビルドしたサイトでは、編集の反映や公開を取り消したページの削除に再ビルドが必要です。
+アプリに合う方式を明示的に選んでください。SDKへのリクエスト自体は、Next.jsのキャッシュ無効化やデプロイを行いません。

@@ -1,148 +1,63 @@
 ---
 title: Introduction
-description: Turn your Notion workspace into a type-safe headless CMS
+description: Use Notion to edit content and a typed SDK to build your site
 ---
 
-## What is NotCMS?
+NotCMS connects the Notion databases your team edits to the website you build.
+Writers work in Notion; developers use a TypeScript SDK to read properties and
+Markdown content from NotCMS.
 
-NotCMS is a headless CMS that uses Notion as your content backend, providing the best of both worlds: Notion's intuitive editor for content creators and a type-safe API for developers.
+## How content reaches your site
 
-<CardGroup cols={2}>
-  <Card title="Type Safety" icon="shield-check">
-    End-to-end type safety from schema to queries with excellent developer
-    experience. Full TypeScript support ensures no runtime type errors.
-  </Card>
-  <Card title="Familiar Editor" icon="pen">
-    Use Notion's editor your team already knows. No need to learn a new CMS
-    interface - content creators stay productive from day one.
-  </Card>
-  <Card title="Simple Setup" icon="rocket">
-    Get started in minutes with our CLI tool. No complex configuration or
-    infrastructure setup required.
-  </Card>
-  <Card title="Real-time Updates" icon="arrows-rotate">
-    Content changes in Notion are immediately available through the API. No
-    build step or manual sync needed.
-  </Card>
-</CardGroup>
+1. Connect Notion in the [dashboard](https://dash.notcms.com), register a database,
+   and wait for its initial synchronization to finish.
+2. Generate a schema with the CLI. It gives your code database and property names,
+   types, and known select options.
+3. Fetch synchronized content on your server or during your site's build.
 
-## Core Concepts
+Later Notion edits become available after synchronization completes. A statically
+built site also needs a rebuild and deployment; a server-rendered site may need
+its cache refreshed. Synchronization and your site's publication are separate
+steps. See the [Astro guide](/en/examples/astro) for a concrete example.
 
-### Type-Safe Queries
+## Read content with types
 
-Query your content with full TypeScript support:
+After [setup](/en/quickstart), import the generated client. This example assumes
+that your database is called `blog` and has a `published` checkbox:
 
+{/* docs-check */}
 ```typescript
-import { Client } from "notcms";
-import { schema } from "./schema";
+import { nc } from "./notcms/schema";
 
-const nc = new Client({ schema });
-
-// Fully typed response
-const [posts, error] = await nc.query.blog.list();
-// posts: Array<{
-//   title: string,
-//   content: string,
-//   properties: {
-//     published: boolean,
-//     author: string
-//   }
-// }>
-```
-
-### Schema-First Approach
-
-NotCMS generates TypeScript schemas from your Notion databases, ensuring type safety throughout your application:
-
-```typescript
-// Auto-generated schema
-export const schema = {
-  blog: {
-    id: "your_database_id",
-    properties: {
-      title: "title",
-      published: "checkbox",
-      author: "rich_text",
-    },
-  },
-} satisfies Schema;
-```
-
-### Error Handling
-
-NotCMS uses a tuple-based error handling pattern for predictable error management:
-
-```typescript
-const [data, error, response] = await nc.query.blog.get(pageId);
-
-if (error) {
-  console.error("Failed to fetch:", error.message);
-  return;
-}
-
-// Use data safely
-console.log(data.title);
-```
-
-## Why NotCMS, instead of raw Notion API?
-
-While Notion's API is powerful, using it directly for content management comes with significant challenges:
-
-### Challenges with raw Notion API
-
-- **Complex API queries**: You need to learn Notion's intricate query syntax and property structures
-- **No TypeScript support**: Query results lack type definitions, leading to runtime errors and poor IDE support
-- **Maintenance nightmare**: When you update Notion properties, you must manually update code across your entire application
-- **Content transformation**: You need to write custom code to convert Notion blocks to Markdown or HTML
-- **Image hosting issues**: Notion image URLs expire, requiring you to implement your own image re-hosting solution
-
-### How NotCMS solves these problems
-
-NotCMS handles all these complexities for you:
-
-```typescript
-// ❌ Raw Notion API - Complex and error-prone
-const response = await notion.databases.query({
-  database_id: "abc123",
-  filter: {
-    property: "Published",
-    checkbox: { equals: true },
-  },
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
 });
-// No TypeScript support, manual type assertions needed
-const title = (response.results[0].properties.Title as any).title[0].plain_text;
+if (error) throw error;
 
-// ✅ NotCMS - Simple and type-safe
-const [posts, error] = await nc.query.blog.list();
-// Full TypeScript support, IDE autocomplete works
-posts.forEach((post) => console.log(post.title));
+for (const post of posts) {
+  console.log(post.title, post.properties.published);
+}
 ```
 
-With NotCMS, you get:
+The schema describes the content shape captured by the last `pull`. It enables
+editor completion and compile-time checks; it does not validate every value at
+runtime. Synchronize and pull again after changing your Notion database.
 
-- **Auto-generated TypeScript types** from your Notion databases
-- **Simple, intuitive API** that feels natural to JavaScript developers
-- **Automatic content transformation** to Markdown
-- **Persistent image hosting** that comes out of the box
-- **Instantly pull updates with CLI** when your Notion schema changes
+## Choose what to publish
 
-## Next Steps
+NotCMS does not give a property named `published` special meaning. Decide which
+pages your application should expose and apply that rule to both lists and
+individual pages. Keep the secret key on the server. See the
+[publication recipes](/en/examples/content-recipes) for scheduled publication,
+languages, and detail-page checks.
 
-<CardGroup cols={2}>
-  <Card title="Quick Start" icon="play" href="/en/quickstart">
-    Set up NotCMS in your project in under 5 minutes
-  </Card>
-  <Card
-    title="Installation"
-    icon="download"
-    href="/en/getting-started/installation"
-  >
-    Install NotCMS and configure your environment
-  </Card>
-  <Card title="SDK Reference" icon="book" href="/en/sdk/client">
-    Explore the complete SDK documentation
-  </Card>
-  <Card title="Examples" icon="code" href="/en/examples/nextjs">
-    See NotCMS in action with real-world examples
-  </Card>
-</CardGroup>
+## Choose a query
+
+- [List pages](/en/usage/list) to retrieve properties with optional filters and sorting.
+- [Fetch one page](/en/usage/get) to retrieve Markdown content by ID or a property such as a slug.
+- [Handle errors](/en/usage/errors-and-rate-limits) by checking the SDK's error tuple before using data.
+
+This documentation targets the published NotCMS 0.5.0 API. Older projects can use
+the [migration guide](/en/cli-commands/migration). Start with the
+[quickstart](/en/quickstart), then choose the [Next.js](/en/examples/nextjs) or
+[Astro](/en/examples/astro) integration.

@@ -6,6 +6,8 @@
   </a>
   <h1>NotCMS</h1>
 
+  <a href="https://docs.notcms.com/ja/introduction">ドキュメント</a> ·
+
   <a href="https://notcms.com">
     ウェブサイト
   </a> ·

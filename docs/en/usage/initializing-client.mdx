@@ -7,6 +7,7 @@ description: Learn how to set up and configure the NotCMS client
 
 To start using NotCMS, you need to initialize a client with your schema and credentials:
 
+{/* docs-check */}
 ```typescript
 import { Client } from 'notcms';
 import { schema } from './notcms/schema';
@@ -40,7 +41,7 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
 <Tabs>
   <Tab title="Next.js">
     ```typescript
-    // Next.js loads .env automatically
+    // Next.js loads .env.local automatically
     import { Client } from 'notcms';
     ```
   </Tab>
@@ -48,9 +49,9 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
   <Tab title="Node.js">
     ```typescript
     import dotenv from 'dotenv';
-    dotenv.config();
+    dotenv.config({ path: ".env.local" });
     
-    import { Client } from 'notcms';
+    const { nc } = await import('./notcms/schema');
     ```
   </Tab>
   
@@ -118,8 +119,8 @@ export const nc = new Client({
 
 <AccordionGroup>
   <Accordion title="Environment variables not loading">
-    - Check `.env` file exists in project root
-    - Ensure you're using a loader like `dotenv`
+    - Check `.env.local` file exists in project root
+    - Ensure you're using a loader like `dotenv` (load `.env.local` explicitly)
     - Verify variable names match exactly
   </Accordion>
   
