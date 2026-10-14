@@ -26,7 +26,7 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 [![npm package][npm-img]][npm-url]
 [![Downloads][downloads-img]][downloads-url]
 [![Issues][issues-img]][issues-url]
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/qqpann/notcms)
+[![Ask DeepWiki](https://img.shields.io/badge/deepwiki-qqpann%2Fnotcms-blue)](https://deepwiki.com/qqpann/notcms)
 
 </div>
 
