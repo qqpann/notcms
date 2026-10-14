@@ -4,7 +4,7 @@
   "logo": {
     "dark": "/assets/notcms-icon.png",
     "light": "/assets/notcms-icon.png",
-    "href": "https://notcms.com"
+    "href": "https://www.notcms.com"
   },
   "favicon": "/assets/notcms-icon.png",
   "theme": "mint",
@@ -17,7 +17,7 @@
   "topbarLinks": [
     {
       "name": "Homepage",
-      "url": "https://notcms.com"
+      "url": "https://www.notcms.com"
     },
     {
       "name": "GitHub",
@@ -34,12 +34,12 @@
     {
       "name": "Templates",
       "icon": "rectangle-terminal",
-      "url": "https://notcms.com/templates"
+      "url": "https://www.notcms.com/templates"
     },
     {
       "name": "Blog",
       "icon": "newspaper",
-      "url": "https://notcms.com/blog"
+      "url": "https://www.notcms.com/blog"
     }
   ],
   "navigation": {

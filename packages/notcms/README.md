@@ -1,21 +1,21 @@
 <div align="center">
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     <picture>
-      <img alt="NotCMS logo" src="/docs/assets/notcms-icon.png" height="128">
+      <img alt="NotCMS logo" src="https://docs.notcms.com/assets/notcms-icon.png" height="128">
     </picture>
   </a>
   <h1>NotCMS</h1>
 
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     Website
   </a> · 
   <a href="https://dash.notcms.com">
     Dashboard
   </a> · 
-  <a href="https://notcms.com/templates">
+  <a href="https://www.notcms.com/templates">
     Templates
   </a> · 
-  <a href="https://notcms.com/blog">
+  <a href="https://www.notcms.com/blog">
     Blog
   </a>
 
@@ -91,8 +91,8 @@ const [page] = await nc.query.blog.get(pages[0].id);
 
 <!-- -->
 
-[build-img]: https://github.com/qqpann/notcms/actions/workflows/release.yml/badge.svg
-[build-url]: https://github.com/qqpann/notcms/actions/workflows/release.yml
+[build-img]: https://github.com/qqpann/notcms/actions/workflows/main.yml/badge.svg
+[build-url]: https://github.com/qqpann/notcms/actions/workflows/main.yml
 [downloads-img]: https://img.shields.io/npm/dt/notcms
 [downloads-url]: https://www.npmtrends.com/notcms
 [npm-img]: https://img.shields.io/npm/v/notcms

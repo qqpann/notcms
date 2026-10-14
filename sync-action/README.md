@@ -1,6 +1,6 @@
 # NotCMS Sync Action
 
-Sync content between [NotCMS](https://notcms.com) (Notion) and your repository as Markdown files.
+Sync content between [NotCMS](https://www.notcms.com) (Notion) and your repository as Markdown files.
 
 > **v0.1** — Pull only (Notion → Repository). Push support coming in future releases.
 

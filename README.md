@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     <picture>
       <img alt="NotCMS logo" src="./docs/assets/notcms-icon.png" height="128">
     </picture>
@@ -8,16 +8,16 @@
 
   <a href="https://docs.notcms.com/en/introduction">Documentation</a> ·
 
-  <a href="https://notcms.com">
+  <a href="https://www.notcms.com">
     Website
   </a> · 
   <a href="https://dash.notcms.com">
     Dashboard
   </a> · 
-  <a href="https://notcms.com/templates">
+  <a href="https://www.notcms.com/templates">
     Templates
   </a> · 
-  <a href="https://notcms.com/blog">
+  <a href="https://www.notcms.com/blog">
     Blog
   </a>
 
@@ -144,7 +144,7 @@ Check out these examples to get started quickly:
 - [Publication, language and stable URL recipes](examples/content-recipes/README.md) for blogs and release notes
 
 - 📚 [Next.js Simple Blog Template](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
-- 🎨 [More templates available on our website](https://notcms.com/templates)
+- 🎨 [More templates available on our website](https://www.notcms.com/templates)
 
 Runnable example source lives under [`examples/`](examples/).
 
@@ -184,8 +184,8 @@ See individual directories for specific license details.
 
 <!-- -->
 
-[build-img]: https://github.com/qqpann/notcms/actions/workflows/release.yml/badge.svg
-[build-url]: https://github.com/qqpann/notcms/actions/workflows/release.yml
+[build-img]: https://github.com/qqpann/notcms/actions/workflows/main.yml/badge.svg
+[build-url]: https://github.com/qqpann/notcms/actions/workflows/main.yml
 [downloads-img]: https://img.shields.io/npm/dt/notcms
 [downloads-url]: https://www.npmtrends.com/notcms
 [npm-img]: https://img.shields.io/npm/v/notcms
