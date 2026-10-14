@@ -26,7 +26,7 @@ NotCMS は、Notion を使った CMS の構築を簡単にします。Notion デ
 [![npm package][npm-img]][npm-url]
 [![Downloads][downloads-img]][downloads-url]
 [![Issues][issues-img]][issues-url]
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/qqpann/notcms)
+[![Ask DeepWiki](https://img.shields.io/badge/deepwiki-qqpann%2Fnotcms-blue)](https://deepwiki.com/qqpann/notcms)
 
 </div>
 
