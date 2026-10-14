@@ -26,7 +26,7 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 [![npm package][npm-img]][npm-url]
 [![Downloads][downloads-img]][downloads-url]
 [![Issues][issues-img]][issues-url]
-[![DeepWiki][deepwiki-img]][deepwiki-url]
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/qqpann/notcms)
 
 </div>
 
@@ -198,8 +198,6 @@ See individual directories for specific license details.
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
 [commitizen-url]: http://commitizen.github.io/cz-cli/
-[deepwiki-img]: https://img.shields.io/badge/deepwiki-qqpann%2Fnotcms-blue
-[deepwiki-url]: https://deepwiki.com/qqpann/notcms
 
 Keep generated types in sync with [PR and scheduled schema checks](https://docs.notcms.com/en/cli-commands/schema-ci).
 
