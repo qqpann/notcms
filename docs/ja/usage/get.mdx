@@ -23,7 +23,10 @@ console.log(post.content);
 
 プロパティによる検索は、サイトの条件に合うページを探します。たとえば、公開済みの記事をslugで取得します。
 
+{/* docs-check */}
 ```ts
+import { nc } from "./notcms/schema";
+
 const [post, error] = await nc.query.blog.getFirst({
   where: { slug: "hello-world", published: true },
 });
@@ -35,7 +38,7 @@ console.log(post?.content);
 リクエスト自体の失敗は、ページなしではなくエラーとして扱います。
 
 <Note>
-`getFirst` を含むリリースが必要です。0.4.0には未搭載です。
+`getFirst` は NotCMS 0.5.0 以降で利用できます。利用前に `notcms` パッケージを更新してください。
 </Note>
 
 ## どの1件を選ぶか

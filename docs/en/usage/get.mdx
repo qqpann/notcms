@@ -26,7 +26,10 @@ an empty page.
 A property lookup finds a page that matches your site's rule. For example, find
 a published post by its slug:
 
+{/* docs-check */}
 ```ts
+import { nc } from "./notcms/schema";
+
 const [post, error] = await nc.query.blog.getFirst({
   where: { slug: "hello-world", published: true },
 });
@@ -38,7 +41,7 @@ console.log(post?.content);
 show a 404. A failed request is an error, not a missing page.
 
 <Note>
-`getFirst` requires the release containing this method; it is not available in 0.4.0.
+`getFirst` is available in NotCMS 0.5.0 and later. Upgrade the `notcms` package before using it.
 </Note>
 
 ## Decide which match to use

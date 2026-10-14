@@ -1,134 +1,100 @@
 ---
 title: クイックスタート
-description: 5分でNotCMSを始めよう
+description: Notionデータベースを接続し、最初のコンテンツを取得する
 ---
 
-NotCMSをプロジェクトに設定し、数分でNotionからコンテンツの取得を開始しましょう。
+このガイドはNotCMS 0.5.0以降を使います。Node.js 18.17以降と、サーバー側でTypeScriptを
+実行できるプロジェクトが必要です。SDKの開発作業用ツールには別のNode要件がありますが、
+SDK利用時の対応ランタイムとは異なります。
 
-## 前提条件
+## 1. データベースを接続する
 
-始める前に、以下を確認してください：
+[ダッシュボード](https://dash.notcms.com/ja)でワークスペースを作成または選択し、
+Notionを接続して、利用するデータベースへのアクセスを許可します。
+データベースを登録し、初回同期の完了を待ってください。
+未同期のデータベースからは、以下で使うコンテンツやスキーマを取得できません。
 
-- Node.js 18.17以上がインストールされていること
-- 少なくとも1つのデータベースを持つNotionアカウント
-- TypeScriptの基本的な知識（推奨）
+## 2. インストールして初期化する
 
-## ステップ1: NotCMSをインストール
+アプリのルートディレクトリで実行します。
 
 <CodeGroup>
 ```bash npm
 npm install notcms
+npx notcms init
 ```
-
-```bash yarn
-yarn add notcms
-```
-
 ```bash pnpm
 pnpm add notcms
+pnpm exec notcms init
 ```
-
+```bash yarn
+yarn add notcms
+yarn notcms init
+```
 ```bash bun
 bun add notcms
+bunx notcms init
 ```
 </CodeGroup>
 
-## ステップ2: プロジェクトを初期化
+`init` は `notcms.config.json` を作成し、認証情報がなければブラウザログインを案内して、
+最初のスキーマを取得します。登録したデータベースを含むワークスペースを選んでください。
+既定では認証情報を `.env.local`、スキーマを `src/notcms/schema.ts` に保存します。
+最後に実際のデータベース名を使ったクエリが表示されます。保存先の変更は [init](/ja/cli-commands/init) を参照してください。
 
-NotCMS CLIを使用してプロジェクトをセットアップ：
+`.env.local` はGitに含めないでください。CLIはこのファイルを読みますが、アプリもサーバー側で
+読み込む必要があります。Next.jsは `.env.local` を読み込みます。通常のNode.jsアプリでは、
+生成クライアントのimport前に `dotenv.config({ path: ".env.local" })` などで読み込んでください。
+`NOTCMS_SECRET_KEY` をブラウザ向けの環境変数で公開しないでください。
+詳しくは[クライアントの初期化](/ja/usage/initializing-client)を参照してください。
 
-```bash
-npx notcms init
-```
+## 3. 一覧を取得する
 
-このコマンドは以下を実行します：
-1. `notcms.config.json`設定ファイルを作成
-2. 認証情報がなければブラウザでログインし、`.env.local`へ保存
-3. タイプセーフなスキーマを`src/notcms/schema.ts`へ取得
-4. 最初のクエリ例を表示
+サーバー側でクエリを実行します。`blog` とプロパティ名は、生成されたスキーマに合わせて置き換えてください。
+以下は `published` というチェックボックスがある場合の例です。
 
-Notionデータベースのスキーマを変更した後は、単独のpullコマンドで更新できます：
-
-```bash
-npx notcms pull
-```
-
-生成されるスキーマは次のようになります：
-
+{/* docs-check */}
 ```typescript
-import { Client } from "notcms";
-import type { Schema } from "notcms";
+import { nc } from "./notcms/schema";
 
-export const schema = {
-  blog: {
-    id: "abc123...",
-    properties: {
-      title: "title",
-      published: "checkbox",
-      author: "rich_text",
-      tags: "multi_select"
-    }
-  }
-} satisfies Schema;
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+});
+if (error) throw error;
 
-export const nc = new Client({ schema });
-```
-
-## ステップ3: NotCMSを使い始める
-
-生成されたクライアントをimportしてコンテンツのクエリを開始：
-
-```typescript
-import { nc } from './notcms/schema';
-
-// 全記事を取得し、表示前にアプリの公開条件で絞り込みます
-const [posts, error] = await nc.query.blog.list();
-
-if (error) {
-  console.error("記事の取得に失敗しました:", error);
-} else {
-  posts.forEach(post => {
-    console.log(post.title);
-  });
+for (const post of posts) {
+  console.log(post.id, post.title);
 }
 ```
 
-## 次は何をする？
+このimportは、既定のスキーマ保存先を使い、`src/example.ts` から実行する場合のパスです。
+SDKはエラータプルを返すため、データを読む前に `error` を確認します。
+空の配列は取得に成功したものの、同期済みページに条件と一致するものがないことを表します。
 
-<CardGroup cols={2}>
-  <Card title="設定" icon="gear" href="/ja/getting-started/configuration">
-    高度な設定オプションについて学ぶ
-  </Card>
-  <Card title="SDKリファレンス" icon="book" href="/ja/sdk/client">
-    完全なSDK APIを探索
-  </Card>
-  <Card title="エラーハンドリング" icon="shield-exclamation" href="/ja/sdk/error-handling">
-    適切なエラー処理方法を学ぶ
-  </Card>
-  <Card title="Next.jsの例" icon="react" href="/ja/examples/nextjs">
-    完全なNext.js統合を見る
-  </Card>
-</CardGroup>
+## 4. Markdown本文を取得する
 
-## よくある問題
+一覧のページIDを指定して本文を取得します。
 
-<AccordionGroup>
-  <Accordion title="環境変数が読み込まれない">
-    `.env`ファイルがプロジェクトルートにあり、`dotenv`や`dotenvx`などのパッケージを使用して読み込んでいることを確認してください。
-  </Accordion>
-  
-  <Accordion title="スキーマ生成が失敗する">
-    Notionデータベースに正しい権限があり、APIキーがアクセスできることを確認してください。
-  </Accordion>
-  
-  <Accordion title="TypeScriptエラー">
-    Notionデータベースに変更を加えた場合は、`npx notcms pull`を再度実行してスキーマを再生成してください。
-  </Accordion>
-</AccordionGroup>
+{/* docs-check */}
+```typescript
+import { nc } from "./notcms/schema";
 
-[旧 CLI・SDK からの移行](/ja/cli-commands/migration) · [ブログ・リリースノートのレシピ](/ja/examples/content-recipes)
+const [post, error] = await nc.query.blog.get("your-page-id");
+if (error) throw error;
+console.log(post.content);
+```
 
+`get` はIDで取得するため、一覧の公開条件を適用しません。
+公開サイトの個別ページを描画する前に、公開条件を再確認してください。
+その実装には[検証済みのコンテンツレシピ](/ja/examples/content-recipes)を利用できます。
+URLにslugを使う場合は [getFirst](/ja/usage/get) を参照してください。
 
-[CI でスキーマを確認する](/ja/cli-commands/schema-ci)
+## サイトを最新に保つ
 
-[Astro](/ja/examples/astro)
+Notionの本文を編集したら、同期を待ち、必要に応じてサイトのキャッシュ更新や再ビルドを行います。
+データベースのプロパティを変更した場合は、さらに `npx notcms pull` とアプリの型検査を実行します。
+`pull` は同期済みのスキーマを取得するコマンドで、コンテンツの同期は開始しません。
+
+次は [Next.js](/ja/examples/nextjs)、[Astro](/ja/examples/astro)、
+[CIでのスキーマ確認](/ja/cli-commands/schema-ci)へ進めます。
+古い環境からの更新は[移行ガイド](/ja/cli-commands/migration)を参照してください。

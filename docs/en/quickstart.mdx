@@ -1,134 +1,102 @@
 ---
 title: Quick Start
-description: Get up and running with NotCMS in under 5 minutes
+description: Connect a Notion database and fetch your first content
 ---
 
-Set up NotCMS in your project and start fetching content from Notion in minutes.
+This guide uses NotCMS 0.5.0 or later. You need Node.js 18.17 or later and a
+project that can run TypeScript on the server. Contributor tooling has separate
+Node requirements; those do not change the SDK's supported runtime.
 
-## Prerequisites
+## 1. Connect a database
 
-Before you begin, make sure you have:
+In the [dashboard](https://dash.notcms.com), create or select a workspace,
+connect Notion, and grant access to the database you want to use. Register the
+database and wait for its initial synchronization to complete. A database that
+has not synchronized cannot provide the content and schema needed below.
 
-- Node.js 18.17 or higher installed
-- A Notion account with at least one database
-- Basic knowledge of TypeScript (recommended)
+## 2. Install and initialize
 
-## Step 1: Install NotCMS
+Run these commands in your application's root:
 
 <CodeGroup>
 ```bash npm
 npm install notcms
+npx notcms init
 ```
-
-```bash yarn
-yarn add notcms
-```
-
 ```bash pnpm
 pnpm add notcms
+pnpm exec notcms init
 ```
-
+```bash yarn
+yarn add notcms
+yarn notcms init
+```
 ```bash bun
 bun add notcms
+bunx notcms init
 ```
 </CodeGroup>
 
-## Step 2: Initialize Your Project
+`init` creates `notcms.config.json`, offers browser login when credentials are
+missing, and pulls the first schema. Select the workspace containing your
+registered database. By default, credentials go into `.env.local` and the
+schema goes into `src/notcms/schema.ts`. The command prints a query using your
+actual database name. See [init](/en/cli-commands/init) for custom paths.
 
-Use the NotCMS CLI to set up your project:
+Keep `.env.local` out of Git. The CLI reads it, but your application must also
+load it in its server runtime. Next.js loads `.env.local`; a plain Node.js app
+can use `dotenv.config({ path: ".env.local" })` before importing the generated
+client. Never expose `NOTCMS_SECRET_KEY` through browser environment variables.
+See [client initialization](/en/usage/initializing-client).
 
-```bash
-npx notcms init
-```
+## 3. Fetch a list
 
-This command will:
-1. Create a `notcms.config.json` configuration file
-2. Open browser login when credentials are missing and save them to `.env.local`
-3. Pull a type-safe schema to `src/notcms/schema.ts`
-4. Print a first query example
+Run the query on the server. Replace `blog` and the property names with those
+from your generated schema. This example assumes a `published` checkbox:
 
-Run the standalone pull command later whenever your Notion database schema changes:
-
-```bash
-npx notcms pull
-```
-
-The generated schema looks like this:
-
+{/* docs-check */}
 ```typescript
-import { Client } from "notcms";
-import type { Schema } from "notcms";
+import { nc } from "./notcms/schema";
 
-export const schema = {
-  blog: {
-    id: "abc123...",
-    properties: {
-      title: "title",
-      published: "checkbox",
-      author: "rich_text",
-      tags: "multi_select"
-    }
-  }
-} satisfies Schema;
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+});
+if (error) throw error;
 
-export const nc = new Client({ schema });
-```
-
-## Step 3: Start Using NotCMS
-
-Import the generated client and start querying your content:
-
-```typescript
-import { nc } from './notcms/schema';
-
-// Fetch all blog posts; apply your publication policy before displaying them
-const [posts, error] = await nc.query.blog.list();
-
-if (error) {
-  console.error("Failed to fetch posts:", error);
-} else {
-  posts.forEach(post => {
-    console.log(post.title);
-  });
+for (const post of posts) {
+  console.log(post.id, post.title);
 }
 ```
 
-## What's Next?
+The import above fits `src/example.ts` with the default schema path. The SDK
+returns an error tuple; check `error` before reading the data. An empty array
+means the query succeeded but no synchronized pages matched your rule.
 
-<CardGroup cols={2}>
-  <Card title="Configuration" icon="gear" href="/en/getting-started/configuration">
-    Learn about advanced configuration options
-  </Card>
-  <Card title="SDK Reference" icon="book" href="/en/sdk/client">
-    Explore the complete SDK API
-  </Card>
-  <Card title="Error Handling" icon="shield-exclamation" href="/en/sdk/error-handling">
-    Learn how to handle errors properly
-  </Card>
-  <Card title="Next.js Example" icon="react" href="/en/examples/nextjs">
-    See a complete Next.js integration
-  </Card>
-</CardGroup>
+## 4. Fetch Markdown content
 
-## Common Issues
+Copy a page ID from the list to retrieve its body:
 
-<AccordionGroup>
-  <Accordion title="Environment variables not loading">
-    Make sure your `.env` file is in the project root and you're using a package like `dotenv` or `dotenvx` to load them.
-  </Accordion>
-  
-  <Accordion title="Schema generation fails">
-    Ensure your Notion databases have the correct permissions and your API key has access to them.
-  </Accordion>
-  
-  <Accordion title="TypeScript errors">
-    Run `npx notcms pull` again to regenerate the schema if you've made changes to your Notion databases.
-  </Accordion>
-</AccordionGroup>
+{/* docs-check */}
+```typescript
+import { nc } from "./notcms/schema";
 
-[Legacy CLI/SDK migration](/en/cli-commands/migration) · [Blog/release-note recipes](/en/examples/content-recipes)
+const [post, error] = await nc.query.blog.get("your-page-id");
+if (error) throw error;
+console.log(post.content);
+```
 
+`get` looks up an ID without applying the list's publication filter. Before
+rendering a public detail page, check its publication rule again. Use the
+[tested content recipes](/en/examples/content-recipes) for that workflow.
+If your URL uses a slug, see [getFirst](/en/usage/get).
 
-[Check schemas in CI](/en/cli-commands/schema-ci)
+## Keep the site current
 
-[Astro](/en/examples/astro)
+After editing Notion content, wait for synchronization and refresh the site's
+cache or rebuild it as appropriate. After changing database properties, also
+run `npx notcms pull` and your application's typecheck. `pull` retrieves the
+synchronized schema; it does not start a content sync.
+
+Continue with [Next.js](/en/examples/nextjs), [Astro](/en/examples/astro), or
+[schema checks in CI](/en/cli-commands/schema-ci). For older installations, see
+[migration](/en/cli-commands/migration).
