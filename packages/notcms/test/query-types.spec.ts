@@ -1,6 +1,7 @@
 import { expectTypeOf } from "vitest";
 import { Client } from "../src/client";
 import type { ListOptions, Schema } from "../src/index";
+import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 
 const schema = {
   blog: {
@@ -79,6 +80,26 @@ function checkInvalidQueries(client: Client<typeof schema>) {
   client.query.blog.list({ sort: { tags: "asc" } });
 }
 void checkInvalidQueries;
+
+function checkUnsupportedQueries(
+  client: Client<typeof unsupportedSchemaResponse.schema>
+) {
+  client.query.blog.list({
+    where: { published: true, language: "ja" },
+    sort: { title: "asc" },
+  });
+  // @ts-expect-error unsupported values cannot be filtered as strings
+  client.query.blog.list({ where: { future: "anything" } });
+  // @ts-expect-error unsupported values cannot be filtered for emptiness
+  client.query.blog.list({ where: { action: { is_empty: true } } });
+  // @ts-expect-error place does not yet have a value or query contract
+  client.query.blog.list({ where: { location: { equals: "London" } } });
+  // @ts-expect-error verification cannot be mistaken for a scalar sort key
+  client.query.blog.list({ sort: { verified: "asc" } });
+  // @ts-expect-error new type names cannot become sortable implicitly
+  client.query.blog.getFirst({ sort: { future: "desc" } });
+}
+void checkUnsupportedQueries;
 
 function checkIdPropertyQueries(
   client: Client<{

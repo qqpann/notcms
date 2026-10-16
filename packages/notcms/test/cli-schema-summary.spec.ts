@@ -91,7 +91,7 @@ describe("schema change summary", () => {
   it.each([
     "export const schema = loadSchema();",
     "export const schema = { blog: { id: process.env.ID, properties: {} } } satisfies Schema;",
-    'export const schema = { blog: { id: "a", properties: { title: "unsupported" } } } satisfies Schema;',
+    'export const schema = { blog: { id: "a", properties: { title: "" } } } satisfies Schema;',
     'export const schema = { blog: { id: "a", properties: {} }, blog: { id: "b", properties: {} } } satisfies Schema;',
     'export const schema = { blog: { id: "a", properties: {} } }.someCode();',
   ])("does not evaluate unsupported local code: %s", (existing) => {

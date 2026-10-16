@@ -94,6 +94,18 @@ A normal pull compares the previous generated schema and reports added or remove
 
 Stale `pull --check` also prints the semantic summary without writing. The first pull and an unsupported previous schema file have distinct messages. Comparison never executes the local module.
 
+## Unsupported property types
+
+<Note>
+This behavior is unreleased. When the release containing this change is published, upgrade the project's `notcms` dependency and use that version's bundled CLI before pulling a schema with unsupported types. Older SDKs cannot typecheck these generated schemas, and older CLIs may reject the entire schema.
+</Note>
+
+Types such as `button`, `place`, `verification`, and future Notion property types are retained by name. `init`, `pull`, and `pull --check` warn with each affected database, property, and type. Other databases and supported columns remain available, including their existing value and choice inference. Older API responses without `options` remain supported.
+
+Unsupported values have TypeScript type `unknown`. They cannot be used in typed `where` or `sort` clauses. The SDK passes through the API response without coercing these values; neither a returned value nor a successful schema pull guarantees that Notion supplied a complete value. Consult the service's sync diagnostics before relying on such a column.
+
+`pull --check` still checks schema drift: an unchanged unsupported type produces a warning and exit code 0; a changed type name produces a schema difference and exit code 1. The command does not write the file.
+
 ## Choice types
 
 The CLI automatically requests choice metadata with `?include=options`. Older CLIs keep receiving schemas without options, so their generated modules remain compatible with older SDKs.

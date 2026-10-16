@@ -16,7 +16,7 @@ function isProperties(value: unknown): value is Properties {
   return (
     isPlainObject(value) &&
     Object.values(value).every(
-      (type) => typeof type === "string" && PROPERTY_TYPE_SET.has(type)
+      (type) => typeof type === "string" && type.trim().length > 0
     )
   );
 }
@@ -49,6 +49,22 @@ function isSchemaEntry(entry: unknown): entry is Schema[string] {
 
 export function isSchema(value: unknown): value is Schema {
   return isPlainObject(value) && Object.values(value).every(isSchemaEntry);
+}
+
+export type UnsupportedProperty = {
+  database: string;
+  property: string;
+  type: string;
+};
+
+export function getUnsupportedProperties(
+  schema: Schema
+): UnsupportedProperty[] {
+  return Object.entries(schema).flatMap(([database, entry]) =>
+    Object.entries(entry.properties)
+      .filter(([, type]) => !PROPERTY_TYPE_SET.has(type))
+      .map(([property, type]) => ({ database, property, type }))
+  );
 }
 
 export type FetchedSchemaResponse = {

@@ -7,6 +7,7 @@ import dedent from "dedent";
 import { dumpConfig } from "./features/config.js";
 import type { DependencySetupResult } from "./features/dependency.js";
 import type { PullSchemaOptions, PullSchemaResult } from "./features/pull.js";
+import { quote } from "./features/quote.js";
 import type { Config, Credentials } from "./types.js";
 
 type LoginResult = {
@@ -256,6 +257,19 @@ async function runPull(options: PullSchemaOptions = {}) {
 }
 
 function printPullResult(result: PullSchemaResult) {
+  if (result.unsupportedProperties.length > 0) {
+    const properties = result.unsupportedProperties.map(
+      ({ database, property, type }) =>
+        `  ${quote(database)}.${quote(property)}: ${quote(type)}`
+    );
+    console.warn(
+      [
+        "Unsupported property types retained in schema:",
+        ...properties,
+        "Their values are typed as unknown; completeness is not guaranteed. Filtering and sorting these properties are unavailable.",
+      ].join("\n")
+    );
+  }
   if (result.status !== "up-to-date") {
     const summary = result.summary;
     if (summary.status === "compared") {
