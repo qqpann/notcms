@@ -85,7 +85,7 @@ for retry decisions.
 Unreleased: `quality()` is planned for `notcms 0.6.0`. It requires a server deployment that provides the page quality API.
 </Note>
 
-`quality(pageId)` reads the saved publication and latest synchronization attempt.
+`quality(pageId)` reads the saved copy quality and latest synchronization attempt.
 It does not fetch Notion or start synchronization, and it never falls back to `get`.
 It returns the same `[data, error, response]` tuple as the other query methods.
 
@@ -99,11 +99,20 @@ console.log(quality.published?.content.completeness);
 console.log(quality.published?.content.diagnostics);
 console.log(quality.published?.media.status);
 console.log(quality.latestAttempt?.report?.diagnostic);
+console.log(quality.delivery?.status);
 ```
 
 `published` is `null` when no saved copy exists. `latestAttempt` can still describe
 a failed first sync; it is `null` when there is no recorded attempt. An unfinished
 attempt has `finishedAt: null` and `report: null`. Timestamps are ISO 8601 strings.
+
+`delivery` describes the current delivery state separately: `available`, `paused`,
+`revalidating`, or `unavailable`. A saved `published` copy can remain present while
+delivery is paused or revalidating. Do not infer availability from `published` or
+its completeness. Older API deployments can omit `delivery`; `undefined` means
+the state was not provided, not that delivery is available. `scope` identifies
+the affected connection, database, page, properties, or content (or is `null`),
+and `reason` is a fixed code or `null`, without raw error data.
 
 Properties and content each carry their own `version`, `completeness`,
 `diagnostics`, and `media`. Locked dimensions can refer to different versions;
@@ -115,7 +124,7 @@ measurements remain unknown, including zero media references without completed
 enumeration. Media `ready` reflects stored upload results and current metadata;
 this read does not check the object's live availability.
 
-The exported `PageQuality`, `PageCopyQuality`, `DimensionQuality`, `MediaQuality`,
+The exported `PageQuality`, `PageDelivery`, `PageCopyQuality`, `DimensionQuality`, `MediaQuality`,
 `PageSyncReport`, and `SyncDiagnostic` types describe the response. This method
 requires an API deployment with the page quality endpoint; an HTTP error stays an
 error tuple without an automatic retry or synchronization request.

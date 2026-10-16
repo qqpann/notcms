@@ -200,7 +200,7 @@ export type MediaQuality = {
 };
 
 export type DimensionQuality = {
-  /** The version actually served for this dimension, including a locked copy. */
+  /** The saved version selected for this dimension, including a locked copy. */
   version: string | null;
   completeness: SyncCompleteness;
   diagnostics: SyncDiagnostic[];
@@ -213,8 +213,25 @@ export type PageCopyQuality = {
   media: MediaQuality;
 };
 
+/** Current delivery state, independent of the saved copy's quality. */
+export type PageDelivery = {
+  status: "available" | "paused" | "revalidating" | "unavailable";
+  scope: "connection" | "database" | "page" | "properties" | "content" | null;
+  reason:
+    | "notion_unauthorized"
+    | "notion_credentials_unavailable"
+    | "notion_access_denied"
+    | "notion_not_found_or_inaccessible"
+    | "revalidation_required"
+    | "revalidation_failed"
+    | "resource_unavailable"
+    | null;
+};
+
 export type PageQuality = {
-  /** Null when no published copy exists, including a failed initial fetch. */
+  /** Absent on older API deployments; absence does not mean available. */
+  delivery?: PageDelivery;
+  /** Saved copy quality; a non-null copy can still have delivery paused. */
   published: PageCopyQuality | null;
   latestAttempt:
     | (PageCopyQuality & {
