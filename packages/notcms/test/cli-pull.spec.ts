@@ -1,9 +1,11 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import ts from "typescript";
 import { pullSchema } from "../src/cli/features/pull";
 import { parseGeneratedSchema } from "../src/cli/features/schema-diff";
 import type { Schema } from "../src/types";
+import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const credentials = {
@@ -27,6 +29,84 @@ describe("pullSchema", () => {
     await fs.rm(dir, { recursive: true, force: true });
   });
 
+  it("generates unsupported types, diagnoses them, and checks subsequent type drift without writing", async () => {
+    const schema = unsupportedSchemaResponse.schema;
+    stubSchema(schema);
+    await writeConfig("schema.ts");
+    const unsupportedProperties = [
+      { database: "blog", property: "action", type: "button" },
+      { database: "blog", property: "location", type: "place" },
+      { database: "blog", property: "verified", type: "verification" },
+      { database: "blog", property: "future", type: "future_widget" },
+    ];
+    expect(await pullSchema({ credentials })).toMatchObject({
+      status: "written",
+      unsupportedProperties,
+    });
+    const content = await fs.readFile(path.join(dir, "schema.ts"), "utf8");
+    expect(parseGeneratedSchema(content)).toEqual(schema);
+    const program = ts.createProgram([path.join(dir, "schema.ts")], {
+      strict: true,
+      noEmit: true,
+      skipLibCheck: true,
+      module: ts.ModuleKind.ESNext,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      target: ts.ScriptTarget.ES2022,
+      paths: { notcms: [path.join(packageRoot, "src/index.ts")] },
+      typeRoots: [path.join(packageRoot, "node_modules/@types")],
+      types: ["node"],
+    });
+    expect(
+      ts
+        .getPreEmitDiagnostics(program)
+        .map((diagnostic) =>
+          ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")
+        )
+    ).toEqual([]);
+    expect(await pullSchema({ credentials, check: true })).toMatchObject({
+      status: "up-to-date",
+      unsupportedProperties,
+    });
+    stubSchema({
+      ...schema,
+      blog: {
+        ...schema.blog,
+        properties: { ...schema.blog.properties, future: "next_widget" },
+      },
+    });
+    expect(await pullSchema({ credentials, check: true })).toMatchObject({
+      status: "stale",
+      summary: {
+        status: "compared",
+        changes: [
+          'Changed property type: "blog"."future"\n  "future_widget" -> "next_widget"',
+        ],
+      },
+      unsupportedProperties: [
+        ...unsupportedProperties.slice(0, 3),
+        { database: "blog", property: "future", type: "next_widget" },
+      ],
+    });
+    expect(await fs.readFile(path.join(dir, "schema.ts"), "utf8")).toBe(
+      content
+    );
+  });
+
+  it("escapes unknown type names when generating an executable schema", async () => {
+    const type = 'future_"; throw new Error("injected"); //\\\n';
+    const schema = { blog: { id: "blog", properties: { custom: type } } };
+    stubSchema(schema);
+    vi.stubEnv("NOTCMS_SECRET_KEY", "ncsec_generated");
+    vi.stubEnv("NOTCMS_WORKSPACE_ID", "ws_generated");
+    await writeConfig("schema.ts");
+    await pullSchema({ credentials });
+    const generatedPath = path.join(dir, "schema.ts");
+    const source = await fs.readFile(generatedPath, "utf8");
+    expect(parseGeneratedSchema(source)).toEqual(schema);
+    const generated = await import(pathToFileURL(generatedPath).href);
+    expect(generated.schema.blog.properties.custom).toBe(type);
+  });
+
   it("writes the configured schema and returns its first database", async () => {
     const schema = {
       "Blog posts": {
@@ -38,6 +118,7 @@ describe("pullSchema", () => {
     await writeConfig("schema.ts");
 
     await expect(pullSchema({ credentials })).resolves.toEqual({
+      unsupportedProperties: [],
       status: "written",
       summary: { status: "missing" },
       schemaPath: "schema.ts",
@@ -113,6 +194,7 @@ export const nc = new Client({ schema });`);
     await pullSchema({ credentials });
 
     await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
+      unsupportedProperties: [],
       status: "up-to-date",
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
@@ -329,6 +411,7 @@ export const nc = new Client({ schema })
     await writeConfig("src/notcms/schema.ts");
 
     await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
+      unsupportedProperties: [],
       status: "stale",
       schemaPath: "src/notcms/schema.ts",
       reason: "missing",
@@ -347,6 +430,7 @@ export const nc = new Client({ schema })
     await fs.writeFile(path.join(dir, "schema.ts"), "existing content");
 
     await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
+      unsupportedProperties: [],
       status: "stale",
       schemaPath: "schema.ts",
       reason: "out-of-date",
@@ -362,6 +446,7 @@ export const nc = new Client({ schema })
     await writeConfig("src/notcms/schema.ts");
 
     await expect(pullSchema({ credentials })).resolves.toEqual({
+      unsupportedProperties: [],
       status: "written",
       summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",

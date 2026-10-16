@@ -256,6 +256,19 @@ async function runPull(options: PullSchemaOptions = {}) {
 }
 
 function printPullResult(result: PullSchemaResult) {
+  if (result.unsupportedProperties.length > 0) {
+    const properties = result.unsupportedProperties.map(
+      ({ database, property, type }) =>
+        `  ${JSON.stringify(database)}.${JSON.stringify(property)}: ${JSON.stringify(type)}`
+    );
+    console.warn(
+      [
+        "Unsupported property types retained in schema:",
+        ...properties,
+        "Their values are typed as unknown; completeness is not guaranteed. Filtering and sorting these properties are unavailable.",
+      ].join("\n")
+    );
+  }
   if (result.status !== "up-to-date") {
     const summary = result.summary;
     if (summary.status === "compared") {

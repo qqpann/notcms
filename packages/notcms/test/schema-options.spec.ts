@@ -7,6 +7,7 @@ import {
 } from "../src/cli/features/schema-diff";
 import { Client } from "../src/client";
 import type { Schema } from "../src/types";
+import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 
 const schema = {
   blog: {
@@ -31,6 +32,39 @@ const schema = {
 } as const satisfies Schema;
 
 describe("choice option schemas", () => {
+  it("infers unsupported values as unknown while preserving known choices and legacy types", () => {
+    const client = new Client({
+      schema: unsupportedSchemaResponse.schema,
+      secretKey: "test",
+      workspaceId: "test",
+    });
+    type P = typeof client.query.blog.$inferPage.properties;
+    expectTypeOf<P["action"]>().toEqualTypeOf<unknown>();
+    expectTypeOf<P["location"]>().toEqualTypeOf<unknown>();
+    expectTypeOf<P["verified"]>().toEqualTypeOf<unknown>();
+    expectTypeOf<P["future"]>().toEqualTypeOf<unknown>();
+    expectTypeOf<P["title"]>().toEqualTypeOf<string | null>();
+    expectTypeOf<P["published"]>().toEqualTypeOf<boolean | null>();
+    expectTypeOf<P["language"]>().toEqualTypeOf<"en" | "ja" | null>();
+    expectTypeOf<
+      typeof client.query.legacy.$inferPage.properties.title
+    >().toEqualTypeOf<string | null>();
+    const legacySchema = {
+      blog: { id: "blog", properties: { title: "title", count: "number" } },
+    } satisfies Schema;
+    const legacyClient = new Client({
+      schema: legacySchema,
+      secretKey: "test",
+      workspaceId: "test",
+    });
+    expectTypeOf<
+      typeof legacyClient.query.blog.$inferPage.properties.title
+    >().toEqualTypeOf<string | null>();
+    expectTypeOf<
+      typeof legacyClient.query.blog.$inferPage.properties.count
+    >().toEqualTypeOf<number | null>();
+  });
+
   it("infers literal choices, empty sets and legacy strings", () => {
     const client = new Client({
       schema,
