@@ -2,6 +2,7 @@ import { Client } from "../src/client";
 import type {
   MediaQuality,
   PageCopyQuality,
+  PageDelivery,
   PageQuality,
   SyncDiagnostic,
 } from "../src/index";
@@ -138,6 +139,40 @@ const snapshots: [string, PageQuality][] = [
   ["absent saved history", { published: null, latestAttempt: null }],
 ];
 
+const deliveryStates = [
+  { status: "available", scope: null, reason: null },
+  {
+    status: "paused",
+    scope: "connection",
+    reason: "notion_unauthorized",
+  },
+  {
+    status: "paused",
+    scope: "content",
+    reason: "notion_access_denied",
+  },
+  {
+    status: "revalidating",
+    scope: "database",
+    reason: "revalidation_required",
+  },
+  {
+    status: "unavailable",
+    scope: "page",
+    reason: "resource_unavailable",
+  },
+] satisfies PageDelivery[];
+for (const delivery of deliveryStates) {
+  snapshots.push([
+    `${delivery.status} delivery (${delivery.scope ?? "no restriction"})`,
+    {
+      published: delivery.status === "unavailable" ? null : unknownCopy,
+      latestAttempt: null,
+      delivery,
+    },
+  ]);
+}
+
 function client() {
   return new Client({
     secretKey: "fixture-key",
@@ -174,6 +209,22 @@ describe("read-only page quality", () => {
       expect(result).toEqual([snapshot, null, response]);
     }
   );
+
+  it("does not infer delivery availability from an older API's saved copy", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: { published: unknownCopy, latestAttempt: null },
+        })
+      )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const [quality, error] = await client().query.abc.quality("fixture-page");
+    expect(error).toBeNull();
+    expect(quality?.published).toEqual(unknownCopy);
+    expect(quality?.delivery).toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 
   it("keeps a supplied identifier inside the quality path instead of calling live get", async () => {
     const fetchMock = vi
