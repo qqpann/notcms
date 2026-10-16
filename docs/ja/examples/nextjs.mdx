@@ -69,6 +69,16 @@ Markdown本文は `post.content` にあります。`post.properties.content` で
 コンテンツの信頼度に合ったMarkdownレンダラーで描画してください。
 HTMLを許可する場合、信頼できないHTMLはページへ挿入する前にサニタイズします。
 
+## 信頼できない本文を安全に描画する
+
+SDKが返すMarkdownはデータであり、安全性が保証されたHTMLではありません。[同梱ブログテンプレート](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)の `MainContent` はMarkedでMarkdownを変換し、最後に `sanitize-html` でサニタイズしてからReactへ渡します。このテンプレートにはNode.js 22.12以降を使用してください。SDKの実行環境の要件は変わりません。
+
+見出し、強調、リスト、表、コード、画像、`details`・`kbd` などの静的HTMLに対応します。Markdown記号はMarkdown構文として解釈されます。記号をそのまま表示するにはエスケープするか、インラインコード・コードブロックを使います。コード内の `<`・`>`・`&` は文字として保持します。見出しのアンカーには `notcms-heading-` を付けます。
+
+リンクにはHTTP・HTTPS・mailto・相対パス・フラグメント、画像にはHTTP・HTTPS・相対パスを許可します。プロトコル相対URL、JavaScript・data・file URLは除去します。イベントハンドラー、インラインスタイル、任意のCSS class、SVG、MathML、script、form、埋め込みアプリケーションは非対応です。タスクリストのチェックボックスは操作できません。任意のiframeやHTMLアプリは再現せず、通常のリンクとして掲載してください。
+
+これらはレンダラーの規則であり、SDKだけを導入しても適用されません。すべてのMarkdown・HTML変換を終えてからサニタイズし、依存するsanitizerを更新してください。HTMLのサニタイズは、外部画像やリンク先文書の実体・MIME・リダイレクト・アクセス制御を検証しません。その境界はメディアサービスとアプリケーションが担当します。
+
 ## 公開条件と更新方法を決める
 
 予約公開、言語のフォールバック、一覧と個別ページそれぞれの確認には、
