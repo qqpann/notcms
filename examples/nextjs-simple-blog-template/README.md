@@ -25,3 +25,9 @@ pnpm dev
 ```
 
 Commit git changes, push to GitHub, and deploy (to Vercel or your choice).
+
+## Content rendering
+
+Use Node.js 22.12 or later. `MainContent` parses Markdown, then sanitizes the final HTML with `sanitize-html`. Keep that final sanitization step when customizing the renderer. Static Markdown/HTML and HTTP(S) images are supported; scripts, event handlers, SVG/MathML, inline styles, unsafe URL schemes, and iframe/HTML applications are removed. Images and linked documents still require a trustworthy media-serving policy. See the [rendering contract](https://docs.notcms.com/en/examples/nextjs#render-untrusted-content-safely).
+
+Run `pnpm test` for the rendering regression tests. `pnpm build:ci` runs the same tests before building with a local empty API fixture; it does not use production content.

@@ -70,6 +70,16 @@ The Markdown body is `post.content`, not `post.properties.content`. Render it
 with a Markdown renderer appropriate for your content's trust level. If HTML is
 allowed, sanitize untrusted HTML before inserting it into the page.
 
+## Render untrusted content safely
+
+The SDK returns Markdown as data; it does not produce trusted HTML. In the [bundled blog template](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template), `MainContent` converts Markdown with Marked and then sanitizes the final HTML with `sanitize-html` before React inserts it. Use Node.js 22.12 or later for this template; the SDK's runtime requirement is unchanged.
+
+The template keeps headings, emphasis, lists, tables, code, images, and static HTML such as `details` and `kbd`. Markdown punctuation is interpreted as Markdown syntax. Escape it or use inline/fenced code to display it literally; code preserves `<`, `>`, and `&` as text. Heading anchors use the `notcms-heading-` prefix.
+
+Links allow HTTP, HTTPS, mailto, relative paths, and fragments. Images allow HTTP, HTTPS, and relative paths. Protocol-relative, JavaScript, data, and file URLs are removed. Event handlers, inline styles, arbitrary CSS classes, SVG, MathML, scripts, forms, and embedded applications are not supported. Task-list checkboxes are disabled. Arbitrary iframe/HTML applications are not reproduced; publish a normal link instead.
+
+These rules belong to the renderer, so copying only the SDK does not apply them. Sanitize after all Markdown/HTML transformations, and maintain the sanitizer dependency. Sanitizing markup does not validate the bytes, MIME type, redirects, or access policy of a remote image or linked document; those boundaries remain the media service and application's responsibility.
+
 ## Choose a publication and refresh policy
 
 For scheduled dates, language fallback, and separate list/detail checks, use the
