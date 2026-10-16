@@ -1,6 +1,12 @@
 import type { ListOptions } from "./query";
 import { routes } from "./routes";
-import type { InferDatabaseProperties, Page, Pages, Schema } from "./types";
+import type {
+  InferDatabaseProperties,
+  Page,
+  PageQuality,
+  Pages,
+  Schema,
+} from "./types";
 import { getEnv } from "./utils/env";
 
 class DatabaseHandler<TDatabase extends Schema[string]> {
@@ -126,6 +132,18 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
   get(pageId: string) {
     return this.fetch<Page<InferDatabaseProperties<TDatabase>>>(
       () => routes.page(this.workspaceId, this.databaseId, pageId),
+      "GET"
+    );
+  }
+
+  /**
+   * Reads saved publication and latest-attempt quality without synchronizing
+   * Notion. Returns the usual [data, error, response] tuple. Unknown and legacy
+   * measurements are returned unchanged; this never falls back to get().
+   */
+  quality(pageId: string) {
+    return this.fetch<PageQuality>(
+      () => routes.pageQuality(this.workspaceId, this.databaseId, pageId),
       "GET"
     );
   }

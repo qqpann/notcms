@@ -78,3 +78,40 @@ for retry decisions.
 - With no sort, or when sort values tie, ordering uses registration order followed by page ID.
 - The optional third tuple value is the list response on success or no match, or the failed response on error. It is `undefined` for a network failure. The SDK does not retry automatically.
 </Accordion>
+
+## Read saved page quality
+
+`quality(pageId)` reads the saved publication and latest synchronization attempt.
+It does not fetch Notion or start synchronization, and it never falls back to `get`.
+It returns the same `[data, error, response]` tuple as the other query methods.
+
+{/* docs-check */}
+```ts
+import { nc } from "./notcms/schema";
+
+const [quality, error] = await nc.query.blog.quality("page-id-123");
+if (error) throw error;
+console.log(quality.published?.content.completeness);
+console.log(quality.published?.content.diagnostics);
+console.log(quality.published?.media.status);
+console.log(quality.latestAttempt?.report?.diagnostic);
+```
+
+`published` is `null` when no saved copy exists. `latestAttempt` can still describe
+a failed first sync; it is `null` when there is no recorded attempt. An unfinished
+attempt has `finishedAt: null` and `report: null`. Timestamps are ISO 8601 strings.
+
+Properties and content each carry their own `version`, `completeness`,
+`diagnostics`, and `media`. Locked dimensions can refer to different versions;
+diagnostics describe the corresponding version, not necessarily the latest attempt.
+Completeness is `unknown`, `complete`, `partial`, or `failed`. Media reports
+`ready`, `pending`, `failed`, `unknown`, `unpersisted`, or `expired`, along with
+`enumerated`, per-status `counts`, and fixed diagnostics. Unknown and legacy
+measurements remain unknown, including zero media references without completed
+enumeration. Media `ready` reflects stored upload results and current metadata;
+this read does not check the object's live availability.
+
+The exported `PageQuality`, `PageCopyQuality`, `DimensionQuality`, `MediaQuality`,
+`PageSyncReport`, and `SyncDiagnostic` types describe the response. This method
+requires an API deployment with the page quality endpoint; an HTTP error stays an
+error tuple without an automatic retry or synchronization request.

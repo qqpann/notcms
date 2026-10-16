@@ -1,6 +1,19 @@
 import { expectTypeOf } from "vitest";
 import { Client } from "../src/client";
-import type { ListOptions, Schema } from "../src/index";
+import type {
+  DimensionQuality,
+  ListOptions,
+  MediaQuality,
+  MediaStatus,
+  PageCopyQuality,
+  PageQuality,
+  PageSyncReport,
+  Schema,
+  SyncCompleteness,
+  SyncDiagnostic,
+  SyncDiagnosticCode,
+  SyncDiagnosticStage,
+} from "../src/index";
 import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 
 const schema = {
@@ -129,3 +142,58 @@ async function checkGetFirstResult(client: Client<typeof schema>) {
   >();
 }
 void checkGetFirstResult;
+
+// The public barrel must expose every quality field and preserve tuple narrowing.
+async function checkQualityResult(client: Client<typeof schema>) {
+  const result = await client.query.blog.quality("page-id");
+  expectTypeOf(result).toEqualTypeOf<
+    | readonly [PageQuality, null, Response]
+    | readonly [undefined, Error, Response | undefined]
+  >();
+  const [quality, error, response] = result;
+  if (error !== null) {
+    expectTypeOf(quality).toEqualTypeOf<undefined>();
+    expectTypeOf(response).toEqualTypeOf<Response | undefined>();
+    return;
+  }
+  expectTypeOf(response).toEqualTypeOf<Response>();
+  expectTypeOf(quality.published).toEqualTypeOf<PageCopyQuality | null>();
+  if (quality.published) {
+    expectTypeOf(
+      quality.published.properties
+    ).toEqualTypeOf<DimensionQuality>();
+    expectTypeOf(
+      quality.published.properties.completeness
+    ).toEqualTypeOf<SyncCompleteness>();
+    expectTypeOf(quality.published.properties.diagnostics).toEqualTypeOf<
+      SyncDiagnostic[]
+    >();
+    expectTypeOf(quality.published.content.version).toEqualTypeOf<
+      string | null
+    >();
+    expectTypeOf(quality.published.media).toEqualTypeOf<MediaQuality>();
+    expectTypeOf(quality.published.media.status).toEqualTypeOf<MediaStatus>();
+    expectTypeOf(
+      quality.published.media.counts.expired
+    ).toEqualTypeOf<number>();
+  }
+  if (quality.latestAttempt) {
+    expectTypeOf(
+      quality.latestAttempt.report
+    ).toEqualTypeOf<PageSyncReport | null>();
+    expectTypeOf(quality.latestAttempt.startedAt).toEqualTypeOf<string>();
+    expectTypeOf(quality.latestAttempt.finishedAt).toEqualTypeOf<
+      string | null
+    >();
+    const diagnostic = quality.latestAttempt.report?.diagnostic;
+    if (diagnostic) {
+      expectTypeOf(diagnostic.code).toEqualTypeOf<SyncDiagnosticCode>();
+      expectTypeOf(diagnostic.stage).toEqualTypeOf<SyncDiagnosticStage>();
+    }
+  }
+  // @ts-expect-error quality needs a page ID
+  client.query.blog.quality();
+  // @ts-expect-error quality does not accept list filters or trigger sync options
+  client.query.blog.quality("page-id", { sync: true });
+}
+void checkQualityResult;

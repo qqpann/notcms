@@ -74,3 +74,38 @@ const [post, error] = await nc.query.blog.getFirst({
 - 並び順の省略時や同値の場合は、登録順、次にページIDで並びます。
 - タプルの3番目は成功時と該当なし時に一覧レスポンス、失敗時に失敗したレスポンスです。ネットワーク障害では `undefined` になります。SDKは自動再試行しません。
 </Accordion>
+
+## 保存済みのページ品質を読む
+
+`quality(pageId)` は公開コピーと最新の同期試行の保存済み情報を読みます。
+Notionへの問い合わせや同期開始は行わず、`get` にもフォールバックしません。
+他の取得メソッドと同じ `[data, error, response]` タプルを返します。
+
+{/* docs-check */}
+```ts
+import { nc } from "./notcms/schema";
+
+const [quality, error] = await nc.query.blog.quality("page-id-123");
+if (error) throw error;
+console.log(quality.published?.content.completeness);
+console.log(quality.published?.content.diagnostics);
+console.log(quality.published?.media.status);
+console.log(quality.latestAttempt?.report?.diagnostic);
+```
+
+保存済みコピーがなければ `published` は `null` です。初回同期の失敗でも
+`latestAttempt` に試行情報が残る場合があります。試行記録がなければ `null`、
+処理中は `finishedAt` と `report` が `null` です。時刻はISO 8601文字列で返します。
+
+プロパティと本文は、それぞれ `version`、`completeness`、`diagnostics`、`media` を持ちます。
+ロックした次元は別の版を指すことがあり、診断もその版のものです。完全性は
+`unknown` / `complete` / `partial` / `failed`、媒体状態は
+`ready` / `pending` / `failed` / `unknown` / `unpersisted` / `expired` で表し、
+列挙済みかを示す `enumerated`、状態別の `counts`、固定診断を返します。
+過去の未測定データや不明な状態を完了とは推定しません。媒体が0件でも、列挙完了が確認できなければ
+`unknown` です。媒体の `ready` は保存されたアップロード結果と現在のメタデータに基づき、
+この読取でオブジェクトの実在や応答可能性を確認するものではありません。
+
+レスポンスの型として `PageQuality`、`PageCopyQuality`、`DimensionQuality`、`MediaQuality`、
+`PageSyncReport`、`SyncDiagnostic` をexportしています。このメソッドにはページ品質endpointを
+提供するAPIのデプロイが必要です。HTTPエラーはエラータプルとして返し、自動再試行や同期要求は行いません。
