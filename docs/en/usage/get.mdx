@@ -81,6 +81,10 @@ for retry decisions.
 
 ## Read saved page quality
 
+<Note>
+Unreleased: `quality()` is planned for `notcms 0.6.0`. It requires a server deployment that provides the page quality API.
+</Note>
+
 `quality(pageId)` reads the saved publication and latest synchronization attempt.
 It does not fetch Notion or start synchronization, and it never falls back to `get`.
 It returns the same `[data, error, response]` tuple as the other query methods.

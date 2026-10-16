@@ -77,6 +77,10 @@ const [post, error] = await nc.query.blog.getFirst({
 
 ## 保存済みのページ品質を読む
 
+<Note>
+未公開の機能です。`quality()` は `notcms 0.6.0` で提供予定で、対応するページ品質取得APIを備えたサーバーが必要です。
+</Note>
+
 `quality(pageId)` は公開コピーと最新の同期試行の保存済み情報を読みます。
 Notionへの問い合わせや同期開始は行わず、`get` にもフォールバックしません。
 他の取得メソッドと同じ `[data, error, response]` タプルを返します。
