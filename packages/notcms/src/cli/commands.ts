@@ -7,6 +7,7 @@ import dedent from "dedent";
 import { dumpConfig } from "./features/config.js";
 import type { DependencySetupResult } from "./features/dependency.js";
 import type { PullSchemaOptions, PullSchemaResult } from "./features/pull.js";
+import { quote } from "./features/quote.js";
 import type { Config, Credentials } from "./types.js";
 
 type LoginResult = {
@@ -259,7 +260,7 @@ function printPullResult(result: PullSchemaResult) {
   if (result.unsupportedProperties.length > 0) {
     const properties = result.unsupportedProperties.map(
       ({ database, property, type }) =>
-        `  ${JSON.stringify(database)}.${JSON.stringify(property)}: ${JSON.stringify(type)}`
+        `  ${quote(database)}.${quote(property)}: ${quote(type)}`
     );
     console.warn(
       [
