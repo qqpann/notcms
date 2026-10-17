@@ -71,7 +71,7 @@ When changes with changesets are merged to `main`:
 - Introduce the common case before alternatives and edge cases. Link to setup guides and references instead of repeating them.
 - Keep runnable applications in `examples/` and verify those source files. Do not couple their tests to prose or section order.
 - Use bullets for independent changes in PR descriptions and changesets. Add a short code example when an API change affects how users write code.
-- Keep English and Japanese guidance aligned in meaning; examples should use the same API.
+- Write documentation in English by default. Add Japanese alongside English only when explicitly requested, keeping the meaning and API examples aligned. Preserve existing translated files and explicitly multilingual deliverables in their intended language.
 
 For structure, see Drizzle's [schema](https://orm.drizzle.team/docs/sql-schema-declaration),
 [select](https://orm.drizzle.team/docs/select), and [migrations](https://orm.drizzle.team/docs/migrations) guides.
@@ -86,14 +86,14 @@ site's links, not these pages. A documentation PR merged here can publish
 independently of an npm release. Do not describe an unreleased API as available;
 state the first published version when introducing a new feature.
 
-Update English and Japanese together. Before opening a PR, run:
+Before opening a PR that changes the public documentation, run:
 
 ```sh
 pnpm test:docs
 pnpm check:docs
 ```
 
-`check:docs` checks page/navigation links and site configuration assets against local files, language parity,
+`check:docs` checks page/navigation links and site configuration assets against local files, English sources for translated pages,
 and selected code examples against the SDK source. Put the invisible MDX comment
 `{/* docs-check */}` immediately before a self-contained `ts` or `typescript`
 fence to include it. Core guides must retain at least one checked example.
@@ -110,6 +110,6 @@ its DNS/redirect setup is managed separately from Mintlify and this repository.
 This check does not validate external websites, fragments, Markdown rendering,
 framework-specific route behavior, or every unmarked code fence. Keep complete
 applications in `examples/` and run their checks when changing them. In the
-Mintlify PR preview, confirm navigation, code blocks, and both languages. After
+Mintlify PR preview, confirm navigation and code blocks in each affected language. After
 merging, confirm the deployment in Mintlify Activity and open the published
 pages. An HTTP 200 alone does not prove that the latest content was deployed.
