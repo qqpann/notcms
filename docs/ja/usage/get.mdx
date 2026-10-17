@@ -118,6 +118,20 @@ console.log(quality.delivery?.status);
 `unknown` です。媒体の `ready` は保存されたアップロード結果と現在のメタデータに基づき、
 この読取でオブジェクトの実在や応答可能性を確認するものではありません。
 
+管理するメディアを検証するサーバーでは、次の診断も返します。
+
+| コード | 意味 | 再試行可否 / 対応 |
+| --- | --- | --- |
+| `media_unsafe_url` | 取得元URLがダウンロードの許可条件を満たしていません。 | `not_retryable` / `review_source` |
+| `media_too_large` | 取得するデータが対応サイズを超えています。 | `not_retryable` / `review_source` |
+| `media_redirect_rejected` | 許可できないリダイレクトが発生しました。 | `not_retryable` / `review_source` |
+| `media_format_rejected` | 画像として扱うファイルの形式が非対応、または形式の情報が一致しません。 | `not_retryable` / `review_source` |
+| `media_fetch_timeout` | ダウンロードが制限時間を超えました。 | `retryable` / `retry` |
+| `media_object_unverified` | 保存済みオブジェクトの検証結果が永続化されていません。 | `unknown` / `wait` |
+
+未検証であることは、アップロード失敗を意味しません。SDKはサーバーの診断をそのまま返し、
+ダウンロードの再試行や保存データの検証は行いません。
+
 レスポンスの型として `PageQuality`、`PageDelivery`、`PageCopyQuality`、`DimensionQuality`、`MediaQuality`、
 `PageSyncReport`、`SyncDiagnostic` をexportしています。このメソッドにはページ品質endpointを
 提供するAPIのデプロイが必要です。HTTPエラーはエラータプルとして返し、自動再試行や同期要求は行いません。
