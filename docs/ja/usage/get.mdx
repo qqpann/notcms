@@ -123,11 +123,11 @@ console.log(quality.delivery?.status);
 | コード | 意味 | 再試行可否 / 対応 |
 | --- | --- | --- |
 | `media_unsafe_url` | 取得元URLがダウンロードの許可条件を満たしていません。 | `not_retryable` / `review_source` |
-| `media_too_large` | 取得するデータが対応サイズを超えています。 | `not_retryable` / `review_source` |
-| `media_redirect_rejected` | 許可できないリダイレクトが発生しました。 | `not_retryable` / `review_source` |
+| `media_too_large` | 管理するメディアが対応サイズを超えています。 | `not_retryable` / `review_source` |
+| `media_redirect_rejected` | 不正なリダイレクト、またはリダイレクト回数の超過が発生しました。 | `not_retryable` / `review_source` |
 | `media_format_rejected` | 画像として扱うファイルの形式が非対応、または形式の情報が一致しません。 | `not_retryable` / `review_source` |
 | `media_fetch_timeout` | ダウンロードが制限時間を超えました。 | `retryable` / `retry` |
-| `media_object_unverified` | 保存済みオブジェクトの検証結果が永続化されていません。 | `unknown` / `wait` |
+| `media_object_unverified` | 保存データに一致する検証結果がありません。 | `unknown` / `wait` |
 
 未検証であることは、アップロード失敗を意味しません。SDKはサーバーの診断をそのまま返し、
 ダウンロードの再試行や保存データの検証は行いません。

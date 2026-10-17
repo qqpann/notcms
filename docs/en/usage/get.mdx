@@ -129,11 +129,11 @@ Servers that validate managed media can also return these diagnostics:
 | Code | Meaning | Retryability / action |
 | --- | --- | --- |
 | `media_unsafe_url` | The source URL is not allowed for download. | `not_retryable` / `review_source` |
-| `media_too_large` | The download exceeds the supported byte limit. | `not_retryable` / `review_source` |
-| `media_redirect_rejected` | The download's redirects are not allowed. | `not_retryable` / `review_source` |
+| `media_too_large` | Managed media exceeds the supported byte limit. | `not_retryable` / `review_source` |
+| `media_redirect_rejected` | A redirect is invalid or exceeds the redirect limit. | `not_retryable` / `review_source` |
 | `media_format_rejected` | A file used as an image has an unsupported or inconsistent format. | `not_retryable` / `review_source` |
 | `media_fetch_timeout` | The download exceeded its time limit. | `retryable` / `retry` |
-| `media_object_unverified` | The saved object has no persisted verification result. | `unknown` / `wait` |
+| `media_object_unverified` | Stored bytes have no matching verification result. | `unknown` / `wait` |
 
 An unverified object is not evidence of a failed upload. The SDK preserves the
 server's diagnostic and does not retry downloads or verify stored bytes itself.
