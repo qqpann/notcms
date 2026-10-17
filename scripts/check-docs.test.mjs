@@ -9,7 +9,7 @@ import {
   typecheckSnippets,
 } from "./check-docs.mjs";
 
-test("reports broken links and missing translations/navigation without treating code as links", async () => {
+test("reports broken links, missing English sources, and missing navigation without treating code as links", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "docs-links-"));
   try {
     await mkdir(path.join(root, "en"));
@@ -56,7 +56,11 @@ test("reports broken links and missing translations/navigation without treating 
     await writeFile(path.join(root, "ja/page.mdx"), "# Page");
     await writeFile(
       path.join(root, "en/untranslated.mdx"),
-      "# Missing translation"
+      "# English-only page"
+    );
+    await writeFile(
+      path.join(root, "ja/orphan.mdx"),
+      "# Missing English source"
     );
     const { errors } = await auditDocs(root);
     assert.ok(
@@ -90,8 +94,12 @@ test("reports broken links and missing translations/navigation without treating 
     );
     assert.ok(errors.some((e) => e.includes("/en/absent")));
     assert.ok(errors.some((e) => e.includes("/en/deleted")));
+    assert.ok(!errors.some((e) => e.includes("untranslated.mdx")));
     assert.ok(
-      errors.some((e) => e.includes("untranslated.mdx: missing ja counterpart"))
+      errors.some((e) => e.includes("ja/orphan.mdx: missing en counterpart"))
+    );
+    assert.ok(
+      !errors.some((e) => e.includes("ja/page.mdx: missing en counterpart"))
     );
     assert.ok(!errors.some((e) => /not-a-link|example.com|\.\/page/.test(e)));
   } finally {
