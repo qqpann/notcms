@@ -202,3 +202,12 @@ See individual directories for specific license details.
 Keep generated types in sync with [PR and scheduled schema checks](https://docs.notcms.com/en/cli-commands/schema-ci).
 
 Build a blog with the [Astro guide](https://docs.notcms.com/en/examples/astro).
+
+## Node.js security baseline (October 2026)
+
+Use Node.js 24.22.1 (`nvm use`) for development and builds. CI and `.nvmrc`
+are pinned to the [October 2026 security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases).
+The published SDK engines describe API compatibility, not security support.
+Consumers should use patched supported Node versions (22.23.4, 24.22.1, or 26.12.1 and later patches).
+The `node24` JavaScript action runtime is supplied by GitHub Actions runners;
+`setup-node` does not replace it. Keep self-hosted runners updated separately.
