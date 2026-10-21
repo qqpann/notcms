@@ -29,7 +29,7 @@ pnpm check
 
 This project uses [Changesets](https://github.com/changesets/changesets) for version management and changelog generation.
 
-**Changes to the published SDK or bundled CLI must include a changeset.** Workflow-only, documentation-only and private Action changes use their own validation/release process. Contributor tooling uses Node 24 and pnpm 11. See [dependency security](./docs/dependency-security.md).
+**Changes to the published SDK or bundled CLI must include a changeset.** Workflow-only, documentation-only and private Action changes use their own validation/release process. Contributor tooling uses Node 26.12.1 and pnpm 12.14.0. See [dependency security](./docs/dependency-security.md).
 
 ### How to add a changeset
 
