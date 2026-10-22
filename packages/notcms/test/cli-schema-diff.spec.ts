@@ -4,11 +4,37 @@ import path from "node:path";
 import {
   diffSchemas,
   formatSchemaChanges,
+  parseGeneratedSchema,
   readGeneratedSchema,
 } from "../src/cli/features/schema-diff";
 import type { Properties, Schema } from "../src/types";
+import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 
 describe("schema diff", () => {
+  it("compares unsupported types without losing type changes or other databases", () => {
+    const schema = unsupportedSchemaResponse.schema;
+    const parsed = parseGeneratedSchema(
+      `export const schema = ${JSON.stringify(schema)} as const satisfies Schema;`
+    );
+    expect(parsed).toEqual(schema);
+    const current = {
+      ...schema,
+      blog: {
+        ...schema.blog,
+        properties: { ...schema.blog.properties, future: "next_widget" },
+      },
+    } satisfies Schema;
+    expect(diffSchemas(parsed as Schema, current)).toEqual([
+      {
+        kind: "property-type-changed",
+        database: "blog",
+        property: "future",
+        before: "future_widget",
+        after: "next_widget",
+      },
+    ]);
+  });
+
   it("reports database, ID, property add/remove, and type changes in stable order", () => {
     const previous = {
       blog: {

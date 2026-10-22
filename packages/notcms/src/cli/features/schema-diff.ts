@@ -9,6 +9,7 @@ import {
   tokenizer,
 } from "acorn";
 import type { Schema } from "../../types.js";
+import { quote } from "./quote.js";
 import { isSchema } from "./schema.js";
 
 const ACORN_OPTIONS = {
@@ -512,13 +513,6 @@ function propertyLabel(change: {
   property: string;
 }): string {
   return `${quote(change.database)}.${quote(change.property)}`;
-}
-
-function quote(value: string): string {
-  return JSON.stringify(value).replace(
-    /[\u007f-\u009f\u2028\u2029]/gu,
-    (character) => `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`
-  );
 }
 
 export type SchemaSummary =

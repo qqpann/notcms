@@ -4,6 +4,8 @@ import { type Server, createServer } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { Schema } from "../src/types";
+import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const cliPath = path.join(packageRoot, "dist/cli.cjs");
@@ -16,6 +18,48 @@ describe("CLI pull output paths", () => {
       { cwd: packageRoot }
     );
     expect(result.code, `${result.stdout}\n${result.stderr}`).toBe(0);
+  });
+
+  it("escapes control characters and Unicode line separators in unsupported-property warnings", async () => {
+    const project = await mkdtemp(path.join(tmpdir(), "notcms-cli-pull-"));
+    const server = await startSchemaServer({
+      blog: { id: "blog", properties: { title: "title" } },
+      "db\u007f\u0085": {
+        id: "control",
+        properties: { "column\u009b\u2028": "future\u009f\u2029" },
+      },
+    });
+
+    try {
+      await writeFile(
+        path.join(project, "notcms.config.json"),
+        JSON.stringify({ schema: "schema.ts" })
+      );
+      const options = {
+        cwd: project,
+        env: {
+          ...process.env,
+          NOTCMS_API_HOST: server.url,
+          NOTCMS_SECRET_KEY: "sk_test",
+          NOTCMS_WORKSPACE_ID: "ws_test",
+        },
+      };
+      for (const args of [["pull"], ["pull", "--check"]]) {
+        const result = await runProcess(
+          process.execPath,
+          [cliPath, ...args],
+          options
+        );
+        expect(result.code, `${result.stdout}\n${result.stderr}`).toBe(0);
+        expect(result.stderr).toContain(
+          '  "db\\u007f\\u0085"."column\\u009b\\u2028": "future\\u009f\\u2029"'
+        );
+        expect(result.stderr).not.toMatch(/[\u007f-\u009f\u2028\u2029]/u);
+      }
+    } finally {
+      await closeServer(server.server);
+      await rm(project, { recursive: true, force: true });
+    }
   });
 
   it.each([
@@ -66,6 +110,17 @@ describe("CLI pull output paths", () => {
           readFile(path.join(project, schemaPath), "utf-8")
         ).resolves.toContain("export const schema = {");
         expect(result.stdout).toContain('nc.query["blog"].list()');
+        for (const [property, type] of Object.entries({
+          action: "button",
+          location: "place",
+          verified: "verification",
+          future: "future_widget",
+        })) {
+          expect(result.stderr).toContain(`"blog"."${property}": "${type}"`);
+        }
+        expect(result.stderr).toContain(
+          "values are typed as unknown; completeness is not guaranteed"
+        );
         const repeated = await runProcess(
           process.execPath,
           [cliPath, "pull"],
@@ -85,11 +140,12 @@ describe("CLI pull output paths", () => {
         );
         expect(checked.code, `${checked.stdout}\n${checked.stderr}`).toBe(0);
         expect(checked.stdout).toContain("is up to date.");
+        expect(checked.stderr).toContain('"blog"."future": "future_widget"');
         expect(checked.stdout).not.toContain("Schema changes:");
         expect(await readFile(path.join(project, schemaPath), "utf8")).toBe(
           formatted
         );
-        const stale = formatted.replace("db_1", "db_old");
+        const stale = formatted.replace("nids_blog", "db_old");
         await writeFile(path.join(project, schemaPath), stale);
         const drift = await runProcess(
           process.execPath,
@@ -111,20 +167,16 @@ describe("CLI pull output paths", () => {
   );
 });
 
-async function startSchemaServer(): Promise<{ server: Server; url: string }> {
+async function startSchemaServer(
+  schema: Schema = unsupportedSchemaResponse.schema
+): Promise<{ server: Server; url: string }> {
   const server = createServer((request, response) => {
     if (
       request.url === "/v1/ws/ws_test/schema?include=options" &&
       request.headers.authorization === "Bearer sk_test"
     ) {
       response.writeHead(200, { "content-type": "application/json" });
-      response.end(
-        JSON.stringify({
-          schema: {
-            blog: { id: "db_1", properties: { title: "title" } },
-          },
-        })
-      );
+      response.end(JSON.stringify({ schema }));
       return;
     }
 

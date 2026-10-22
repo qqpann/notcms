@@ -1,5 +1,6 @@
 import { fetchSchema, fetchSchemaResponse } from "../src/cli/features/schema";
 import { PROPERTY_TYPES } from "../src/types";
+import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 
 describe("fetchSchema", () => {
   afterEach(() => {
@@ -159,8 +160,9 @@ describe("fetchSchema", () => {
       { schema: { blog: { id: "db_1" } } },
       // property value is not a string
       { schema: { blog: { id: "db_1", properties: { slug: 123 } } } },
-      // unknown property type
-      { schema: { blog: { id: "db_1", properties: { slug: "bogus" } } } },
+      // empty property type is malformed, unlike a new type name
+      { schema: { blog: { id: "db_1", properties: { slug: "" } } } },
+      { schema: { blog: { id: "db_1", properties: { slug: "  " } } } },
     ];
 
     for (const payload of malformedPayloads) {
@@ -174,6 +176,22 @@ describe("fetchSchema", () => {
       );
       await expect(fetchSchema()).rejects.toThrow(/Failed to fetch schema/);
     }
+  });
+
+  it("retains unsupported property types alongside known and legacy schemas", async () => {
+    stubCredentials();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify(unsupportedSchemaResponse), {
+          status: 200,
+        })
+      )
+    );
+
+    await expect(fetchSchema()).resolves.toEqual(
+      unsupportedSchemaResponse.schema
+    );
   });
 
   it("throws a fetch failure message for error and malformed responses", async () => {

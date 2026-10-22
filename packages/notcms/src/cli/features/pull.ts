@@ -10,7 +10,11 @@ import {
   parseGeneratedSchema,
   summarizeSchema,
 } from "./schema-diff.js";
-import { fetchSchemaResponse } from "./schema.js";
+import {
+  type UnsupportedProperty,
+  fetchSchemaResponse,
+  getUnsupportedProperties,
+} from "./schema.js";
 
 export type PullSchemaOptions = {
   check?: boolean;
@@ -38,10 +42,11 @@ type StaleSchemaResult = {
   summary: SchemaSummary;
 };
 
-export type PullSchemaResult =
+export type PullSchemaResult = (
   | WrittenSchemaResult
   | UpToDateSchemaResult
-  | StaleSchemaResult;
+  | StaleSchemaResult
+) & { unsupportedProperties: UnsupportedProperty[] };
 
 /**
  * Fetch the workspace schema and either write it locally or compare it with
@@ -56,6 +61,7 @@ export async function pullSchema(
   const absoluteSchemaPath = path.resolve(schemaPath);
   const schemaResponse = await fetchSchemaResponse(options.credentials);
   const schema = schemaResponse.schema;
+  const unsupportedProperties = getUnsupportedProperties(schema);
   const content = createSchemaModule(schema);
   const firstDatabaseName =
     schemaResponse.onboardingDatabaseName === undefined
@@ -73,13 +79,19 @@ export async function pullSchema(
 
   if (options.check) {
     if (summary.status === "compared" && summary.changes.length === 0) {
-      return { status: "up-to-date", schemaPath, firstDatabaseName };
+      return {
+        status: "up-to-date",
+        schemaPath,
+        firstDatabaseName,
+        unsupportedProperties,
+      };
     }
     return {
       status: "stale",
       schemaPath,
       reason: existing === null ? "missing" : "out-of-date",
       summary,
+      unsupportedProperties,
     };
   }
 
@@ -95,6 +107,7 @@ export async function pullSchema(
     firstDatabaseName,
     summary,
     schemaChanges,
+    unsupportedProperties,
   };
 }
 

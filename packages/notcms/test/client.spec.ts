@@ -1,4 +1,5 @@
 import { Client } from "../src/client";
+import { unsupportedSchemaResponse } from "./fixtures/unsupported-schema";
 import { schema } from "./sample-schema";
 
 const HOST = "https://api.notcms.com/v1";
@@ -52,6 +53,34 @@ describe("DatabaseHandler", () => {
     vi.unstubAllGlobals();
     vi.unstubAllEnvs();
     vi.restoreAllMocks();
+  });
+
+  it("passes unsupported values through without coercing or discarding them", async () => {
+    const client = new Client({
+      schema: unsupportedSchemaResponse.schema,
+      secretKey: "sk_test",
+      workspaceId: "ws_test",
+    });
+    const page = {
+      id: "page_1",
+      title: "A page",
+      properties: {
+        title: "A page",
+        published: true,
+        language: "ja",
+        action: null,
+        location: { latitude: 35.68, longitude: 139.76 },
+        verified: { state: "verified" },
+        future: ["retained", { value: 1 }],
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse({ data: [page] }))
+    );
+    const [pages, error] = await client.query.blog.list();
+    expect(error).toBeNull();
+    expect(pages).toEqual([page]);
   });
 
   function createClient() {

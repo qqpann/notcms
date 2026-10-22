@@ -1,5 +1,6 @@
 import type {
   InferDatabaseProperties,
+  KnownPropertyType,
   Properties,
   PropertyType,
   Schema,
@@ -14,15 +15,19 @@ type DateCondition = AtLeastOne<{
   on_or_before: string | Date;
   on_or_after: string | Date;
 }>;
-type Condition<TType extends PropertyType, TValue> =
-  | EmptyCondition
-  | (TType extends "date" | "created_time" | "last_edited_time"
-      ? DateCondition
-      : TType extends "multi_select"
-        ? { contains: TValue extends readonly (infer E)[] ? E : never }
-        : TType extends "files" | "people" | "relation" | "rollup"
-          ? never
-          : Equality<TValue>);
+type Condition<TType extends PropertyType, TValue> = [TType] extends [
+  KnownPropertyType,
+]
+  ?
+      | EmptyCondition
+      | (TType extends "date" | "created_time" | "last_edited_time"
+          ? DateCondition
+          : TType extends "multi_select"
+            ? { contains: TValue extends readonly (infer E)[] ? E : never }
+            : TType extends "files" | "people" | "relation" | "rollup"
+              ? never
+              : Equality<TValue>)
+  : never;
 
 type PageIdCondition = { in: readonly string[] } & Partial<
   Record<
@@ -55,9 +60,11 @@ export type Where<TDatabase extends Schema[string]> = {
 };
 
 type SortableKeys<T extends Properties> = {
-  [K in keyof T]: T[K] extends "multi_select" | "files" | "people" | "relation"
-    ? never
-    : K;
+  [K in keyof T]: T[K] extends KnownPropertyType
+    ? T[K] extends "multi_select" | "files" | "people" | "relation"
+      ? never
+      : K
+    : never;
 }[keyof T];
 
 /** Exactly one scalar property; empty values always sort last. */

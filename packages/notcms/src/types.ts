@@ -1,7 +1,7 @@
 /**
  * Runtime list of supported property types.
- * Single source of truth for both the `Properties` type and
- * runtime validation (e.g. CLI schema pull).
+ * Known value types. Schemas also retain unrecognized type names so a new
+ * Notion property type cannot prevent using the other database properties.
  */
 export const PROPERTY_TYPES = [
   // boolean
@@ -33,7 +33,9 @@ export const PROPERTY_TYPES = [
   "relation",
 ] as const;
 
-export type PropertyType = (typeof PROPERTY_TYPES)[number];
+export type KnownPropertyType = (typeof PROPERTY_TYPES)[number];
+
+export type PropertyType = KnownPropertyType | (string & Record<never, never>);
 
 export type Properties = Record<string, PropertyType>;
 
@@ -72,9 +74,12 @@ type MapProperties<T extends Properties, O extends PropertyOptions> = {
       ? O[K][number] | null
       : T[K] extends "multi_select"
         ? O[K][number][] | null
-        : PropertyTypeMap[T[K]]
-    : PropertyTypeMap[T[K]];
+        : PropertyValue<T[K]>
+    : PropertyValue<T[K]>;
 };
+type PropertyValue<T extends PropertyType> = T extends keyof PropertyTypeMap
+  ? PropertyTypeMap[T]
+  : unknown;
 type PropertyTypeMap = {
   // boolean
   checkbox: boolean | null;
