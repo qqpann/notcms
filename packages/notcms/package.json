@@ -60,7 +60,7 @@
   "homepage": "https://github.com/qqpann/notcms#readme",
   "dependencies": {},
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.22.0",
+    "@dotenvx/dotenvx": "^2.38.2",
     "@inquirer/prompts": "^7.0.1",
     "@types/node": "^24.0.0",
     "acorn": "8.15.0",
