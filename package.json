@@ -26,8 +26,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.6",
     "@changesets/cli": "^3.0.3",
-    "husky": "^9.1.4",
-    "turbo": "^2.9.14"
+    "husky": "^9.1.7",
+    "turbo": "^2.11.10"
   },
   "engines": {
     "node": "^26.13.0",
