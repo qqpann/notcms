@@ -38,7 +38,7 @@
   "homepage": "https://github.com/qqpann/notcms#readme",
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.6.6",
     "typescript": "7.0.2"
   }
 }
