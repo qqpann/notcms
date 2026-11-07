@@ -31,6 +31,20 @@ This project uses [Changesets](https://github.com/changesets/changesets) for ver
 
 **Changes to the published SDK or bundled CLI must include a changeset.** Workflow-only, documentation-only and private Action changes use their own validation/release process. Contributor tooling uses Node 26.13.0 and pnpm 12.18.0. See [dependency security](./docs/dependency-security.md).
 
+### TypeScript toolchain
+
+Run `pnpm typecheck` to check all workspaces with TypeScript 7.0.2. The SDK,
+Sync Action and blog scripts explicitly invoke the workspace-root compiler;
+`notcms-kit` also uses TypeScript 7.
+
+The SDK, Sync Action and blog retain TypeScript 6.0.3 as a build dependency.
+The documentation checker, tsup declaration bundler, ncc and Next.js use its
+JavaScript compiler API, which TypeScript 7 does not provide. Keep these local
+pins until those tools support the native compiler. Their build-time checks
+remain enabled in addition to TypeScript 7 typechecking. Running a bare `tsc`
+inside those packages uses the compatibility compiler; use the package's
+`typecheck` script for TypeScript 7.
+
 ### How to add a changeset
 
 1. After making your changes, run:

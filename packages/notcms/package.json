@@ -29,7 +29,7 @@
     "check": "biome check .",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "node ../../node_modules/typescript/bin/tsc --noEmit",
     "fix": "biome check --write ."
   },
   "repository": {

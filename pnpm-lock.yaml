@@ -186,6 +186,9 @@ importers:
       turbo:
         specifier: ^2.11.10
         version: 2.11.10
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
 
   examples/nextjs-simple-blog-template:
     dependencies:
