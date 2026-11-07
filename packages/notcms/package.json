@@ -62,7 +62,7 @@
   "devDependencies": {
     "@dotenvx/dotenvx": "^2.38.2",
     "@inquirer/prompts": "^7.0.1",
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.6.6",
     "acorn": "8.19.0",
     "boxen": "^8.0.1",
     "chalk": "^5.3.0",
