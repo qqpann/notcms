@@ -3,14 +3,14 @@ import path from "node:path";
 import type { Schema } from "../../types.js";
 import type { Credentials } from "../types.js";
 import { loadConfig } from "./config.js";
+import { fetchSchemaResponse } from "./schema.js";
 import {
-  type SchemaChange,
-  type SchemaSummary,
   diffSchemas,
   parseGeneratedSchema,
+  type SchemaChange,
+  type SchemaSummary,
   summarizeSchema,
 } from "./schema-diff.js";
-import { fetchSchemaResponse } from "./schema.js";
 
 export type PullSchemaOptions = {
   check?: boolean;

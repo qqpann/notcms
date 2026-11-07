@@ -1,5 +1,5 @@
 import { EventEmitter } from "node:events";
-import { promises as fs, existsSync, writeFileSync } from "node:fs";
+import { existsSync, promises as fs, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 

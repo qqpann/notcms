@@ -16,7 +16,9 @@
   "bin": {
     "notcms": "./dist/cli.cjs"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -24,10 +26,11 @@
     "lint": "eslint ./src/ --fix",
     "format": "biome format --write .",
     "lint-biome": "biome lint --write .",
-    "check": "biome check --write .",
+    "check": "biome check .",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "fix": "biome check --write ."
   },
   "repository": {
     "type": "git",
@@ -66,7 +69,7 @@
     "commander": "^12.1.0",
     "dedent": "^1.5.3",
     "tsup": "^8.0.0",
-    "typescript": "^5.5.4",
+    "typescript": "6.0.3",
     "vitest": "^5.0.3"
   }
 }

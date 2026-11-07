@@ -1,4 +1,4 @@
-import { type Renderer, marked } from "marked";
+import { marked, type Renderer } from "marked";
 
 const renderer: Partial<Renderer> = {
   paragraph({ tokens }) {

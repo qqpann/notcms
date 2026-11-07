@@ -5,7 +5,8 @@ export default defineConfig([
   {
     entry: ["src/index.ts"],
     format: ["esm", "cjs"],
-    dts: true,
+    // tsup 8 injects baseUrl into declaration generation; its compiler API requires TS 6.
+    dts: { compilerOptions: { ignoreDeprecations: "6.0" } },
     clean: true,
     outDir: "dist",
     target: "node18",

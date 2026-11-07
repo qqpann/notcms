@@ -12,9 +12,10 @@ jobs:
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 26.12.1
-          cache: 'pnpm'
+          node-version: 26.13.0
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
+      - run: pnpm check
       - run: pnpm test:docs
       - run: pnpm check:docs
       - run: pnpm test:staged-publish

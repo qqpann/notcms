@@ -1,5 +1,5 @@
-import { Client } from "notcms";
 import type { Schema } from "notcms";
+import { Client } from "notcms";
 
 export const schema = {
   writers: {
