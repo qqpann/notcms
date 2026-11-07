@@ -3,10 +3,10 @@ import {
   type Expression,
   type ObjectExpression,
   type Property,
-  type Token,
   parseExpressionAt,
-  tokTypes,
+  type Token,
   tokenizer,
+  tokTypes,
 } from "acorn";
 import type { Schema } from "../../types.js";
 import { isSchema } from "./schema.js";
@@ -507,10 +507,7 @@ export function formatSchemaChanges(
   return lines.join("\n");
 }
 
-function propertyLabel(change: {
-  database: string;
-  property: string;
-}): string {
+function propertyLabel(change: { database: string; property: string }): string {
   return `${quote(change.database)}.${quote(change.property)}`;
 }
 

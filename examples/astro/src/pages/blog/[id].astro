@@ -14,7 +14,8 @@ if (!id) throw new Error("Missing page ID");
 const [post, error] = await nc.query.blog.get(id);
 if (error) throw new Error("Could not load blog post");
 // Recheck in case publication changed after path generation.
-if (post.properties.published !== true) throw new Error("Post is no longer published");
+if (post.properties.published !== true)
+  throw new Error("Post is no longer published");
 const cover = post.properties.cover?.[0];
 ---
 <html lang="en">

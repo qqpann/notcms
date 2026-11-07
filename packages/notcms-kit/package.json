@@ -6,10 +6,13 @@
   "bin": {
     "notcms-kit": "./dist/index.js"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
-    "postbuild": "node add-shebang.cjs"
+    "postbuild": "node add-shebang.cjs",
+    "typecheck": "tsc --project tsconfig.build.json --noEmit"
   },
   "repository": {
     "type": "git",
@@ -24,7 +27,11 @@
   "engines": {
     "node": ">=18.17.0"
   },
-  "keywords": ["notcms", "cms", "deprecated"],
+  "keywords": [
+    "notcms",
+    "cms",
+    "deprecated"
+  ],
   "bugs": {
     "url": "https://github.com/qqpann/notcms/issues"
   },
@@ -32,6 +39,6 @@
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "typescript": "^5"
+    "typescript": "7.0.2"
   }
 }

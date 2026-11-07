@@ -205,11 +205,33 @@ Build a blog with the [Astro guide](https://docs.notcms.com/en/examples/astro).
 
 ## Node.js security baseline (October 2026)
 
-Use Node.js 26.12.1 (`nvm use`) for development and builds. CI and `.nvmrc`
+Use Node.js 26.13.0 (`nvm use`) for development and builds. CI and `.nvmrc`
 are pinned to the [October 2026 security release](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases).
 The published SDK engines describe API compatibility, not security support.
-Consumers should use patched supported Node versions (22.23.4, 24.22.1, or 26.12.1 and later patches).
+Consumers should use patched supported Node versions (22.23.4, 24.22.1, or 26.13.0 and later patches).
 The `node24` JavaScript action runtime is supplied by GitHub Actions runners;
 `setup-node` does not replace it. Keep self-hosted runners updated separately.
 
-開発・CI では `.nvmrc` の Node.js 26.12.1 と `packageManager` の pnpm 12.14.0 を使用します。Node.js 26 は Corepack を同梱しないため、pnpm が未導入の場合は `npm install --global pnpm@12.14.0` で導入してください。
+開発・CI では `.nvmrc` の Node.js 26.13.0 と `packageManager` の pnpm 12.18.0 を使用します。Node.js 26 は Corepack を同梱しないため、pnpm が未導入の場合は `npm install --global pnpm@12.18.0` で導入してください。
+
+## 共通の開発ツールとコマンド（2026-11）
+
+開発・CI は Node.js 26.13.0（LTS）、pnpm 12.18.0、Biome 2.6.6 を使用します。
+`pnpm check` は読み取り専用の静的検査、`pnpm fix` は自動修正、
+`pnpm typecheck` は型検査です。互換用の既存コマンドも残します。
+
+`pnpm dev` は通常のローカル開発です。複数製品を同時に開発する場合は
+`pnpm dev:isolated` を使います。割り当ては kagekara.com が 4100、
+NotCMSApp が Dashboard 4200 / API 4201 / WWW 4202、
+cleartodo が Web 4300 / WWW 4301 / API 4302 / PostgreSQL 4303、
+GameHeads が Web 4400 / API 4401 / realtime 4402 / PostgreSQL 4403
+（inspector 4404–4405）、notcms のサンプルが 4500 です。
+既存の開発用データベースを別ポートで使う場合は先に対応するローカルサービスを停止し、
+OAuth・Webhook の開発用コールバックは起動したポートに合わせてください。
+本番接続先や本番コールバックは変更しません。
+
+Node.js と pnpm の指定は `.nvmrc` と `packageManager` が正本です。
+外部ビルドサービスのバージョン上書きも同じ値に揃えてください。
+通常更新は小分けにし、セキュリティ修正版を優先します。
+
+SDK の tsup 型定義生成とドキュメント検査、同期Actionの ncc、および Next.js サンプルは TypeScript 6.0.3、非推奨CLIは7.0.2です。SDKの対応Node.js `>=18.17.0` とビルドtarget `node18` は維持します。tsup がJavaScript compiler APIの不要な型生成に対応した時点で7系を再検証します。`dev` はSDKのwatch、`dev:isolated` はNext.jsサンプルを起動します。

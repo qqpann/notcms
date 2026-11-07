@@ -1,5 +1,6 @@
 ---
 import { nc } from "../../notcms/schema";
+
 const [posts, error] = await nc.query.blog.list({
   where: { published: true },
 });

@@ -5,15 +5,19 @@ packages:
 
 verifyDepsBeforeRun: false
 allowBuilds:
-  '@biomejs/biome': true
+  "@biomejs/biome": true
   esbuild: true
   msw: true
-  'sharp@0.34.5': true
+  "sharp@0.34.5": true
 minimumReleaseAgeExclude:
   - postcss@8.5.17
 
 # Tailwind 3 and postcss-nested retain the same selector-parser API with the fixed v7 line.
 overrides:
+  "vite@>=7.0.0 <7.3.7": "7.3.7"
+  "undici@>=6.0.0 <6.29.1": "6.29.1"
+  "glob@>=9.0.0 <14.0.2": "14.0.4"
+  "minimatch@>=7.0.0 <11.0.1": "11.0.5"
   postcss-selector-parser: 7.1.6
   # external-editor uses the compatible tmpNameSync API; 0.0.33 cannot receive fixes.
   tmp: 0.2.7

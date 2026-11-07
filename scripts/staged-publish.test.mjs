@@ -4,7 +4,6 @@ import test from "node:test";
 
 import {
   CHANGELOG_PATH,
-  PACKAGE_JSON_PATH,
   classifyStageFailure,
   collectManifestEntryPaths,
   decidePublishedVersion,
@@ -12,6 +11,7 @@ import {
   findMissingManifestFiles,
   isSupportedNodeVersion,
   isSupportedNpmVersion,
+  PACKAGE_JSON_PATH,
   parsePackDryRunOutput,
   parsePublishedVersionOutput,
   stagePackage,

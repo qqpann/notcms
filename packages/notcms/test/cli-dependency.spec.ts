@@ -18,10 +18,10 @@ vi.mock("node:child_process", () => childProcessMocks);
 vi.mock("../src/cli/features/dependency-resolution.js", () => resolutionMocks);
 
 import {
-  type PackageManager,
   createPackageManagerInvocation,
   detectPackageManager,
   ensureNotcmsDependency,
+  type PackageManager,
 } from "../src/cli/features/dependency";
 
 describe("createPackageManagerInvocation", () => {
