@@ -131,10 +131,9 @@ export async function auditDocs(directory) {
     ];
     for (const [, url] of links) checkLink(url, file);
     const suffix = file.split("/").slice(1).join("/");
-    for (const language of languages) {
-      if (!files.has(`${language.language}/${suffix}`)) {
-        errors.push(`${file}: missing ${language.language} counterpart`);
-      }
+    // English pages may stand alone; translations must retain an English source.
+    if (!file.startsWith("en/") && !files.has(`en/${suffix}`)) {
+      errors.push(`${file}: missing en counterpart`);
     }
   }
   return { errors, snippets, pageCount: pages.length };
@@ -205,7 +204,7 @@ if (
       process.exitCode = 1;
     } else {
       console.log(
-        `Checked links and language parity for ${result.pageCount} pages; typechecked ${result.snippets.length} published examples.`
+        `Checked links and English sources for translations across ${result.pageCount} pages; typechecked ${result.snippets.length} published examples.`
       );
     }
   } catch (error) {
