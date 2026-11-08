@@ -20,9 +20,9 @@ You may create issues, and comment on or add labels to existing issues, without 
 
 "Minor" means it does not change behavior, data, security, or what a test checks (naming, comments, wording, small duplication or cleanup, suggestions to add tests, and similar). Never defer: bugs introduced by the current change, security or data-loss issues, CI failures, or major review findings. When unsure, fix it in the current PR.
 
-- Before filing, search open and closed issues. If the same issue exists, comment on it instead of opening a new one.
+- Before filing, search open and closed issues. If the same issue is open, comment on it instead of opening a new one. If a closed issue covers the same problem and it remains or has come back, do not reopen it; open a new issue that links to it.
 - In the body, state the problem, where it came from (links to the PR, review comment, or commit), and how to fix it (write "TBD" if undecided).
-- Group minor comments from the same PR into one issue with a checklist.
+- Group closely related minor comments from the same PR into one issue with a checklist. Keep items that should be prioritized independently in separate issues.
 - Add the `follow-up` label. If the repository does not have it, create it with `gh label create follow-up`.
 - Reply to each deferred review comment with the issue link, and list the issues under "Deferred review comments" in the PR description.
 - List the issues you created or updated, with links, in your final report. Never include secrets, credentials, or personal data.
