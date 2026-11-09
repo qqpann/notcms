@@ -32,9 +32,11 @@ export function safeUrl(href: string): string | null {
     return null;
   }
   try {
-    // encodeURI percent-encodes quotes, angle brackets, and spaces, so the
-    // result cannot leave a double-quoted attribute.
-    return encodeURI(href.trim()).replace(/%25/g, "%");
+    // encodeURI percent-encodes quotes, angle brackets, and spaces, but keeps
+    // `&`, `#`, and `;`. Escape for the attribute as well, so a character
+    // reference such as `javascript&#58;` stays literal text instead of being
+    // decoded by the HTML parser into a scheme that skipped the check above.
+    return escapeHtml(encodeURI(href.trim()).replace(/%25/g, "%"));
   } catch {
     return null;
   }
