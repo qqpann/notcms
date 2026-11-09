@@ -51,10 +51,76 @@ export function isSchema(value: unknown): value is Schema {
   return isPlainObject(value) && Object.values(value).every(isSchemaEntry);
 }
 
+/** A property whose Notion type this SDK version cannot represent yet. */
+export type UnsupportedProperty = {
+  database: string;
+  property: string;
+  type: string;
+};
+
 export type FetchedSchemaResponse = {
   onboardingDatabaseName?: string | null;
   schema: Schema;
+  /**
+   * Properties left out of `schema` because their type is not in
+   * `PROPERTY_TYPES` (for example a Notion type added after this release).
+   * Callers must surface them so the omission is never silent.
+   */
+  unsupportedProperties: UnsupportedProperty[];
 };
+
+/**
+ * Remove string-typed properties whose type is unknown to this SDK, so that
+ * one new Notion property type does not reject the whole workspace schema.
+ * Anything else that is malformed (non-string types, unknown fields) is left
+ * in place for `isSchema` to reject.
+ */
+/** Define an own property, so a `__proto__` key stays data, as in JSON.parse. */
+function setOwn(target: Record<string, unknown>, key: string, value: unknown) {
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
+}
+
+function omitUnsupportedProperties(value: unknown): {
+  value: unknown;
+  unsupportedProperties: UnsupportedProperty[];
+} {
+  const unsupportedProperties: UnsupportedProperty[] = [];
+  if (!isPlainObject(value)) return { value, unsupportedProperties };
+  const result: Record<string, unknown> = {};
+  for (const [database, entry] of Object.entries(value)) {
+    if (!isPlainObject(entry) || !isPlainObject(entry.properties)) {
+      setOwn(result, database, entry);
+      continue;
+    }
+    const properties: Record<string, unknown> = {};
+    const omitted = new Set<string>();
+    for (const [property, type] of Object.entries(entry.properties)) {
+      if (typeof type === "string" && !PROPERTY_TYPE_SET.has(type)) {
+        unsupportedProperties.push({ database, property, type });
+        omitted.add(property);
+      } else {
+        setOwn(properties, property, type);
+      }
+    }
+    if (omitted.size === 0) {
+      setOwn(result, database, entry);
+      continue;
+    }
+    const next: Record<string, unknown> = { ...entry, properties };
+    if (isPlainObject(entry.options)) {
+      next.options = Object.fromEntries(
+        Object.entries(entry.options).filter(([key]) => !omitted.has(key))
+      );
+    }
+    setOwn(result, database, next);
+  }
+  return { value: result, unsupportedProperties };
+}
 
 export async function fetchSchema(credentials?: Credentials): Promise<Schema> {
   return (await fetchSchemaResponse(credentials)).schema;
@@ -102,7 +168,13 @@ export async function fetchSchemaResponse(
       throw new Error(`Unexpected status ${res.status}`);
     }
     const data: unknown = await res.json();
-    if (!isPlainObject(data) || !isSchema(data.schema)) {
+    if (!isPlainObject(data)) {
+      throw new Error("Invalid schema payload.");
+    }
+    const { value: schema, unsupportedProperties } = omitUnsupportedProperties(
+      data.schema
+    );
+    if (!isSchema(schema)) {
       throw new Error("Invalid schema payload.");
     }
     const hasOnboardingDatabaseName = Object.prototype.hasOwnProperty.call(
@@ -118,7 +190,8 @@ export async function fetchSchemaResponse(
       throw new Error("Invalid onboarding database name.");
     }
     return {
-      schema: data.schema,
+      schema,
+      unsupportedProperties,
       ...(hasOnboardingDatabaseName
         ? {
             onboardingDatabaseName:

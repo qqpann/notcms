@@ -39,6 +39,7 @@ describe("pullSchema", () => {
 
     await expect(pullSchema({ credentials })).resolves.toEqual({
       status: "written",
+      unsupportedProperties: [],
       summary: { status: "missing" },
       schemaPath: "schema.ts",
       firstDatabaseName: "Blog posts",
@@ -114,6 +115,7 @@ export const nc = new Client({ schema });`);
 
     await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
       status: "up-to-date",
+      unsupportedProperties: [],
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: "Blog",
     });
@@ -330,6 +332,7 @@ export const nc = new Client({ schema })
 
     await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
       status: "stale",
+      unsupportedProperties: [],
       schemaPath: "src/notcms/schema.ts",
       reason: "missing",
       summary: { status: "missing" },
@@ -348,6 +351,7 @@ export const nc = new Client({ schema })
 
     await expect(pullSchema({ check: true, credentials })).resolves.toEqual({
       status: "stale",
+      unsupportedProperties: [],
       schemaPath: "schema.ts",
       reason: "out-of-date",
       summary: { status: "unavailable" },
@@ -363,6 +367,7 @@ export const nc = new Client({ schema })
 
     await expect(pullSchema({ credentials })).resolves.toEqual({
       status: "written",
+      unsupportedProperties: [],
       summary: { status: "missing" },
       schemaPath: "src/notcms/schema.ts",
       firstDatabaseName: null,

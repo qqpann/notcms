@@ -84,6 +84,7 @@ describe("fetchSchema", () => {
     await expect(fetchSchemaResponse()).resolves.toEqual({
       onboardingDatabaseName: "Blog",
       schema,
+      unsupportedProperties: [],
     });
   });
 
@@ -131,6 +132,84 @@ describe("fetchSchema", () => {
     await expect(fetchSchema()).resolves.toEqual(schema);
   });
 
+  it("omits properties with unsupported types and reports them", async () => {
+    stubCredentials();
+    const schema = {
+      blog: {
+        id: "db_1",
+        properties: {
+          title: "title",
+          action: "button",
+          location: "place",
+          review: "verification",
+          tag: "select",
+        },
+        options: { tag: ["a", "b"] },
+      },
+      authors: { id: "db_2", properties: { name: "title" } },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(JSON.stringify({ schema }), { status: 200 })
+        )
+    );
+
+    await expect(fetchSchemaResponse()).resolves.toEqual({
+      schema: {
+        blog: {
+          id: "db_1",
+          properties: { title: "title", tag: "select" },
+          options: { tag: ["a", "b"] },
+        },
+        authors: { id: "db_2", properties: { name: "title" } },
+      },
+      unsupportedProperties: [
+        { database: "blog", property: "action", type: "button" },
+        { database: "blog", property: "location", type: "place" },
+        { database: "blog", property: "review", type: "verification" },
+      ],
+    });
+  });
+
+  it("keeps prototype-like names as data while omitting a property", async () => {
+    stubCredentials();
+    const payload = `{"schema":{"__proto__":{"id":"db_1","properties":{"__proto__":"title","x":"button"}}}}`;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(payload, { status: 200 }))
+    );
+
+    const schema = await fetchSchema();
+    expect(Object.keys(schema)).toEqual(["__proto__"]);
+    expect(Object.keys(schema["__proto__"].properties)).toEqual(["__proto__"]);
+  });
+
+  it("drops options that belong to an omitted property", async () => {
+    stubCredentials();
+    const schema = {
+      blog: {
+        id: "db_1",
+        properties: { kind: "future_select" },
+        options: { kind: ["a"] },
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(JSON.stringify({ schema }), { status: 200 })
+        )
+    );
+
+    await expect(fetchSchema()).resolves.toEqual({
+      blog: { id: "db_1", properties: {}, options: {} },
+    });
+  });
+
   it("accepts a workspace with no databases", async () => {
     stubCredentials();
     vi.stubGlobal(
@@ -159,8 +238,6 @@ describe("fetchSchema", () => {
       { schema: { blog: { id: "db_1" } } },
       // property value is not a string
       { schema: { blog: { id: "db_1", properties: { slug: 123 } } } },
-      // unknown property type
-      { schema: { blog: { id: "db_1", properties: { slug: "bogus" } } } },
     ];
 
     for (const payload of malformedPayloads) {
