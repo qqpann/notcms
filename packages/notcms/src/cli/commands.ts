@@ -256,6 +256,7 @@ async function runPull(options: PullSchemaOptions = {}) {
 }
 
 function printPullResult(result: PullSchemaResult) {
+  printUnsupportedProperties(result.unsupportedProperties);
   if (result.status !== "up-to-date") {
     const summary = result.summary;
     if (summary.status === "compared") {
@@ -324,6 +325,35 @@ function printPullResult(result: PullSchemaResult) {
   );
 
   printFirstQuery(result);
+}
+
+function printUnsupportedProperties(
+  properties: PullSchemaResult["unsupportedProperties"]
+) {
+  if (properties.length === 0) return;
+  const lines = properties.map(
+    ({ database, property, type }) =>
+      `  - ${database}.${property} (${chalk.yellow(type)})`
+  );
+  console.warn(
+    boxen(
+      dedent`
+        These properties use types this notcms version does not support yet,
+        so they were left out of the generated schema:
+
+        ${lines.join("\n")}
+
+        Other databases and properties are available as usual.
+        Update notcms to pick up support for newer property types.
+      `,
+      {
+        padding: 1,
+        title: "[ Unsupported properties ]",
+        borderColor: "yellow",
+        borderStyle: "round",
+      }
+    )
+  );
 }
 
 function printFirstQuery(

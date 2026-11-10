@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Schema } from "../../types.js";
 import type { Credentials } from "../types.js";
 import { loadConfig } from "./config.js";
-import { fetchSchemaResponse } from "./schema.js";
+import { fetchSchemaResponse, type UnsupportedProperty } from "./schema.js";
 import {
   diffSchemas,
   parseGeneratedSchema,
@@ -18,6 +18,7 @@ export type PullSchemaOptions = {
 };
 
 type WrittenSchemaResult = {
+  unsupportedProperties: UnsupportedProperty[];
   status: "written";
   schemaPath: string;
   firstDatabaseName: string | null;
@@ -26,12 +27,14 @@ type WrittenSchemaResult = {
 };
 
 type UpToDateSchemaResult = {
+  unsupportedProperties: UnsupportedProperty[];
   status: "up-to-date";
   schemaPath: string;
   firstDatabaseName: string | null;
 };
 
 type StaleSchemaResult = {
+  unsupportedProperties: UnsupportedProperty[];
   status: "stale";
   schemaPath: string;
   reason: "missing" | "out-of-date";
@@ -56,6 +59,7 @@ export async function pullSchema(
   const absoluteSchemaPath = path.resolve(schemaPath);
   const schemaResponse = await fetchSchemaResponse(options.credentials);
   const schema = schemaResponse.schema;
+  const unsupportedProperties = schemaResponse.unsupportedProperties;
   const content = createSchemaModule(schema);
   const firstDatabaseName =
     schemaResponse.onboardingDatabaseName === undefined
@@ -73,13 +77,19 @@ export async function pullSchema(
 
   if (options.check) {
     if (summary.status === "compared" && summary.changes.length === 0) {
-      return { status: "up-to-date", schemaPath, firstDatabaseName };
+      return {
+        status: "up-to-date",
+        schemaPath,
+        firstDatabaseName,
+        unsupportedProperties,
+      };
     }
     return {
       status: "stale",
       schemaPath,
       reason: existing === null ? "missing" : "out-of-date",
       summary,
+      unsupportedProperties,
     };
   }
 
@@ -95,6 +105,7 @@ export async function pullSchema(
     firstDatabaseName,
     summary,
     schemaChanges,
+    unsupportedProperties,
   };
 }
 
