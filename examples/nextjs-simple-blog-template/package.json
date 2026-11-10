@@ -7,6 +7,7 @@
     "build": "next build",
     "build:ci": "node scripts/build-ci.mjs",
     "start": "next start",
+    "test": "node --test --experimental-strip-types lib/markdown.test.mjs",
     "typecheck": "node ../../node_modules/typescript/bin/tsc --noEmit"
   },
   "dependencies": {
