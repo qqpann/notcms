@@ -9,7 +9,7 @@ export default defineConfig([
     dts: { compilerOptions: { ignoreDeprecations: "6.0" } },
     clean: true,
     outDir: "dist",
-    target: "node18",
+    target: "node22",
   },
   // CLI: 全依存関係をバンドル（CJS形式、一部の依存関係がCJSのため）
   {
@@ -19,6 +19,6 @@ export default defineConfig([
     banner: { js: "#!/usr/bin/env node" },
     noExternal: [/.*/], // 全てバンドル
     outDir: "dist",
-    target: "node18",
+    target: "node22",
   },
 ]);
