@@ -1,5 +1,20 @@
 # notcms
 
+## 1.0.0
+
+### Major Changes
+
+- ccb71f1: NotCMS 1.0.0 is the first stable release. The SDK and CLI APIs are unchanged from 0.5.0, and from this version on they follow semantic versioning.
+  
+  - **Breaking:** Node.js 22 or later is required (previously 18.17). The bundled CLI's prompt and output dependencies (`@inquirer/prompts` 8, `boxen` 9) no longer run on Node.js 18, and Node.js 18 and 20 have reached end of life.
+
+### Patch Changes
+
+- 32527b1: Update the bundled CLI environment-file loader to dotenvx 2.
+- 0b79daa: Refresh the bundled CLI parser and template dependencies.
+- 81a14ed: Refresh compiler and build dependencies.
+- 967575c: `notcms pull` and `notcms init` no longer fail for the whole workspace when a database has a property type this version does not support yet (for example Notion's `button`, `place`, or `verification`). Those properties are left out of the generated schema and listed in a warning; other databases and properties are generated as usual.
+
 ## 0.5.0
 
 ### Minor Changes
