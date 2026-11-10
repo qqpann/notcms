@@ -24,7 +24,7 @@ export const PROPERTY_TYPES = [
   "date",
   "created_time",
   "last_edited_time",
-  // string (unsupported)
+  // number, string (Date) or string[]
   "rollup",
   // string[]
   "multi_select",
@@ -91,13 +91,14 @@ type PropertyTypeMap = {
   rich_text: string | null;
   status: string | null;
   unique_id: string | null;
-  formula: string | number | null;
+  // Matches the formula result type; an empty result is null.
+  formula: string | number | boolean | null;
   //  string (Date)
   date: string | null;
   created_time: string | null;
   last_edited_time: string | null;
-  //  string (unsupported)
-  rollup: string | null;
+  // number, date string, or the rolled-up values as strings
+  rollup: string | number | string[] | null;
   //  string[]
   multi_select: string[] | null;
   files: string[] | null;

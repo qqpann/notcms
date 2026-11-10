@@ -14,6 +14,7 @@ const schema = {
       released: "date",
       writers: "relation",
       score: "formula",
+      total: "rollup",
     },
   },
 } as const satisfies Schema;
@@ -44,7 +45,14 @@ describe("list query types", () => {
     >().toEqualTypeOf<boolean | null>();
     expectTypeOf<
       typeof client.query.blog.$inferPage.properties.score
-    >().toEqualTypeOf<string | number | null>();
+    >().toEqualTypeOf<string | number | boolean | null>();
+    expectTypeOf<
+      typeof client.query.blog.$inferPage.properties.total
+    >().toEqualTypeOf<string | number | string[] | null>();
+    const byBoolean: ListOptions<typeof schema.blog> = {
+      where: { score: { equals: true } },
+    };
+    expect(byBoolean.where?.score).toEqual({ equals: true });
   });
 });
 

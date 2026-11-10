@@ -55,7 +55,7 @@ const [posts, error] = await nc.query.blog.list({
 
 | 演算子 | 対象のプロパティ型 |
 | --- | --- |
-| 値の直接指定、`equals`、`not_equals` | checkbox、number、文字列系、formula（文字列または数値） |
+| 値の直接指定、`equals`、`not_equals` | checkbox、number、文字列系、formula（文字列、数値または真偽値） |
 | `is_empty: true`、`is_not_empty: true` | すべての型 |
 | `contains` | multi_select（配列要素と完全一致） |
 | `before`、`after`、`on_or_before`、`on_or_after` | date、created_time、last_edited_time。ISO文字列または `Date` |
