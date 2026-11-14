@@ -57,6 +57,17 @@ const [post, error] = await nc.query.blog.getFirst({
 変更時のリダイレクトをサイト側で管理します。言語別slugやIDによる代替は
 [URLレシピ](/ja/examples/content-recipes)を参照してください。
 
+## 画像とファイル
+
+Notion自体のファイルURLは署名付きで、約1時間で失効します。NotCMSは画像、`files` プロパティのファイル、
+Notionにアップロードされたファイル・PDF・動画ブロックのファイルを保存し、
+`https://api.notcms.com/v1/images/{id}` として返します。このURLは失効しないため、静的にビルドしたページに埋め込めます。
+
+- 同期直後はファイルのコピー中のため、短時間 `202` と `Retry-After` を返すことがあります。
+- 画像はインラインで表示します。それ以外のファイルはダウンロード（`Content-Disposition: attachment`）として配信します。
+- 1ファイルの上限は20 MiBです。超えるファイルは保存できず、URLはエラーを返します。大きな動画は外部ホストのリンクにしてください。
+- 外部リンク、埋め込み、ブックマーク、外部URLを指すファイル・動画ブロックは元のURLのままです。
+
 ## 結果を扱う
 
 | 結果 | `post` | `error` |

@@ -60,6 +60,19 @@ Use an explicit sort when “first” matters. For a slug route, keep slugs uniq
 your content workflow, and manage redirects when they change. See the
 [URL recipes](/en/examples/content-recipes) for language-specific slugs and ID fallbacks.
 
+## Images and files
+
+Notion's own file URLs are signed and expire after about an hour. NotCMS copies
+images, files in `files` properties, and files uploaded to Notion in file, PDF
+and video blocks into its storage, and returns them as
+`https://api.notcms.com/v1/images/{id}`. These URLs do not expire, so they are
+safe to embed in statically built pages.
+
+- A URL can answer `202` with `Retry-After` for a short time after synchronization while the file is still being copied.
+- Images are served inline. Other files are served as downloads (`Content-Disposition: attachment`).
+- Each file can be up to 20 MiB. A larger file cannot be stored and its URL returns an error; link large videos from an external host instead.
+- External links, embeds and bookmarks, and file or video blocks that point to an external URL, keep their original URL.
+
 ## Handle the result
 
 | Outcome | `post` | `error` |
