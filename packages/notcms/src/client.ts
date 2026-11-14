@@ -1,4 +1,4 @@
-import type { ListOptions } from "./query";
+import type { ListInclude, ListOptions, ListPagesOptions } from "./query";
 import { routes } from "./routes";
 import type { InferDatabaseProperties, Page, Pages, Schema } from "./types";
 import { getEnv } from "./utils/env";
@@ -55,6 +55,8 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
 
   /**
    * Retrieves a list of pages from the database.
+   * Pages omit `content` unless `include: ["content"]` is passed, which returns
+   * each page's Markdown content in the same request.
    *
    * @template TDatabase - The database schema.
    * @returns {Promise<[Pages<InferDatabaseProperties<TDatabase>>, null, Response] | [undefined, Error, Response | undefined]>}
@@ -68,11 +70,20 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    *      - `Error`: The error encountered.
    *      - `Response | undefined`: The optional HTTP response object.
    */
-  list(options?: ListOptions<TDatabase>) {
-    return this.fetch<Pages<InferDatabaseProperties<TDatabase>>>(
-      () => this.pagesUrl(options).toString(),
-      "GET"
-    );
+  list<const TInclude extends readonly ListInclude[] = []>(
+    options?: ListPagesOptions<TDatabase, TInclude>
+  ) {
+    return this.fetch<
+      "content" extends TInclude[number]
+        ? Page<InferDatabaseProperties<TDatabase>>[]
+        : Pages<InferDatabaseProperties<TDatabase>>
+    >(() => {
+      const url = this.pagesUrl(options);
+      if (options?.include?.includes("content")) {
+        url.searchParams.set("include", "content");
+      }
+      return url.toString();
+    }, "GET");
   }
 
   /**

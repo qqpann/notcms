@@ -61,6 +61,7 @@ npx notcms init
 ```
 
 `notcms.config.json` が作成されます。認証情報がない場合はブラウザーでログイン画面が開き、`NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` が `.env.local` に保存されます。
+ログインは必須ではありません。2つの変数が環境変数か env ファイルに設定済みなら、ブラウザーは開きません。CI、コンテナ、リモート環境やエージェントのセッション、追加の Git ワークツリーではこの方法を使います（シークレットはダッシュボードの **ワークスペースのシークレット** で作成します）。
 
 `notcms` がプロジェクトの直接依存として登録され、利用可能な状態になっていることも確認します。検出したパッケージマネージャーのインストールまたは追加コマンドを提示し、既存の依存バージョン指定は置き換えません。その後、スキーマを取得し、実行できる最初のクエリ例を表示します。
 
@@ -104,6 +105,9 @@ import { nc } from "./notcms/schema";
 
 // ブログ記事の一覧を取得
 const [pages] = await nc.query.blog.list();
+
+// Markdown 本文を含めて一覧を1回で取得
+const [posts] = await nc.query.blog.list({ include: ["content"] });
 
 // 特定のブログ記事を取得
 const [page] = await nc.query.blog.get("page_id");

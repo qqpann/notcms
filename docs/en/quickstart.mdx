@@ -49,6 +49,24 @@ can use `dotenv.config({ path: ".env.local" })` before importing the generated
 client. Never expose `NOTCMS_SECRET_KEY` through browser environment variables.
 See [client initialization](/en/usage/initializing-client).
 
+### Without browser login
+
+Browser login only writes `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID` to
+your env file. Every command reads these two variables, so you can skip login
+entirely: create a secret under **Workspace Secrets** in the
+[dashboard](https://dash.notcms.com), then set both variables in the
+environment or in an env file. When they are present, `init` and `pull` never
+open a browser. Use this in CI, in containers, in remote or agent sessions where
+browser login is unavailable, and in additional Git worktrees.
+
+```bash
+NOTCMS_SECRET_KEY=... NOTCMS_WORKSPACE_ID=... npx notcms pull
+```
+
+Commit the generated schema so builds do not need to pull. In CI, run
+`npx notcms pull --check` with the variables supplied as secrets; see
+[schema checks in CI](/en/cli-commands/schema-ci).
+
 ## 3. Fetch a list
 
 Run the query on the server. Replace `blog` and the property names with those

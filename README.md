@@ -62,6 +62,10 @@ npx notcms init
 
 This creates `notcms.config.json`. If credentials are missing, it opens browser
 login and saves `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID` to `.env.local`.
+Login is optional: when both variables are already set in the environment or an
+env file, no browser opens. Use that in CI, containers, remote or agent sessions,
+and extra Git worktrees (create a secret under **Workspace Secrets** in the
+dashboard).
 It ensures `notcms` is both a direct dependency and available to the project,
 offering either the detected package manager's install command or an add
 command without replacing an existing dependency spec. It then pulls the
@@ -107,6 +111,9 @@ import { nc } from "./notcms/schema";
 
 // List all blog posts
 const [pages] = await nc.query.blog.list();
+
+// List posts with their Markdown content in one request
+const [posts] = await nc.query.blog.list({ include: ["content"] });
 
 // Get a specific blog post
 const [page] = await nc.query.blog.get("page_id");

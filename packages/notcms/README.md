@@ -55,6 +55,10 @@ npx notcms pull
 npx notcms pull --check # Check without writing, for CI/CD
 ```
 
+Login is optional. Every command reads `NOTCMS_SECRET_KEY` and
+`NOTCMS_WORKSPACE_ID`; when both are set in the environment or an env file, no
+browser opens. Use that in CI, containers, and remote or agent sessions.
+
 > **Migration from notcms-kit**: The CLI is now included in the `notcms` package.
 > Use `npx notcms` instead of `npx notcms-kit`.
 
@@ -87,6 +91,9 @@ import { nc } from "./notcms/schema";
 const [pages, error] = await nc.query.blog.list();
 if (error) throw error;
 const [page] = await nc.query.blog.get(pages[0].id);
+
+// Include each page's Markdown content in the list response
+const [posts] = await nc.query.blog.list({ include: ["content"] });
 ```
 
 <!-- -->

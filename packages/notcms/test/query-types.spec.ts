@@ -57,6 +57,22 @@ describe("list query types", () => {
 });
 
 // Checked by tsc without making network requests.
+async function checkListInclude(client: Client<typeof schema>) {
+  const [withContent] = await client.query.blog.list({ include: ["content"] });
+  expectTypeOf(withContent!).toEqualTypeOf<
+    (typeof client.query.blog.$inferPage)[]
+  >();
+  const [withoutContent] = await client.query.blog.list();
+  expectTypeOf(withoutContent!).toEqualTypeOf<
+    typeof client.query.blog.$inferPages
+  >();
+  // @ts-expect-error pages listed without include have no content
+  withoutContent?.[0]?.content;
+  // @ts-expect-error unknown include values are rejected
+  client.query.blog.list({ include: ["body"] });
+}
+void checkListInclude;
+
 function checkInvalidQueries(client: Client<typeof schema>) {
   client.query.blog.getFirst({
     where: { published: true },
