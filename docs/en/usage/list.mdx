@@ -66,6 +66,32 @@ Dates are compared in UTC. A date without a time is midnight UTC (09:00 in Japan
 
 `sort` accepts exactly one scalar property with `"asc"` or `"desc"`. Array properties cannot be sorted. Empty values come last in either direction. Ties, and lists without `sort`, use registration order followed by page ID. Unknown properties, unsupported operators and invalid inputs return HTTP 400 through the usual error tuple.
 
+## Include content
+
+`list()` omits page content by default. Pass `include: ["content"]` to receive
+each page's Markdown `content` in the same request, for example when a static
+site builds every post:
+
+{/* docs-check */}
+```typescript
+import { nc } from "./notcms/schema";
+
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+  include: ["content"],
+});
+if (error) throw error;
+
+for (const post of posts) {
+  console.log(post.title, post.content.length);
+}
+```
+
+The result is typed as pages with `content`, the same shape as `get()`. Content
+comes from the synchronized copy, like the rest of the list response. Large
+databases return large responses; combine `include` with `where` or
+`id: { in: [...] }` to fetch only what you need.
+
 ## Retrieve related pages by ID
 
 A relation contains Notion page IDs. Retrieve the related pages from a database you select, with at most 100 IDs per call:

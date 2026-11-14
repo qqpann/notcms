@@ -66,6 +66,27 @@ const [posts, error] = await nc.query.blog.list({
 
 `sort` は配列型を除く1プロパティに `"asc"` または `"desc"` を指定します。空の値はどちらでも末尾、同値の場合と `sort` 省略時は登録順、次にページID順です。未知のプロパティ、非対応の演算子、不正な入力はHTTP 400となり、通常のエラータプルで返します。
 
+## 本文を含める
+
+`list()` は既定ではページ本文を返しません。`include: ["content"]` を渡すと、各ページのMarkdown `content` を同じリクエストで受け取れます。静的サイトで全記事をビルドする場合などに使います。
+
+{/* docs-check */}
+```typescript
+import { nc } from "./notcms/schema";
+
+const [posts, error] = await nc.query.blog.list({
+  where: { published: true },
+  include: ["content"],
+});
+if (error) throw error;
+
+for (const post of posts) {
+  console.log(post.title, post.content.length);
+}
+```
+
+結果は `get()` と同じ、`content` を持つページの型になります。本文は一覧の他の値と同じく同期済みのコピーから返します。データベースが大きいとレスポンスも大きくなるため、`where` や `id: { in: [...] }` と組み合わせて必要なページだけを取得してください。
+
 ## 関連ページをIDで一括取得
 
 relationはNotionのページIDの配列です。関連先のデータベースを選び、1回につき最大100件のIDで取得できます。

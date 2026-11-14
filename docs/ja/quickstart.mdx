@@ -48,6 +48,21 @@ bunx notcms init
 `NOTCMS_SECRET_KEY` をブラウザ向けの環境変数で公開しないでください。
 詳しくは[クライアントの初期化](/ja/usage/initializing-client)を参照してください。
 
+### ブラウザログインを使わない場合
+
+ブラウザログインは `NOTCMS_SECRET_KEY` と `NOTCMS_WORKSPACE_ID` をenvファイルに書き込むだけです。
+すべてのコマンドはこの2つの変数を読むため、ログインは省略できます。
+[ダッシュボード](https://dash.notcms.com)の **ワークスペースのシークレット** でシークレットを作成し、
+2つの変数を環境変数かenvファイルに設定してください。設定済みなら `init` も `pull` もブラウザを開きません。
+CI、コンテナ、ブラウザログインを使えないリモート環境やエージェントのセッション、追加のGitワークツリーではこの方法を使います。
+
+```bash
+NOTCMS_SECRET_KEY=... NOTCMS_WORKSPACE_ID=... npx notcms pull
+```
+
+生成したスキーマはコミットし、ビルド時にpullしなくて済むようにします。CIでは変数をシークレットとして渡し、
+`npx notcms pull --check` を実行してください。詳しくは[CIでのスキーマ確認](/ja/cli-commands/schema-ci)を参照してください。
+
 ## 3. 一覧を取得する
 
 サーバー側でクエリを実行します。`blog` とプロパティ名は、生成されたスキーマに合わせて置き換えてください。

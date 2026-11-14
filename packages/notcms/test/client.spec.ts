@@ -81,6 +81,33 @@ describe("DatabaseHandler", () => {
     expect(response?.status).toBe(200);
   });
 
+  it("includes content in list results only when requested", async () => {
+    const pages = [
+      { id: "p1", title: "One", properties: {}, content: "# One" },
+      { id: "p2", title: "Two", properties: {}, content: "# Two" },
+    ];
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: pages }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const [data, error] = await createClient().query.abc.list({
+      where: { id: { in: ["p1", "p2"] } },
+      include: ["content"],
+    });
+    await createClient().query.abc.list({ include: [] });
+
+    const withContent = new URL(fetchMock.mock.calls[0][0]);
+    expect(withContent.searchParams.get("include")).toBe("content");
+    expect(withContent.searchParams.has("limit")).toBe(false);
+    expect(
+      JSON.parse(withContent.searchParams.get("filter") ?? "null")
+    ).toEqual({ id: { in: ["p1", "p2"] } });
+    expect(
+      new URL(fetchMock.mock.calls[1][0]).searchParams.has("include")
+    ).toBe(false);
+    expect(error).toBeNull();
+    expect(data?.map((page) => page.content)).toEqual(["# One", "# Two"]);
+  });
+
   it("encodes filters, dates and one sort key as JSON query parameters", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: [] }));
     vi.stubGlobal("fetch", fetchMock);

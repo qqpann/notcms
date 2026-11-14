@@ -71,3 +71,15 @@ export type ListOptions<TDatabase extends Schema[string]> = {
   where?: Where<TDatabase>;
   sort?: Sort<TDatabase>;
 };
+
+/** Extra fields that `list()` can include in each page. */
+export type ListInclude = "content";
+
+/** Options for `list()`: `ListOptions` plus fields to include in each page. */
+export type ListPagesOptions<
+  TDatabase extends Schema[string],
+  TInclude extends readonly ListInclude[] = readonly ListInclude[],
+> = ListOptions<TDatabase> & {
+  /** Include each page's Markdown `content`, as `get()` and `getFirst()` do. */
+  include?: TInclude;
+};
