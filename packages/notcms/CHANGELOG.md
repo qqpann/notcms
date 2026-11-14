@@ -1,5 +1,21 @@
 # notcms
 
+## 1.1.0
+
+### Minor Changes
+
+- a296b7b: Add `include: ["content"]` to `list()` to receive each page's Markdown content in the same request.
+  
+  ```ts
+  const [posts, error] = await nc.query.blog.list({
+    where: { published: true },
+    include: ["content"],
+  });
+  // posts[0].content is typed as string
+  ```
+  
+  Without `include`, `list()` behaves as before and returns pages without content.
+
 ## 1.0.1
 
 ### Patch Changes
