@@ -80,6 +80,7 @@ npx notcms pull
 ```
 
 This fetches your database schema from NotCMS and regenerates the configured TypeScript file.
+Keep generated types in sync with [PR and scheduled schema checks](https://docs.notcms.com/en/cli-commands/schema-ci).
 
 For reference, the generated schema will look something like this:
 
@@ -148,9 +149,9 @@ CI usage, and compatibility checks.
 
 Check out these examples to get started quickly:
 
-- [Publication, language and stable URL recipes](examples/content-recipes/README.md) for blogs and release notes
-
 - 📚 [Next.js Simple Blog Template](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
+- 🚀 [Build a blog with Astro](https://docs.notcms.com/en/examples/astro)
+- 🧩 [Publication, language and stable URL recipes](examples/content-recipes/README.md) for blogs and release notes
 - 🎨 [More templates available on our website](https://www.notcms.com/templates)
 
 Runnable example source lives under [`examples/`](examples/).
@@ -191,21 +192,9 @@ See individual directories for specific license details.
 
 <!-- -->
 
-[build-img]: https://github.com/qqpann/notcms/actions/workflows/main.yml/badge.svg
-[build-url]: https://github.com/qqpann/notcms/actions/workflows/main.yml
 [downloads-img]: https://img.shields.io/npm/dt/notcms
 [downloads-url]: https://www.npmtrends.com/notcms
 [npm-img]: https://img.shields.io/npm/v/notcms
 [npm-url]: https://www.npmjs.com/package/notcms
 [issues-img]: https://img.shields.io/github/issues/qqpann/notcms
 [issues-url]: https://github.com/qqpann/notcms/issues
-[codecov-img]: https://codecov.io/gh/qqpann/notcms/branch/main/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/qqpann/notcms
-[semantic-release-img]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-[semantic-release-url]: https://github.com/semantic-release/semantic-release
-[commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
-[commitizen-url]: http://commitizen.github.io/cz-cli/
-
-Keep generated types in sync with [PR and scheduled schema checks](https://docs.notcms.com/en/cli-commands/schema-ci).
-
-Build a blog with the [Astro guide](https://docs.notcms.com/en/examples/astro).

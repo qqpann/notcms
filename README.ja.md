@@ -75,6 +75,8 @@ npx notcms pull
 
 NotCMS からデータベースのスキーマを取得し、設定した TypeScript ファイルを再生成します。
 
+[PR と定期実行のスキーマチェック](https://docs.notcms.com/ja/cli-commands/schema-ci)で、生成した型を Notion のスキーマと同期した状態に保てます。
+
 生成されるスキーマの例は次のとおりです。
 
 ```ts
@@ -138,8 +140,9 @@ npx notcms pull --check
 
 次のサンプルを参考に、すぐに使い始められます。
 
-- ブログやリリースノート向けの[公開状態・言語・安定した URL の実装例](examples/content-recipes/README.md)
 - 📚 [Next.js シンプルブログのテンプレート](https://github.com/qqpann/notcms/tree/main/examples/nextjs-simple-blog-template)
+- 🚀 [Astro でブログを作る](https://docs.notcms.com/ja/examples/astro)
+- 🧩 ブログやリリースノート向けの[公開状態・言語・安定した URL の実装例](examples/content-recipes/README.md)
 - 🎨 [ウェブサイトで公開しているその他のテンプレート](https://www.notcms.com/templates)
 
 実行可能なサンプルのソースは [`examples/`](examples/) にあります。
@@ -180,17 +183,9 @@ npx notcms pull --check
 
 <!-- -->
 
-[build-img]: https://github.com/qqpann/notcms/actions/workflows/main.yml/badge.svg
-[build-url]: https://github.com/qqpann/notcms/actions/workflows/main.yml
 [downloads-img]: https://img.shields.io/npm/dt/notcms
 [downloads-url]: https://www.npmtrends.com/notcms
 [npm-img]: https://img.shields.io/npm/v/notcms
 [npm-url]: https://www.npmjs.com/package/notcms
 [issues-img]: https://img.shields.io/github/issues/qqpann/notcms
 [issues-url]: https://github.com/qqpann/notcms/issues
-[codecov-img]: https://codecov.io/gh/qqpann/notcms/branch/main/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/qqpann/notcms
-[semantic-release-img]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-[semantic-release-url]: https://github.com/semantic-release/semantic-release
-[commitizen-img]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
-[commitizen-url]: http://commitizen.github.io/cz-cli/
