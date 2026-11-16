@@ -47,6 +47,16 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
   </Tab>
   
   <Tab title="Node.js">
+    Node.js can load the file itself:
+
+    ```bash
+    node --env-file=.env.local app.ts
+    ```
+
+    With `dotenv`, load the generated client after `dotenv.config()` with a
+    dynamic `import()`. A static `import` runs first, before the variables are
+    set.
+
     ```typescript
     import dotenv from 'dotenv';
     dotenv.config({ path: ".env.local" });
@@ -120,7 +130,7 @@ export const nc = new Client({
 <AccordionGroup>
   <Accordion title="Environment variables not loading">
     - Check `.env.local` file exists in project root
-    - Ensure you're using a loader like `dotenv` (load `.env.local` explicitly)
+    - Ensure your runtime loads `.env.local` (for example `node --env-file=.env.local`, or `dotenv` before a dynamic `import()` of the generated client)
     - Verify variable names match exactly
   </Accordion>
   

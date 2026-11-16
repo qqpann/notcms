@@ -47,6 +47,15 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
   </Tab>
   
   <Tab title="Node.js">
+    Node.jsだけでファイルを読み込めます。
+
+    ```bash
+    node --env-file=.env.local app.ts
+    ```
+
+    `dotenv` を使う場合は、`dotenv.config()` のあとで生成クライアントを動的な `import()` で読み込みます。
+    静的な `import` は環境変数を設定する前に実行されます。
+
     ```typescript
     import dotenv from 'dotenv';
     dotenv.config({ path: ".env.local" });
@@ -119,7 +128,7 @@ export const nc = new Client({
 <AccordionGroup>
   <Accordion title="環境変数が読み込まれない">
     - プロジェクトルートに `.env.local` ファイルが存在することを確認
-    - `dotenv` などのローダーで `.env.local` を明示的に読み込んでいることを確認
+    - 実行環境が `.env.local` を読み込んでいることを確認（`node --env-file=.env.local`、または `dotenv` のあとで生成クライアントを動的な `import()` で読み込むなど）
     - 変数名が正確に一致していることを確認
   </Accordion>
   

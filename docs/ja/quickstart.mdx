@@ -44,7 +44,9 @@ bunx notcms init
 
 `.env.local` はGitに含めないでください。CLIはこのファイルを読みますが、アプリもサーバー側で
 読み込む必要があります。Next.jsは `.env.local` を読み込みます。通常のNode.jsアプリでは、
-生成クライアントのimport前に `dotenv.config({ path: ".env.local" })` などで読み込んでください。
+`node --env-file=.env.local` で起動するか、`dotenv.config({ path: ".env.local" })` のあとで
+生成クライアントを動的な `import()` で読み込んでください。静的な `import` は `dotenv.config()` より先に
+実行されるため、環境変数のないままクライアントが作られます。
 `NOTCMS_SECRET_KEY` をブラウザ向けの環境変数で公開しないでください。
 詳しくは[クライアントの初期化](/ja/usage/initializing-client)を参照してください。
 
