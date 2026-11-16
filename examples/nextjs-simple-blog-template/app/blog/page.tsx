@@ -4,13 +4,14 @@ import { nc } from "~/src/notcms/schema";
 export const revalidate = 10;
 
 export default async function Blog() {
-  let [pages] = await nc.query.blog.list();
-  let [writers] = await nc.query.writers.list();
-
-  pages = pages ?? [];
-  writers = writers ?? [];
-
-  pages = pages.filter((page) => page.properties.published);
+  const [pages, error] = await nc.query.blog.list({
+    where: { published: true },
+  });
+  // Throw instead of rendering an empty list, so a failed request is not
+  // mistaken for a blog without posts and does not replace a cached page.
+  if (error) throw error;
+  const [writers, writersError] = await nc.query.writers.list();
+  if (writersError) throw writersError;
 
   return <BlogPagesList pages={pages} writers={writers} />;
 }
