@@ -46,6 +46,41 @@ export function extractSnippets(source, file) {
   }));
 }
 
+// Mintlify ignores mint.json keys in docs.json without reporting an error, so
+// the setting silently disappears from the published site.
+const legacyConfigKeys = {
+  topbarLinks: "navbar.links",
+  topbarCtaButton: "navbar.primary",
+  modeToggle: "appearance",
+  footerSocials: "footer.socials",
+  anchors: "navigation.global.anchors",
+  tabs: "navigation.tabs",
+  analytics: "integrations",
+  feedback: "the Mintlify dashboard",
+  i18n: "navigation.languages",
+};
+
+export function checkConfigKeys(config) {
+  const errors = [];
+  for (const [key, replacement] of Object.entries(legacyConfigKeys)) {
+    if (Object.hasOwn(config, key)) {
+      errors.push(
+        `docs.json: ${key} is a mint.json key that Mintlify ignores; use ${replacement}`
+      );
+    }
+  }
+  // docs.json metadata only configures page timestamps; meta tags belong in seo.
+  const metatags = Object.keys(config.metadata ?? {}).filter(
+    (key) => key !== "timestamp"
+  );
+  if (metatags.length) {
+    errors.push(
+      `docs.json: move ${metatags.join(", ")} from metadata to seo.metatags`
+    );
+  }
+  return errors;
+}
+
 export async function auditDocs(directory) {
   const files = new Set(await filesUnder(directory));
   const pages = [...files].filter((file) => file.endsWith(".mdx"));
@@ -54,6 +89,7 @@ export async function auditDocs(directory) {
   const config = JSON.parse(
     await readFile(path.join(directory, "docs.json"), "utf8")
   );
+  errors.push(...checkConfigKeys(config));
   const languages = config.navigation.languages;
   function checkLink(url, from) {
     const resolved = new URL(
