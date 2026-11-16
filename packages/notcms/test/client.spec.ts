@@ -20,14 +20,18 @@ describe("Client constructor", () => {
     vi.stubEnv("NOTCMS_SECRET_KEY", undefined);
     vi.stubEnv("NOTCMS_WORKSPACE_ID", "ws_1");
 
-    expect(() => new Client({ schema })).toThrow(/secretKey is required/);
+    expect(() => new Client({ schema })).toThrow(
+      /secretKey is required\. Set the NOTCMS_SECRET_KEY environment variable/
+    );
   });
 
   it("throws when workspaceId is not provided", () => {
     vi.stubEnv("NOTCMS_SECRET_KEY", "sk_1");
     vi.stubEnv("NOTCMS_WORKSPACE_ID", undefined);
 
-    expect(() => new Client({ schema })).toThrow(/workspaceId is required/);
+    expect(() => new Client({ schema })).toThrow(
+      /workspaceId is required\. Set the NOTCMS_WORKSPACE_ID environment variable/
+    );
   });
 
   it("throws when schema is not provided", () => {

@@ -157,14 +157,17 @@ export class Client<TSchema extends Schema> {
   }) {
     const secretKey = options?.secretKey || getEnv("NOTCMS_SECRET_KEY");
     const workspaceId = options?.workspaceId || getEnv("NOTCMS_WORKSPACE_ID");
+    // The generated schema module creates the client when it is imported, so
+    // these errors often surface in a deployment that lacks the variables.
+    // Name the variable to set there.
     if (!secretKey) {
       throw new Error(
-        "secretKey is required. Pass it as an option or set it as an environment variable."
+        "secretKey is required. Set the NOTCMS_SECRET_KEY environment variable, or pass secretKey to new Client()."
       );
     }
     if (!workspaceId) {
       throw new Error(
-        "workspaceId is required. Pass it as an option or set it as an environment variable."
+        "workspaceId is required. Set the NOTCMS_WORKSPACE_ID environment variable, or pass workspaceId to new Client()."
       );
     }
     this.secretKey = secretKey;
