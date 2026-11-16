@@ -192,6 +192,21 @@ test("checks declaration files referenced by conditional exports", () => {
   ]);
 });
 
+test("wires the changesets/action v2 output into the stage decision", async () => {
+  const workflow = await readFile(
+    new URL("../.github/workflows/publish.yml", import.meta.url),
+    "utf8"
+  );
+  const versionJob = workflow.slice(0, workflow.indexOf("\n  stage:"));
+  assert.match(versionJob, /uses: changesets\/action@v2\n/);
+  assert.match(
+    versionJob,
+    /has_changesets: \$\{\{ steps\.changesets\.outputs\.has-changesets \}\}/
+  );
+  assert.match(versionJob, /create-github-releases: false/);
+  assert.match(versionJob, /push-git-tags: false/);
+});
+
 test("keeps the stage job dependency-free until its pure release decision", async () => {
   const workflow = await readFile(
     new URL("../.github/workflows/publish.yml", import.meta.url),

@@ -16,7 +16,7 @@ jobs:
       contents: write
       pull-requests: write
     outputs:
-      has_changesets: ${{ steps.changesets.outputs.hasChangesets }}
+      has_changesets: ${{ steps.changesets.outputs.has-changesets }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -29,12 +29,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Create Release Pull Request
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          # The release job below creates GitHub Releases after successful staging.
-          createGithubReleases: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # The release job below creates GitHub Releases and tags after successful staging.
+          create-github-releases: false
+          push-git-tags: false
 
   stage:
     name: Stage notcms package
