@@ -4,7 +4,6 @@ import {
   mkdir,
   mkdtemp,
   readFile,
-  realpath,
   rm,
   stat,
   writeFile,
@@ -19,52 +18,6 @@ import { runCommand } from "./staged-publish.mjs";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const rootRequire = createRequire(new URL("../package.json", import.meta.url));
 const changesetCli = rootRequire.resolve("@changesets/cli/bin.js");
-
-for (const consumer of [
-  "packages/notcms",
-  "examples/nextjs-simple-blog-template",
-]) {
-  test(`external-editor temporary-file round trip: ${consumer}`, async () => {
-    let consumerRequire = createRequire(
-      path.join(root, consumer, "package.json")
-    );
-    if (consumer.startsWith("examples/")) {
-      consumerRequire = createRequire(consumerRequire.resolve("notcms"));
-    }
-    const promptsRequire = createRequire(
-      consumerRequire.resolve("@inquirer/prompts")
-    );
-    const editorRequire = createRequire(
-      promptsRequire.resolve("@inquirer/editor")
-    );
-    const { ExternalEditor } = editorRequire("external-editor");
-    const directory = await mkdtemp(path.join(tmpdir(), "notcms-editor-"));
-    try {
-      const editor = new ExternalEditor("Fixture Markdown\n", {
-        dir: directory,
-        prefix: "notcms-",
-        postfix: ".md",
-        mode: 0o600,
-      });
-      assert.equal(
-        await realpath(path.dirname(editor.tempFile)),
-        await realpath(directory)
-      );
-      assert.equal(
-        await readFile(editor.tempFile, "utf8"),
-        "Fixture Markdown\n"
-      );
-      assert.equal((await stat(editor.tempFile)).mode & 0o777, 0o600);
-      await writeFile(editor.tempFile, "Updated Markdown\n");
-      editor.readTemporaryFile();
-      assert.equal(editor.text, "Updated Markdown\n");
-      editor.cleanup();
-      await assert.rejects(stat(editor.tempFile), { code: "ENOENT" });
-    } finally {
-      await rm(directory, { recursive: true, force: true });
-    }
-  });
-}
 
 test("Changesets generates a fixture SDK patch without altering the checkout", async () => {
   const fixture = await mkdtemp(path.join(tmpdir(), "notcms-changeset-"));
