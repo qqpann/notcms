@@ -5,8 +5,8 @@ For the rendering and publication choices, read the [Astro guide](https://docs.n
 
 ## Run it in a new project
 
-Use a Node version supported by Astro. This example was checked with Node 24,
-Astro 6.4.8, Vite 7.3.5, and NotCMS 0.4.0; it does not require `getFirst`.
+Use a Node version supported by Astro. This example was checked with Node 22
+and 26, Astro 6.4.8, Vite 7.3.5, and NotCMS 1.1.0.
 
 1. In Notion, create a `blog` database with `title` (Title), `published` (Checkbox),
    `slug` (Text), and `cover` (Files & media). Add a published post with a body and
@@ -16,7 +16,7 @@ Astro 6.4.8, Vite 7.3.5, and NotCMS 0.4.0; it does not require `getFirst`.
    ```sh
    npm create astro@latest -- astro-notcms --template minimal --no-install --no-git
    cd astro-notcms
-   npm install astro@6.4.8 notcms@0.4.0
+   npm install astro@6.4.8 notcms@1.1.0
    npm install --save-dev vite@7.3.5
    npx notcms init
    ```
