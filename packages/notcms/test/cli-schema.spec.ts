@@ -21,6 +21,23 @@ describe("fetchSchema", () => {
     );
   });
 
+  it("suggests browser login and the env files the CLI reads", async () => {
+    vi.stubEnv("NOTCMS_SECRET_KEY", undefined);
+    vi.stubEnv("NOTCMS_WORKSPACE_ID", "ws_test");
+
+    const message = await fetchSchema().then(
+      () => "",
+      (error: Error) => error.message
+    );
+    expect(message).toContain("NOTCMS_WORKSPACE_ID: ws_test");
+    expect(message).toContain("NOTCMS_SECRET_KEY:   (not set)");
+    expect(message).toContain("$ npx notcms login");
+    expect(message).toContain(".env.local or .dev.vars");
+    // The CLI loads the env files itself; sourcing them is not needed.
+    expect(message).not.toContain("source");
+    expect(message).not.toContain("undefined");
+  });
+
   it("fetches and returns the workspace schema", async () => {
     stubCredentials();
     const schema = {
@@ -290,5 +307,90 @@ describe("fetchSchema", () => {
       )
     );
     await expect(fetchSchema()).rejects.toThrow(/Failed to fetch schema/);
+  });
+
+  async function fetchSchemaError(response: Response | Error) {
+    stubCredentials();
+    vi.stubGlobal(
+      "fetch",
+      response instanceof Error
+        ? vi.fn().mockRejectedValue(response)
+        : vi.fn().mockResolvedValue(response)
+    );
+    return fetchSchema().then(
+      () => {
+        throw new Error("Expected fetchSchema to fail");
+      },
+      (error: Error) => error.message
+    );
+  }
+
+  it("shows the API's reason and a fix for each rejected request", async () => {
+    const unauthorized = await fetchSchemaError(
+      new Response("Invalid or expired secret", { status: 401 })
+    );
+    expect(unauthorized).toContain("401 Invalid or expired secret");
+    expect(unauthorized).toContain("NOTCMS_SECRET_KEY was not accepted");
+    expect(unauthorized).toContain("$ npx notcms login");
+
+    const forbidden = await fetchSchemaError(
+      new Response("Permission denied", { status: 403 })
+    );
+    expect(forbidden).toContain("403 Permission denied");
+    expect(forbidden).toContain("belongs to a different workspace");
+
+    const notFound = await fetchSchemaError(
+      new Response("Workspace not found", { status: 404 })
+    );
+    expect(notFound).toContain("Check NOTCMS_WORKSPACE_ID");
+
+    const rateLimited = await fetchSchemaError(
+      new Response(JSON.stringify({ error: "rate_limited" }), { status: 429 })
+    );
+    expect(rateLimited).toContain('429 {"error":"rate_limited"}');
+    expect(rateLimited).toContain("Wait a minute");
+
+    const unavailable = await fetchSchemaError(
+      new Response("Service temporarily unavailable", { status: 503 })
+    );
+    expect(unavailable).toContain("Try again in a few minutes");
+    expect(unavailable).not.toContain("npx notcms login");
+  });
+
+  it("says the API could not be reached when no response arrives", async () => {
+    const cause = Object.assign(
+      new Error("getaddrinfo ENOTFOUND api.notcms.com"),
+      { code: "ENOTFOUND" }
+    );
+    const message = await fetchSchemaError(
+      Object.assign(new TypeError("fetch failed"), { cause })
+    );
+
+    expect(message).toContain(
+      "Failed to fetch schema from NotCMS: could not reach https://api.notcms.com/v1."
+    );
+    expect(message).toContain("getaddrinfo ENOTFOUND api.notcms.com");
+    expect(message).toContain("internet connection");
+    expect(message).not.toContain("NOTCMS_API_HOST");
+  });
+
+  it("points at NOTCMS_API_HOST when a custom host cannot be reached", async () => {
+    vi.stubEnv("NOTCMS_API_HOST", "http://127.0.0.1:9/v1");
+    const message = await fetchSchemaError(new TypeError("fetch failed"));
+
+    expect(message).toContain("could not reach http://127.0.0.1:9/v1.");
+    expect(message).toContain("NOTCMS_API_HOST is set");
+  });
+
+  it("asks for an update when a successful response is not a readable schema", async () => {
+    const message = await fetchSchemaError(
+      new Response(JSON.stringify({ schema: { blog: { id: 1 } } }), {
+        status: 200,
+      })
+    );
+
+    expect(message).toContain("this version of notcms cannot read");
+    expect(message).toContain("Update the notcms package");
+    expect(message).not.toContain("Check NOTCMS_SECRET_KEY");
   });
 });

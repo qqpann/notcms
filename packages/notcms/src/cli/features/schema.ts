@@ -3,6 +3,7 @@ import dedent from "dedent";
 import { PROPERTY_TYPES, type Properties, type Schema } from "../../types.js";
 import { routes } from "../routes.js";
 import type { Credentials } from "../types.js";
+import { getApiHost } from "../variables.js";
 
 const DASHBOARD_URL = "https://dash.notcms.com/";
 
@@ -133,40 +134,62 @@ export async function fetchSchemaResponse(
   const workspaceId =
     credentials?.workspaceId ?? process.env.NOTCMS_WORKSPACE_ID;
   if (!secretKey || !workspaceId) {
+    // Keep each line short: boxen wraps long lines and drops their indentation.
     throw new Error(
       dedent`
       Both ${chalk.yellow("NOTCMS_SECRET_KEY")} and ${chalk.yellow("NOTCMS_WORKSPACE_ID")} must be set.
 
       ${chalk.bold("Got:")}
-        NOTCMS_WORKSPACE_ID: ${workspaceId ? chalk.green(workspaceId) : chalk.red(workspaceId)}
-        NOTCMS_SECRET_KEY:   ${secretKey ? chalk.green("(set)") : chalk.red(secretKey)}
+        NOTCMS_WORKSPACE_ID: ${workspaceId ? chalk.green(workspaceId) : chalk.red("(not set)")}
+        NOTCMS_SECRET_KEY:   ${secretKey ? chalk.green("(set)") : chalk.red("(not set)")}
 
       ${chalk.bold("Suggested action:")}
-        1. Get your key and id from the dashboard.
-          Visit ${chalk.blue(`<${DASHBOARD_URL}>`)}
+        Log in via browser to save both to .env.local:
+          ${chalk.blue("$ npx notcms login")}
 
-        2. Set them in your environment variables, and make sure they are loaded.
-          Example:
-          ${chalk.blue("$ echo 'NOTCMS_SECRET_KEY=your_secret_key' >> .env")}
-          ${chalk.blue("$ echo 'NOTCMS_WORKSPACE_ID=your_workspace_id' >> .env")}
-          ${chalk.blue("$ source .env")}
-
-        3. Run the command again.
-          ${chalk.blue("$ npx notcms pull")}
+        Or copy them from ${chalk.blue(DASHBOARD_URL)} into .env,
+        .env.local or .dev.vars, then run the command again.
+        For another file, pass it with --env <PATH>.
       `
     );
   }
-  const res = await fetch(routes.schema(workspaceId), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${secretKey}`,
-    },
-  });
+
+  let res: Response;
   try {
-    if (!res.ok) {
-      throw new Error(`Unexpected status ${res.status}`);
-    }
+    res = await fetch(routes.schema(workspaceId), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${secretKey}`,
+      },
+    });
+  } catch (error) {
+    // fetch() rejects only when no HTTP response arrives (DNS, connection,
+    // TLS or proxy failures), so the key and workspace ID are not the cause.
+    throw schemaFetchError({
+      problem: `could not reach ${getApiHost()}.`,
+      got: describeNetworkError(error),
+      actions: [
+        "Check your internet connection and proxy settings,",
+        "then run the command again.",
+        ...(process.env.NOTCMS_API_HOST
+          ? ["NOTCMS_API_HOST is set; unset it to use the default API."]
+          : []),
+      ],
+    });
+  }
+
+  if (!res.ok) {
+    throw schemaFetchError({
+      problem: "the API returned an error.",
+      got: [String(res.status), await readErrorDetail(res)]
+        .filter(Boolean)
+        .join(" "),
+      actions: suggestedActionsForStatus(res.status),
+    });
+  }
+
+  try {
     const data: unknown = await res.json();
     if (!isPlainObject(data)) {
       throw new Error("Invalid schema payload.");
@@ -201,19 +224,78 @@ export async function fetchSchemaResponse(
           }
         : {}),
     };
-  } catch (error) {
-    throw new Error(
-      dedent`
-      Failed to fetch schema from NotCMS.
+  } catch {
+    throw schemaFetchError({
+      problem: "this version of notcms cannot read the response.",
+      got: `${res.status}, but not a schema this version understands`,
+      actions: [
+        "Update the notcms package to the latest version,",
+        "then run the command again.",
+      ],
+    });
+  }
+}
 
-      ${chalk.bold("Got:")}
-        ${res.status} ${res.statusText}
+function schemaFetchError(details: {
+  problem: string;
+  got: string;
+  actions: string[];
+}): Error {
+  return new Error(
+    [
+      `Failed to fetch schema from NotCMS: ${details.problem}`,
+      "",
+      chalk.bold("Got:"),
+      `  ${details.got}`,
+      "",
+      chalk.bold("Suggested action:"),
+      ...details.actions.map((line) => `  ${line}`),
+    ].join("\n")
+  );
+}
 
-      ${chalk.bold("Suggested action:")}
-        1. Check your key and id.
-        2. Check your internet connection.
-        3. Try again.
-      `
-    );
+/** The low-level reason, such as `getaddrinfo ENOTFOUND api.notcms.com`. */
+function describeNetworkError(error: unknown): string {
+  if (!(error instanceof Error)) return String(error);
+  const cause: unknown = (error as { cause?: unknown }).cause;
+  if (cause instanceof Error && cause.message) return cause.message;
+  return error.message;
+}
+
+/** The first line of the error body, which the API sends as plain text. */
+async function readErrorDetail(res: Response): Promise<string> {
+  const text = await res.text().catch(() => "");
+  const firstLine = text.trim().split("\n")[0] ?? "";
+  return firstLine.length > 120 ? `${firstLine.slice(0, 117)}...` : firstLine;
+}
+
+function suggestedActionsForStatus(status: number): string[] {
+  const login = `${chalk.blue("$ npx notcms login")}`;
+  switch (status) {
+    case 401:
+      return [
+        "NOTCMS_SECRET_KEY was not accepted. It may have been deleted",
+        "in the dashboard. Log in again to save a new key:",
+        `  ${login}`,
+      ];
+    case 403:
+      return [
+        "NOTCMS_SECRET_KEY belongs to a different workspace than",
+        "NOTCMS_WORKSPACE_ID. Use both values from the same workspace,",
+        "or log in again to save a matching pair:",
+        `  ${login}`,
+      ];
+    case 404:
+      return [
+        "Check NOTCMS_WORKSPACE_ID. If the workspace was deleted,",
+        "log in again and choose another workspace:",
+        `  ${login}`,
+      ];
+    case 429:
+      return ["Too many requests. Wait a minute, then try again."];
+    default:
+      return status >= 500
+        ? ["NotCMS could not respond. Try again in a few minutes."]
+        : ["Check NOTCMS_SECRET_KEY and NOTCMS_WORKSPACE_ID, then try again."];
   }
 }
