@@ -23,7 +23,6 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf ./dist/",
-    "lint": "eslint ./src/ --fix",
     "format": "biome format --write .",
     "lint-biome": "biome lint --write .",
     "check": "biome check .",
