@@ -40,9 +40,14 @@ async function main() {
   // Load env before any command action
   program.hook("preAction", (thisCommand) => {
     const options = thisCommand.opts<{ env: string[] }>();
+    // Most projects have only some of the default files, so a missing default
+    // file is expected and must not look like an error. A file named with
+    // --env is expected to exist, so keep reporting it when it is missing.
+    const isDefaultEnv = thisCommand.getOptionValueSource("env") === "default";
     config({
       path: options.env,
       logLevel: "error",
+      ...(isDefaultEnv ? { ignore: ["MISSING_ENV_FILE"] } : {}),
     });
   });
 
