@@ -65,7 +65,7 @@ const renderer: RendererObject = {
   heading({ tokens, depth }) {
     const text = this.parser.parseInline(tokens);
     const anchor = text.toLowerCase().replace(/[^\w]+/g, "-");
-    return `<h${depth} class="[font-family:'Selecta_VF_Trial-Medium',Helvetica] font-medium text-[#f8f7f7] leading-8 mb-[1.5rem]">
+    return `<h${depth} class="font-medium text-[#f8f7f7] leading-8 mb-[1.5rem]">
               <a name="${anchor}" class="anchor" href="#${anchor}">
                 <span class="header-link"></span>
               </a>
@@ -77,7 +77,7 @@ const renderer: RendererObject = {
     // marked has already escaped `text` (alt) and `title`.
     if (url === null) return text;
     const titleAttribute = title ? ` title="${title}"` : "";
-    return `<img src="${url}" alt="${text}"${titleAttribute} class="relative max-w-[601px] h-auto bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]">`;
+    return `<img src="${url}" alt="${text}"${titleAttribute} class="relative max-w-[min(601px,100%)] h-auto bg-black rounded-[10px] border-[0.5px] border-solid border-[#ffffff1f] shadow-[0px_2px_2px_-1px_#000000,0px_4px_4px_-2px_#000000]">`;
   },
   code({ text, escaped }) {
     const code = escaped ? text : escapeHtml(text);

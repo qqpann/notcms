@@ -1,3 +1,4 @@
+import typography from "@tailwindcss/typography";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -17,6 +18,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  // Styles the post body rendered by components/blog/main-content.tsx.
+  plugins: [typography],
 };
 export default config;
