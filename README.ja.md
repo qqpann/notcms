@@ -37,7 +37,7 @@ NotCMS は、Notion を使った CMS の構築を簡単にします。Notion デ
 - 🛡️ **型安全**: TypeScript による、クエリとレスポンスの型付け
 - 🎯 **シンプルな API**: コンテンツを取得するための分かりやすい API
 - 📝 **Notion をバックエンドに**: Notion の使いやすいエディターでコンテンツを作成
-- 🔄 **フレームワークに依存しない**: Next.js、React、Vue など、さまざまな JavaScript フレームワークで利用可能
+- 🔄 **フレームワークに依存しない**: サーバー側またはビルド時にコンテンツを取得する JavaScript フレームワーク（Next.js、Astro、Nuxt など）で利用可能
 - 🛠️ **CLI ツール**: プロジェクトのセットアップ、ブラウザーログイン、スキーマ管理に使う NotCMS CLI を同梱
 
 ## はじめに
@@ -95,7 +95,7 @@ export const schema = {
       // プロパティを更新したら notcms pull を再実行してください
     },
   },
-} satisfies Schema;
+} as const satisfies Schema;
 
 export const nc = new Client({ schema });
 ```

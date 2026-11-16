@@ -37,7 +37,7 @@ NotCMS makes it easy to create a CMS, from Notion. It provides a type-safe TypeS
 - 🛡️ **Type Safety**: Fully typed queries and responses using TypeScript
 - 🎯 **Simple API**: Clean and intuitive API for fetching content
 - 📝 **Notion as Backend**: Use Notion's user-friendly editor for content creation
-- 🔄 **Framework Agnostic**: Works with any JavaScript framework (Next.js, React, Vue, etc.)
+- 🔄 **Framework Agnostic**: Works with any JavaScript framework that fetches content on the server or at build time (Next.js, Astro, Nuxt, etc.)
 - 🛠️ **CLI Tools**: Includes the NotCMS CLI for project setup, browser login, and schema management
 
 ## Getting Started
@@ -100,7 +100,7 @@ export const schema = {
       // Run notcms pull again when properties are updated
     },
   },
-} satisfies Schema;
+} as const satisfies Schema;
 
 export const nc = new Client({ schema });
 ```
