@@ -34,13 +34,25 @@ describe("cli config", () => {
     );
   });
 
-  it("falls back to the default config for broken or invalid content", async () => {
+  it("rejects a broken file instead of silently using the default path", async () => {
     const broken = path.join(dir, "broken.json");
-    await writeFile(broken, "not json");
-    expect(await loadConfig(broken)).toEqual(DEFAULT_CONFIG);
+    // A trailing comma is a common hand-editing mistake.
+    await writeFile(broken, '{"schema": "app/notcms/schema.ts",}');
+    await expect(loadConfig(broken)).rejects.toThrow(
+      `${broken} is not valid JSON`
+    );
+  });
 
+  it.each([
+    ["a non-string schema", { schema: 123 }],
+    ["a missing schema", { output: "app/notcms/schema.ts" }],
+    ["null", null],
+    ["an array", ["app/notcms/schema.ts"]],
+  ])("rejects a config with %s", async (_label, content) => {
     const wrongShape = path.join(dir, "wrong.json");
-    await writeFile(wrongShape, JSON.stringify({ schema: 123 }));
-    expect(await loadConfig(wrongShape)).toEqual(DEFAULT_CONFIG);
+    await writeFile(wrongShape, JSON.stringify(content));
+    await expect(loadConfig(wrongShape)).rejects.toThrow(
+      `${wrongShape} must set "schema"`
+    );
   });
 });

@@ -18,9 +18,14 @@ database or its properties change.
 ## What it does
 
 1. Loads `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID`
-2. Fetches the current workspace schema from NotCMS
-3. Generates the configured schema module and its `nc` client
-4. Prints a query for the first database
+2. Reads the schema path from `notcms.config.json`
+3. Fetches the current workspace schema from NotCMS
+4. Generates the configured schema module and its `nc` client
+5. Prints a query for the first database
+
+Without `notcms.config.json`, the schema is written to `src/notcms/schema.ts`.
+If the file exists but is not valid JSON or has no `schema` string, the command
+stops with an error instead of writing to the default path.
 
 ## Options
 
