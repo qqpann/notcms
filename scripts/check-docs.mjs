@@ -149,9 +149,9 @@ export async function auditDocs(directory) {
         checkLink(value, location);
       }
     } else if (Array.isArray(value)) {
-      value.forEach((item, index) =>
-        checkConfigLinks(item, `${location}[${index}]`)
-      );
+      for (const [index, item] of value.entries()) {
+        checkConfigLinks(item, `${location}[${index}]`);
+      }
     } else if (value && typeof value === "object") {
       for (const [key, item] of Object.entries(value)) {
         checkConfigLinks(item, `${location}.${key}`);

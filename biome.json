@@ -21,7 +21,18 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "none"
+      "preset": "none",
+      "correctness": {
+        "preset": "recommended",
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
+      },
+      "suspicious": {
+        "preset": "recommended",
+        "noControlCharactersInRegex": "off",
+        "noPrototypeBuiltins": "off",
+        "noUnknownAtRules": "off"
+      }
     }
   },
   "javascript": {
@@ -41,6 +52,17 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": "off",
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["**/*.stories.@(ts|tsx)", "**/*.story.@(ts|tsx)"],
       "linter": {
