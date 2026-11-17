@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import React from "react";
 import { BlogPageDetail } from "~/components/blog/detail";
 import { nc } from "~/src/notcms/schema";
 
