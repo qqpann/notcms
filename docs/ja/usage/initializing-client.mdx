@@ -68,6 +68,42 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
     NotCMSクライアントはサーバーのエンドポイントまたはサーバーサイドレンダリングで使用します。
     `VITE_` で始まる変数はブラウザへ公開されるため、`NOTCMS_SECRET_KEY` を `VITE_` 変数へ入れないでください。
     サーバーランタイムでsecretを読み込み、そこで `Client` に渡します。
+
+    生成された `notcms/schema` モジュールも、読み込まれた時点で `process.env` からクライアントを作ります。
+    しかし Vite は `.env` ファイルの値を `process.env` へ入れません。
+    [Astroのサンプル](https://github.com/qqpann/notcms/tree/main/examples/astro)と同じように、Vite の設定ファイル（Astro では `astro.config.mjs`）で `NOTCMS_` の値を `process.env` へ入れてください。
+
+    ```typescript
+    // vite.config.ts
+    import { defineConfig, loadEnv } from 'vite';
+
+    export default defineConfig(({ mode }) => {
+      // デプロイ先の環境で設定した値を優先します。
+      const local = loadEnv(mode, process.cwd(), 'NOTCMS_');
+      for (const [key, value] of Object.entries(local)) {
+        process.env[key] ??= value;
+      }
+      return {
+        // 既存の設定
+      };
+    });
+    ```
+  </Tab>
+
+  <Tab title="Cloudflare Workers">
+    Workers は、互換性フラグ `nodejs_compat` が有効で互換性日付が 2025-04-01 以降のとき、Worker の変数とシークレットを `process.env` に入れます。
+    互換性日付が 2026-08-04 以降なら、このフラグは最初から有効です。
+
+    ```jsonc
+    // wrangler.jsonc
+    {
+      "compatibility_date": "2026-11-01",
+      "compatibility_flags": ["nodejs_compat"]
+    }
+    ```
+
+    この設定がないと `process.env` は空になり、値を自分で `Client` に渡していても、生成された `notcms/schema` モジュールを読み込んだ時点で `secretKey is required` で失敗します。
+    キーは `npx wrangler secret put NOTCMS_SECRET_KEY` で保存し、`NOTCMS_WORKSPACE_ID` は `vars` かシークレットに設定します。
   </Tab>
 </Tabs>
 
@@ -121,6 +157,8 @@ export const nc = new Client({
 });
 ```
 
+生成されたスキーマのモジュールは読み込まれた時点で `process.env` を読むため、上の Vite のタブのとおり値を `process.env` へ入れてください。
+
 ## トラブルシューティング
 
 ### よくある問題
@@ -129,6 +167,7 @@ export const nc = new Client({
   <Accordion title="環境変数が読み込まれない">
     - プロジェクトルートに `.env.local` ファイルが存在することを確認
     - 実行環境が `.env.local` を読み込んでいることを確認（`node --env-file=.env.local`、または `dotenv` のあとで生成クライアントを動的な `import()` で読み込むなど）
+    - 生成された `notcms/schema` モジュールは、読み込まれた時点で環境変数を読みます。自分の `Client` に `secretKey` と `workspaceId` を渡しても、この読み込みは省けないため、先に環境変数へ設定してください（上の Vite と Cloudflare Workers のタブを参照）
     - 変数名が正確に一致していることを確認
   </Accordion>
   
