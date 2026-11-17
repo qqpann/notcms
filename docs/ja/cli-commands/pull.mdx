@@ -18,9 +18,14 @@ npx notcms pull
 ## 実行内容
 
 1. `NOTCMS_SECRET_KEY`と`NOTCMS_WORKSPACE_ID`を読み込み
-2. NotCMSから現在のワークスペーススキーマを取得
-3. 設定されたスキーマmoduleと`nc`クライアントを生成
-4. 最初のデータベース用クエリを表示
+2. `notcms.config.json`からスキーマの出力先を読み込み
+3. NotCMSから現在のワークスペーススキーマを取得
+4. 設定されたスキーマmoduleと`nc`クライアントを生成
+5. 最初のデータベース用クエリを表示
+
+`notcms.config.json`がなければ、スキーマは`src/notcms/schema.ts`に書き出されます。
+ファイルがあってもJSONとして読めない、または`schema`の文字列がない場合は、
+既定の出力先に書き出さずにエラーで止まります。
 
 ## オプション
 

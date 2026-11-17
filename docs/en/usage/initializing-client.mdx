@@ -47,6 +47,16 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
   </Tab>
   
   <Tab title="Node.js">
+    Node.js can load the file itself:
+
+    ```bash
+    node --env-file=.env.local app.ts
+    ```
+
+    With `dotenv`, load the generated client after `dotenv.config()` with a
+    dynamic `import()`. A static `import` runs first, before the variables are
+    set.
+
     ```typescript
     import dotenv from 'dotenv';
     dotenv.config({ path: ".env.local" });
@@ -60,6 +70,50 @@ NOTCMS_WORKSPACE_ID=your-workspace-id
     Do not put `NOTCMS_SECRET_KEY` in a `VITE_` variable: Vite exposes `VITE_`
     values to browser code. Load the secret in your server runtime and pass it
     to `Client` there.
+
+    The generated `notcms/schema` module also creates a client from
+    `process.env` when it is imported, but Vite does not copy `.env` files into
+    `process.env`. Copy the `NOTCMS_` values there in your Vite config (for
+    Astro, `astro.config.mjs`), as the
+    [Astro example](https://github.com/qqpann/notcms/tree/main/examples/astro)
+    does:
+
+    ```typescript
+    // vite.config.ts
+    import { defineConfig, loadEnv } from 'vite';
+
+    export default defineConfig(({ mode }) => {
+      // Values from the deployment environment take precedence.
+      const local = loadEnv(mode, process.cwd(), 'NOTCMS_');
+      for (const [key, value] of Object.entries(local)) {
+        process.env[key] ??= value;
+      }
+      return {
+        // your existing config
+      };
+    });
+    ```
+  </Tab>
+
+  <Tab title="Cloudflare Workers">
+    Workers put a Worker's variables and secrets in `process.env` when the
+    `nodejs_compat` compatibility flag is on and the compatibility date is
+    2025-04-01 or later. Compatibility dates from 2026-08-04 turn the flag on
+    by default.
+
+    ```jsonc
+    // wrangler.jsonc
+    {
+      "compatibility_date": "2026-11-01",
+      "compatibility_flags": ["nodejs_compat"]
+    }
+    ```
+
+    Without it, `process.env` is empty, and importing the generated
+    `notcms/schema` module fails with `secretKey is required`, even when you
+    pass the values to `Client` yourself. Store the key with
+    `npx wrangler secret put NOTCMS_SECRET_KEY`, and set `NOTCMS_WORKSPACE_ID`
+    in `vars` or as a secret.
   </Tab>
 </Tabs>
 
@@ -113,6 +167,9 @@ export const nc = new Client({
 });
 ```
 
+The generated schema module still reads `process.env` when it is imported, so
+copy the values there as shown in the Vite tab above.
+
 ## Troubleshooting
 
 ### Common Issues
@@ -120,7 +177,8 @@ export const nc = new Client({
 <AccordionGroup>
   <Accordion title="Environment variables not loading">
     - Check `.env.local` file exists in project root
-    - Ensure you're using a loader like `dotenv` (load `.env.local` explicitly)
+    - Ensure your runtime loads `.env.local` (for example `node --env-file=.env.local`, or `dotenv` before a dynamic `import()` of the generated client)
+    - The generated `notcms/schema` module reads the variables when it is imported. Passing `secretKey` and `workspaceId` to your own `Client` does not skip that read, so set them in the environment first (see the Vite and Cloudflare Workers tabs above)
     - Verify variable names match exactly
   </Accordion>
   

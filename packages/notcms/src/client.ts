@@ -3,6 +3,19 @@ import { routes } from "./routes";
 import type { InferDatabaseProperties, Page, Pages, Schema } from "./types";
 import { getEnv } from "./utils/env";
 
+/**
+ * The tuple every query resolves to: the data on success, or the error.
+ *
+ * Query methods declare it as their return type so that the published
+ * declaration file refers to the named property types. When the return type is
+ * inferred, the declaration emitter expands those types and leaves an
+ * unresolved type parameter, which turns select, status and multi_select values
+ * into `any` for package users.
+ */
+type QueryResult<T> =
+  | readonly [T, null, Response]
+  | readonly [undefined, Error, Response | undefined];
+
 class DatabaseHandler<TDatabase extends Schema[string]> {
   constructor(
     private secretKey: string,
@@ -19,7 +32,10 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
   declare readonly $inferPages: Pages<InferDatabaseProperties<TDatabase>>;
 
   // common function to fetch data
-  private async fetch<T>(createUrl: () => string | URL, method: string) {
+  private async fetch<T>(
+    createUrl: () => string | URL,
+    method: string
+  ): Promise<QueryResult<T>> {
     let response: Response | undefined;
     try {
       response = await fetch(createUrl(), {
@@ -72,7 +88,13 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    */
   list<const TInclude extends readonly ListInclude[] = []>(
     options?: ListPagesOptions<TDatabase, TInclude>
-  ) {
+  ): Promise<
+    QueryResult<
+      "content" extends TInclude[number]
+        ? Page<InferDatabaseProperties<TDatabase>>[]
+        : Pages<InferDatabaseProperties<TDatabase>>
+    >
+  > {
     return this.fetch<
       "content" extends TInclude[number]
         ? Page<InferDatabaseProperties<TDatabase>>[]
@@ -92,18 +114,18 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    * (`limit=1&include=content`), so content comes from the synchronized data
    * that list() reads. Errors retain the usual error tuple and response.
    */
-  async getFirst(options?: ListOptions<TDatabase>) {
-    const result = await this.fetch<Page<InferDatabaseProperties<TDatabase>>[]>(
-      () => {
-        const url = this.pagesUrl(options);
-        url.searchParams.set("include", "content");
-        url.searchParams.set("limit", "1");
-        return url.toString();
-      },
-      "GET"
-    );
-    const [pages, error, response] = result;
-    if (error !== null) return result;
+  async getFirst(
+    options?: ListOptions<TDatabase>
+  ): Promise<QueryResult<Page<InferDatabaseProperties<TDatabase>> | null>> {
+    const [pages, error, response] = await this.fetch<
+      Page<InferDatabaseProperties<TDatabase>>[]
+    >(() => {
+      const url = this.pagesUrl(options);
+      url.searchParams.set("include", "content");
+      url.searchParams.set("limit", "1");
+      return url.toString();
+    }, "GET");
+    if (error !== null) return [undefined, error, response] as const;
     return [pages.length > 0 ? pages[0] : null, null, response] as const;
   }
 
@@ -134,7 +156,9 @@ class DatabaseHandler<TDatabase extends Schema[string]> {
    *      - `Error`: The error encountered.
    *      - `Response | undefined`: The optional HTTP response object.
    */
-  get(pageId: string) {
+  get(
+    pageId: string
+  ): Promise<QueryResult<Page<InferDatabaseProperties<TDatabase>>>> {
     return this.fetch<Page<InferDatabaseProperties<TDatabase>>>(
       () => routes.page(this.workspaceId, this.databaseId, pageId),
       "GET"
@@ -157,14 +181,17 @@ export class Client<TSchema extends Schema> {
   }) {
     const secretKey = options?.secretKey || getEnv("NOTCMS_SECRET_KEY");
     const workspaceId = options?.workspaceId || getEnv("NOTCMS_WORKSPACE_ID");
+    // The generated schema module creates the client when it is imported, so
+    // these errors often surface in a deployment that lacks the variables.
+    // Name the variable to set there.
     if (!secretKey) {
       throw new Error(
-        "secretKey is required. Pass it as an option or set it as an environment variable."
+        "secretKey is required. Set the NOTCMS_SECRET_KEY environment variable, or pass secretKey to new Client()."
       );
     }
     if (!workspaceId) {
       throw new Error(
-        "workspaceId is required. Pass it as an option or set it as an environment variable."
+        "workspaceId is required. Set the NOTCMS_WORKSPACE_ID environment variable, or pass workspaceId to new Client()."
       );
     }
     this.secretKey = secretKey;

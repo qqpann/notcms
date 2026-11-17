@@ -1,15 +1,20 @@
 {
   "name": "notcms",
   "version": "1.1.0",
-  "description": "NotCMS makes it easy to build a CMS for your website.",
+  "description": "NotCMS makes it easy to create a CMS, from Notion.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "types": "./dist/index.d.ts",
@@ -33,7 +38,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qqpann/notcms.git"
+    "url": "git+https://github.com/qqpann/notcms.git",
+    "directory": "packages/notcms"
   },
   "license": "MIT",
   "author": {
@@ -47,6 +53,7 @@
   "keywords": [
     "notcms",
     "cms",
+    "headless cms",
     "content management system",
     "notion",
     "markdown",

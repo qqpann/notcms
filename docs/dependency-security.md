@@ -5,7 +5,8 @@ The October 2026 refresh removes vulnerable dependency paths from the Sync Actio
 - Upgrade Changesets CLI to 3.0.3: its new dependency graph removes the old js-yaml/argparse/sprintf-js path. Contributor tooling uses Node 26.12.1 and pnpm 12.14.0; the published SDK requires Node >=22 from 1.0.0 (0.x supported Node >=18.17).
 - Remove ts-node, which is unused in build/test workflows, eliminating its vulnerable diff dependency. Legacy VS Code launch entries still reference ts-node/Jest; those obsolete debugger settings require a separate update.
 - Refresh compatible transitive versions, including brace-expansion, cross-spawn, glob, minimatch, picomatch and rollup. The SDK patch changeset covers rebuilt CLI dependencies.
-- Override postcss-selector-parser to 7.1.6 for Tailwind 3/PostCSS, and tmp to 0.2.7 for legacy external-editor consumers. These cross-version overrides require demo build/visual checks and an actual external-editor temporary-file compatibility check. No install-hook permissions are expanded.
+- Override postcss-selector-parser to 7.1.6 for Tailwind 3/PostCSS. This cross-version override requires demo build/visual checks. No install-hook permissions are expanded.
+- The refresh also overrode tmp to 0.2.7 for legacy external-editor consumers. That override and its temporary-file compatibility test were removed in November 2026: the only consumer was the Next.js template's pinned `notcms@0.0.12-development`, and the template now uses notcms 1.x, which bundles its CLI dependencies. The SDK's own prompts use `@inquirer/external-editor`, which does not depend on tmp.
 
 ### Remaining upstream advisory
 

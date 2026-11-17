@@ -5,7 +5,11 @@ import path from "node:path";
 import test from "node:test";
 import {
   auditDocs,
+  auditPublishedReadmes,
+  checkConfigKeys,
   extractSnippets,
+  findRelativeLinks,
+  publishedReadmes,
   typecheckSnippets,
 } from "./check-docs.mjs";
 
@@ -23,9 +27,16 @@ test("reports broken links, missing English sources, and missing navigation with
           dark: "/missing-logo.svg",
           light: "/logo.svg",
         },
-        topbarLinks: [{ url: "https://www.notcms.com" }],
-        anchors: [{ url: "https://docs.notcms.com/en/missing-anchor" }],
+        navbar: { links: [{ label: "Home", href: "https://www.notcms.com" }] },
         navigation: {
+          global: {
+            anchors: [
+              {
+                anchor: "Missing",
+                href: "https://docs.notcms.com/en/missing-anchor",
+              },
+            ],
+          },
           languages: [
             {
               language: "en",
@@ -75,13 +86,15 @@ test("reports broken links, missing English sources, and missing navigation with
     );
     assert.ok(
       errors.some((e) =>
-        e.includes("docs.json.anchors[0].url: missing link target")
+        e.includes(
+          "docs.json.navigation.global.anchors[0].href: missing link target"
+        )
       )
     );
     assert.ok(
       errors.some((e) => e.includes("en/page.mdx: use https://www.notcms.com"))
     );
-    assert.ok(!errors.some((e) => /topbarLinks|logo.light/.test(e)));
+    assert.ok(!errors.some((e) => /navbar|logo.light/.test(e)));
     assert.ok(
       errors.some((e) =>
         e.includes("docs.json: missing link target /en/missing")
@@ -105,6 +118,53 @@ test("reports broken links, missing English sources, and missing navigation with
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test("rejects mint.json keys that Mintlify ignores in docs.json", () => {
+  const errors = checkConfigKeys({
+    topbarLinks: [],
+    topbarCtaButton: {},
+    modeToggle: { default: "dark" },
+    footerSocials: {},
+    anchors: [],
+    analytics: {},
+    feedback: {},
+    i18n: [],
+    metadata: { timestamp: true, "og:site_name": "NotCMS" },
+  });
+  for (const [key, replacement] of [
+    ["topbarLinks", "navbar.links"],
+    ["topbarCtaButton", "navbar.primary"],
+    ["modeToggle", "appearance"],
+    ["footerSocials", "footer.socials"],
+    ["anchors", "navigation.global.anchors"],
+    ["analytics", "integrations"],
+    ["feedback", "the Mintlify dashboard"],
+    ["i18n", "navigation.languages"],
+  ]) {
+    assert.ok(
+      errors.some(
+        (e) => e.includes(`docs.json: ${key} is`) && e.endsWith(replacement)
+      ),
+      key
+    );
+  }
+  assert.ok(
+    errors.includes(
+      "docs.json: move og:site_name from metadata to seo.metatags"
+    )
+  );
+  assert.equal(errors.length, 9);
+  assert.deepEqual(
+    checkConfigKeys({
+      appearance: { default: "dark" },
+      navbar: { links: [] },
+      footer: { socials: {} },
+      metadata: { timestamp: true },
+      seo: { metatags: { "og:site_name": "NotCMS" } },
+    }),
+    []
+  );
 });
 
 test("compiles the published code and rejects missing schema and incorrect content access", async () => {
@@ -134,4 +194,31 @@ test("compiles the published code and rejects missing schema and incorrect conte
   assert.ok(
     errors.some((e) => e.includes("en/setup.mdx:10") && e.includes("schema"))
   );
+});
+
+test("finds relative links that break when a registry shows the published README", () => {
+  const source = [
+    "[Docs](https://docs.notcms.com/en/introduction) [Section](#install)",
+    "[Migration](../../docs/en/cli-commands/migration.mdx) [Local](./CHANGELOG.md)",
+    '<img src="https://docs.notcms.com/assets/notcms-icon.png"> <img src="./logo.png">',
+    "[mail](mailto:support@example.com)",
+    "[npm-url]: https://www.npmjs.com/package/notcms",
+    "[local-ref]: docs/guide.md",
+    "[^note]: A footnote, not a link.",
+    "```md",
+    "[Inside code](../ignored.md)",
+    "```",
+  ].join("\n");
+
+  assert.deepEqual(findRelativeLinks(source), [
+    "../../docs/en/cli-commands/migration.mdx",
+    "./CHANGELOG.md",
+    "./logo.png",
+    "docs/guide.md",
+  ]);
+});
+
+test("the published SDK README uses only absolute links", async () => {
+  assert.deepEqual(publishedReadmes, ["packages/notcms/README.md"]);
+  assert.deepEqual(await auditPublishedReadmes(), []);
 });

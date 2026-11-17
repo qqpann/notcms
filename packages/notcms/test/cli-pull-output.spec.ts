@@ -8,16 +8,16 @@ import { fileURLToPath } from "node:url";
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const cliPath = path.join(packageRoot, "dist/cli.cjs");
 
-describe("CLI pull output paths", () => {
-  beforeAll(async () => {
-    const result = await runProcess(
-      process.execPath,
-      [path.join(packageRoot, "node_modules/tsup/dist/cli-default.js")],
-      { cwd: packageRoot }
-    );
-    expect(result.code, `${result.stdout}\n${result.stderr}`).toBe(0);
-  });
+beforeAll(async () => {
+  const result = await runProcess(
+    process.execPath,
+    [path.join(packageRoot, "node_modules/tsup/dist/cli-default.js")],
+    { cwd: packageRoot }
+  );
+  expect(result.code, `${result.stdout}\n${result.stderr}`).toBe(0);
+});
 
+describe("CLI pull output paths", () => {
   it.each([
     ["schema.ts", "process"],
     ["src/notcms/schema.ts", "process"],
@@ -62,6 +62,11 @@ describe("CLI pull output paths", () => {
         );
 
         expect(result.code, `${result.stdout}\n${result.stderr}`).toBe(0);
+        // Projects rarely have every default env file, so the missing ones
+        // must not be reported as errors.
+        expect(`${result.stdout}${result.stderr}`).not.toContain(
+          "MISSING_ENV_FILE"
+        );
         await expect(
           readFile(path.join(project, schemaPath), "utf-8")
         ).resolves.toContain("export const schema = {");
@@ -109,6 +114,28 @@ describe("CLI pull output paths", () => {
       }
     }
   );
+});
+
+describe("CLI env files", () => {
+  it("still reports a missing env file that was passed with --env", async () => {
+    const project = await mkdtemp(path.join(tmpdir(), "notcms-cli-env-"));
+    try {
+      const env = { ...process.env };
+      delete env.NOTCMS_SECRET_KEY;
+      delete env.NOTCMS_WORKSPACE_ID;
+      const result = await runProcess(
+        process.execPath,
+        [cliPath, "--env", ".env.missing", "pull"],
+        { cwd: project, env }
+      );
+
+      expect(result.code).toBe(1);
+      expect(`${result.stdout}${result.stderr}`).toContain("MISSING_ENV_FILE");
+      expect(`${result.stdout}${result.stderr}`).toContain(".env.missing");
+    } finally {
+      await rm(project, { recursive: true, force: true });
+    }
+  });
 });
 
 async function startSchemaServer(): Promise<{ server: Server; url: string }> {

@@ -78,10 +78,10 @@ Keep `notcms.config.json` and your server-side credentials. Replace old
 `notcms-kit init` / `notcms-kit pull` scripts with `notcms init` / `notcms pull`.
 Regenerate the schema and typecheck your application before deploying an upgrade;
 this is especially necessary for prerelease SDKs such as `0.0.12-development`.
-See the [migration checklist](../../docs/en/cli-commands/migration.mdx) for package-manager equivalents,
+See the [migration checklist](https://docs.notcms.com/en/cli-commands/migration) for package-manager equivalents,
 CI usage, and compatibility checks.
 
-See the [tested blog and release-note recipes](../../examples/content-recipes/README.md) for publication, language, URLs, and failure handling.
+See the [tested blog and release-note recipes](https://github.com/qqpann/notcms/tree/main/examples/content-recipes) for publication, language, URLs, and failure handling.
 
 ### SDK Usage
 

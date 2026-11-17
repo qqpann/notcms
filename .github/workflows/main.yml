@@ -4,6 +4,11 @@ on:
     branches: ["*"]
   pull_request:
 
+# The job only checks out and tests the repository, so the token stays read-only
+# even when the repository default grants write access.
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,6 +35,8 @@ jobs:
         working-directory: packages/notcms
       - name: Test bundled CLI environment loading
         run: node --test scripts/cli-bundle.test.mjs
+      - name: Type-check the built package from ES module and CommonJS projects
+        run: node --test scripts/sdk-types.test.mjs
       - run: pnpm run test
         working-directory: packages/notcms
       - run: pnpm run build:ci

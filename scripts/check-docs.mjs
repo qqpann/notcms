@@ -46,6 +46,70 @@ export function extractSnippets(source, file) {
   }));
 }
 
+// Mintlify ignores mint.json keys in docs.json without reporting an error, so
+// the setting silently disappears from the published site.
+const legacyConfigKeys = {
+  topbarLinks: "navbar.links",
+  topbarCtaButton: "navbar.primary",
+  modeToggle: "appearance",
+  footerSocials: "footer.socials",
+  anchors: "navigation.global.anchors",
+  tabs: "navigation.tabs",
+  analytics: "integrations",
+  feedback: "the Mintlify dashboard",
+  i18n: "navigation.languages",
+};
+
+export function checkConfigKeys(config) {
+  const errors = [];
+  for (const [key, replacement] of Object.entries(legacyConfigKeys)) {
+    if (Object.hasOwn(config, key)) {
+      errors.push(
+        `docs.json: ${key} is a mint.json key that Mintlify ignores; use ${replacement}`
+      );
+    }
+  }
+  // docs.json metadata only configures page timestamps; meta tags belong in seo.
+  const metatags = Object.keys(config.metadata ?? {}).filter(
+    (key) => key !== "timestamp"
+  );
+  if (metatags.length) {
+    errors.push(
+      `docs.json: move ${metatags.join(", ")} from metadata to seo.metatags`
+    );
+  }
+  return errors;
+}
+
+// Registries and other package viewers show the README from the published
+// package, away from the repository. Relative links there resolve to a guessed
+// location or not at all, so a published README needs absolute URLs.
+export const publishedReadmes = ["packages/notcms/README.md"];
+
+export function findRelativeLinks(source) {
+  const prose = source.replace(/```[^\n]*\n[\s\S]*?```/g, "");
+  return [
+    ...prose.matchAll(/\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g),
+    ...prose.matchAll(/(?:href|src)=["']([^"']+)["']/g),
+    ...prose.matchAll(/^\s*\[(?!\^)[^\]]+\]:\s*(\S+)/gm),
+  ]
+    .map(([, url]) => url)
+    .filter((url) => !/^(?:[a-z][a-z0-9+.-]*:|#)/i.test(url));
+}
+
+export async function auditPublishedReadmes(root = repository) {
+  const errors = [];
+  for (const file of publishedReadmes) {
+    const source = await readFile(path.join(root, file), "utf8");
+    for (const url of findRelativeLinks(source)) {
+      errors.push(
+        `${file}: use an absolute URL for ${url}; registries show this README outside the repository`
+      );
+    }
+  }
+  return errors;
+}
+
 export async function auditDocs(directory) {
   const files = new Set(await filesUnder(directory));
   const pages = [...files].filter((file) => file.endsWith(".mdx"));
@@ -54,6 +118,7 @@ export async function auditDocs(directory) {
   const config = JSON.parse(
     await readFile(path.join(directory, "docs.json"), "utf8")
   );
+  errors.push(...checkConfigKeys(config));
   const languages = config.navigation.languages;
   function checkLink(url, from) {
     const resolved = new URL(
@@ -197,6 +262,7 @@ if (
     const result = await auditDocs(path.join(repository, "docs"));
     const errors = [
       ...result.errors,
+      ...(await auditPublishedReadmes()),
       ...(await typecheckSnippets(result.snippets)),
     ];
     if (errors.length) {

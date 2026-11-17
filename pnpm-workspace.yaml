@@ -19,5 +19,3 @@ overrides:
   "glob@>=9.0.0 <14.0.2": "14.0.4"
   "minimatch@>=7.0.0 <11.0.1": "11.0.5"
   postcss-selector-parser: 7.1.6
-  # external-editor uses the compatible tmpNameSync API; 0.0.33 cannot receive fixes.
-  tmp: 0.2.7

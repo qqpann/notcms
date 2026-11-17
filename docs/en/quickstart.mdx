@@ -44,9 +44,12 @@ schema goes into `src/notcms/schema.ts`. The command prints a query using your
 actual database name. See [init](/en/cli-commands/init) for custom paths.
 
 Keep `.env.local` out of Git. The CLI reads it, but your application must also
-load it in its server runtime. Next.js loads `.env.local`; a plain Node.js app
-can use `dotenv.config({ path: ".env.local" })` before importing the generated
-client. Never expose `NOTCMS_SECRET_KEY` through browser environment variables.
+load it in its server runtime. Next.js loads `.env.local`. A plain Node.js app
+can start with `node --env-file=.env.local`, or call
+`dotenv.config({ path: ".env.local" })` and then load the generated client with
+a dynamic `import()`: a static `import` runs before `dotenv.config()`, so the
+client is created without the variables. Never expose `NOTCMS_SECRET_KEY`
+through browser environment variables.
 See [client initialization](/en/usage/initializing-client).
 
 ### Without browser login

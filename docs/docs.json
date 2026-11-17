@@ -13,38 +13,41 @@
     "light": "#FF5CAD",
     "dark": "#BE185D"
   },
-  "modeToggle": {
+  "appearance": {
     "default": "dark"
   },
-  "topbarLinks": [
-    {
-      "name": "Homepage",
-      "url": "https://www.notcms.com"
-    },
-    {
-      "name": "GitHub",
-      "url": "https://github.com/qqpann/notcms"
+  "navbar": {
+    "links": [
+      {
+        "label": "Homepage",
+        "href": "https://www.notcms.com"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/qqpann/notcms"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://dash.notcms.com"
     }
-  ],
-  "topbarCtaButton": {
-    "name": "Get Started",
-    "url": "https://dash.notcms.com",
-    "style": "roundedRectangle"
   },
-  "tabs": [],
-  "anchors": [
-    {
-      "name": "Templates",
-      "icon": "rectangle-terminal",
-      "url": "https://www.notcms.com/templates"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://www.notcms.com/blog"
-    }
-  ],
   "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Templates",
+          "icon": "rectangle-terminal",
+          "href": "https://www.notcms.com/templates"
+        },
+        {
+          "anchor": "Blog",
+          "icon": "newspaper",
+          "href": "https://www.notcms.com/blog"
+        }
+      ]
+    },
     "languages": [
       {
         "language": "en",
@@ -120,36 +123,12 @@
       }
     ]
   },
-  "footerSocials": {
-    "x": "https://x.com/notcmsjs",
-    "github": "https://github.com/qqpann/notcms"
-  },
-  "feedback": {
-    "thumbsRating": true,
-    "suggestEdit": true,
-    "raiseIssue": true
+  "footer": {
+    "socials": {
+      "github": "https://github.com/qqpann/notcms"
+    }
   },
   "search": {
     "prompt": "Search documentation..."
-  },
-  "metadata": {
-    "og:site_name": "NotCMS Documentation",
-    "og:description": "Type-safe headless CMS powered by Notion",
-    "twitter:site": "@notcmsjs"
-  },
-  "analytics": {
-    "plausible": {
-      "domain": "docs.notcms.com"
-    }
-  },
-  "i18n": [
-    {
-      "locale": "en",
-      "name": "English"
-    },
-    {
-      "locale": "ja",
-      "name": "日本語"
-    }
-  ]
+  }
 }
