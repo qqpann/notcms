@@ -38,7 +38,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qqpann/notcms.git"
+    "url": "git+https://github.com/qqpann/notcms.git",
+    "directory": "packages/notcms"
   },
   "license": "MIT",
   "author": {

@@ -5,8 +5,11 @@ import path from "node:path";
 import test from "node:test";
 import {
   auditDocs,
+  auditPublishedReadmes,
   checkConfigKeys,
   extractSnippets,
+  findRelativeLinks,
+  publishedReadmes,
   typecheckSnippets,
 } from "./check-docs.mjs";
 
@@ -191,4 +194,31 @@ test("compiles the published code and rejects missing schema and incorrect conte
   assert.ok(
     errors.some((e) => e.includes("en/setup.mdx:10") && e.includes("schema"))
   );
+});
+
+test("finds relative links that break when a registry shows the published README", () => {
+  const source = [
+    "[Docs](https://docs.notcms.com/en/introduction) [Section](#install)",
+    "[Migration](../../docs/en/cli-commands/migration.mdx) [Local](./CHANGELOG.md)",
+    '<img src="https://docs.notcms.com/assets/notcms-icon.png"> <img src="./logo.png">',
+    "[mail](mailto:support@example.com)",
+    "[npm-url]: https://www.npmjs.com/package/notcms",
+    "[local-ref]: docs/guide.md",
+    "[^note]: A footnote, not a link.",
+    "```md",
+    "[Inside code](../ignored.md)",
+    "```",
+  ].join("\n");
+
+  assert.deepEqual(findRelativeLinks(source), [
+    "../../docs/en/cli-commands/migration.mdx",
+    "./CHANGELOG.md",
+    "./logo.png",
+    "docs/guide.md",
+  ]);
+});
+
+test("the published SDK README uses only absolute links", async () => {
+  assert.deepEqual(publishedReadmes, ["packages/notcms/README.md"]);
+  assert.deepEqual(await auditPublishedReadmes(), []);
 });

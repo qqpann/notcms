@@ -81,6 +81,35 @@ export function checkConfigKeys(config) {
   return errors;
 }
 
+// Registries and other package viewers show the README from the published
+// package, away from the repository. Relative links there resolve to a guessed
+// location or not at all, so a published README needs absolute URLs.
+export const publishedReadmes = ["packages/notcms/README.md"];
+
+export function findRelativeLinks(source) {
+  const prose = source.replace(/```[^\n]*\n[\s\S]*?```/g, "");
+  return [
+    ...prose.matchAll(/\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g),
+    ...prose.matchAll(/(?:href|src)=["']([^"']+)["']/g),
+    ...prose.matchAll(/^\s*\[(?!\^)[^\]]+\]:\s*(\S+)/gm),
+  ]
+    .map(([, url]) => url)
+    .filter((url) => !/^(?:[a-z][a-z0-9+.-]*:|#)/i.test(url));
+}
+
+export async function auditPublishedReadmes(root = repository) {
+  const errors = [];
+  for (const file of publishedReadmes) {
+    const source = await readFile(path.join(root, file), "utf8");
+    for (const url of findRelativeLinks(source)) {
+      errors.push(
+        `${file}: use an absolute URL for ${url}; registries show this README outside the repository`
+      );
+    }
+  }
+  return errors;
+}
+
 export async function auditDocs(directory) {
   const files = new Set(await filesUnder(directory));
   const pages = [...files].filter((file) => file.endsWith(".mdx"));
@@ -233,6 +262,7 @@ if (
     const result = await auditDocs(path.join(repository, "docs"));
     const errors = [
       ...result.errors,
+      ...(await auditPublishedReadmes()),
       ...(await typecheckSnippets(result.snippets)),
     ];
     if (errors.length) {
