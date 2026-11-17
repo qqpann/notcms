@@ -40,3 +40,21 @@ if (error && response?.status === 429) {
   // Try again after retryAfterSeconds
 }
 ```
+
+## Temporary Failures
+
+The API responds with `503` and a `Retry-After: 10` header when the failure is likely to clear up on its own:
+
+- The API cannot read its stored data for a moment.
+- `get` cannot reach Notion because Notion is temporarily unavailable, and NotCMS does not have a synchronized copy of the page yet. When a copy exists, `get` returns that copy instead.
+
+Wait for the number of seconds in `Retry-After`, then try again. You can handle `503` the same way as `429`:
+
+```typescript
+const [post, error, response] = await nc.query.blog.get("page-id-123");
+
+if (error && (response?.status === 429 || response?.status === 503)) {
+  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? 60);
+  // Try again after retryAfterSeconds
+}
+```

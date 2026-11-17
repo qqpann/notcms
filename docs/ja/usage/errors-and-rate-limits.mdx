@@ -40,3 +40,21 @@ if (error && response?.status === 429) {
   // retryAfterSeconds 秒後に再試行する
 }
 ```
+
+## 一時的な失敗
+
+しばらく待てば直る見込みが高い失敗には、API は `503` と `Retry-After: 10` ヘッダーを返します。
+
+- API が保存済みのデータを一時的に読めないとき
+- Notion が一時的に使えず `get` が Notion からページを取得できないうえ、そのページの同期済みのコピーがまだ NotCMS にないとき。コピーがあれば、`get` はそのコピーを返します
+
+`Retry-After` の秒数だけ待ってから再試行してください。`503` も `429` と同じように扱えます。
+
+```typescript
+const [post, error, response] = await nc.query.blog.get("page-id-123");
+
+if (error && (response?.status === 429 || response?.status === 503)) {
+  const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? 60);
+  // retryAfterSeconds 秒後に再試行する
+}
+```
