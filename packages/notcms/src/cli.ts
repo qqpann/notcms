@@ -1,10 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { config } from "@dotenvx/dotenvx";
 import boxen from "boxen";
-import chalk from "chalk";
-import { Command } from "commander";
-import { init, login, pull } from "./cli/commands.js";
+import { createProgram } from "./cli/program.js";
 
 function getCliVersion(): string {
   try {
@@ -22,55 +19,7 @@ function getCliVersion(): string {
 }
 
 async function main() {
-  const program = new Command("notcms");
-  program.version(getCliVersion(), "-v, --version");
-  program.showHelpAfterError();
-  program.configureOutput({
-    outputError: (str, write) => write(chalk.red(str)),
-  });
-
-  const DEFAULT_ENV_PATH = [".env", ".env.local", ".dev.vars"];
-  program.option(
-    "-e, --env <PATH>",
-    "Specify env file",
-    (option) => option.split(","),
-    DEFAULT_ENV_PATH
-  );
-
-  // Load env before any command action
-  program.hook("preAction", (thisCommand) => {
-    const options = thisCommand.opts<{ env: string[] }>();
-    // Most projects have only some of the default files, so a missing default
-    // file is expected and must not look like an error. A file named with
-    // --env is expected to exist, so keep reporting it when it is missing.
-    const isDefaultEnv = thisCommand.getOptionValueSource("env") === "default";
-    config({
-      path: options.env,
-      logLevel: "error",
-      ...(isDefaultEnv ? { ignore: ["MISSING_ENV_FILE"] } : {}),
-    });
-  });
-
-  program.command("init").description("Initialize NotCMS").action(init);
-  program
-    .command("login")
-    .description("Log in to NotCMS via browser and save credentials")
-    .option(
-      "-w, --write <PATH>",
-      "Env file to save credentials to",
-      ".env.local"
-    )
-    .action(login);
-  program
-    .command("pull")
-    .description("Pull schema from NotCMS")
-    .option(
-      "--check",
-      "Check if the local schema is up to date without writing (for CI/CD)"
-    )
-    .action(pull);
-
-  await program.parseAsync(process.argv);
+  await createProgram(getCliVersion()).parseAsync(process.argv);
 }
 
 main().catch(async (err: Error) => {
