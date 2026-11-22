@@ -27,6 +27,10 @@ Otherwise write "N/A (reason)". Reuse the same images in the Japanese section.
 | --- | --- |
 | <!-- Before screenshot or N/A (reason) --> | <!-- After screenshot or N/A (reason) --> |
 
+### Deferred review comments
+
+<!-- Links to issues filed for deferred review comments, or "None". -->
+
 ### Pull-Request Checklist
 
 <!-- Keep every item. For unavailable commands or inapplicable items, leave unchecked and add N/A (reason). -->
@@ -62,6 +66,10 @@ Otherwise write "N/A (reason)". Reuse the same images in the Japanese section.
 | 変更前 | 変更後 |
 | --- | --- |
 | <!-- 変更前の画像または「なし（理由）」 --> | <!-- 変更後の画像または「なし（理由）」 --> |
+
+### 後回しにした指摘
+
+<!-- 後回しにしたレビュー指摘の Issue へのリンク。なければ「なし」。 -->
 
 ### PR チェックリスト
 
