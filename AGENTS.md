@@ -18,7 +18,7 @@ checked out as its submodule.
 - Fix valid Codex findings in the same PR, except minor ones deferred to an issue as described in "File deferred work as issues". Reply on the PR with the reason for any finding you do not fix.
 - After opening the PR, wait for the Codex review. After pushing fixes, comment `@codex review` and wait for the re-review. Report to the user once Codex has no more findings ("Didn't find any major issues" or 👍).
 
-## Code Review Rules
+## Review guidelines
 
 Guidance for Codex cloud code review.
 
