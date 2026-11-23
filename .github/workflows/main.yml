@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: ["*"]
+    branches: [main]
   pull_request:
 
 # The job only checks out and tests the repository, so the token stays read-only
