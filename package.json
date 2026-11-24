@@ -24,10 +24,10 @@
     "dev:isolated": "pnpm --filter blog-demo dev --port 4500"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.7",
+    "@biomejs/biome": "2.6.8",
     "@changesets/cli": "^3.0.3",
     "husky": "^9.1.7",
-    "turbo": "^2.11.11",
+    "turbo": "^2.11.13",
     "typescript": "7.0.2"
   },
   "engines": {
