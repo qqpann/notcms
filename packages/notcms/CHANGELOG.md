@@ -1,5 +1,29 @@
 # notcms
 
+## 1.1.1
+
+### Patch Changes
+
+- 1d8d8d2: Update the dependencies bundled into the `notcms` CLI:
+  
+  - `commander` 12 → 15. The CLI now rejects unexpected extra arguments (for example `notcms init extra`) with an error instead of ignoring them.
+  - `chalk` 5 → 6.
+  - `@inquirer/prompts` 8.7 → 8.8.
+- d3caabb: Make `notcms` CLI failures easier to act on:
+  
+  - Stop printing `MISSING_ENV_FILE` errors for default env files (`.env`, `.env.local`, `.dev.vars`) that the project does not have. A file passed with `--env` is still reported when it is missing.
+  - When credentials are missing, suggest `npx notcms login` and name the env files the CLI reads, instead of suggesting `source .env`.
+  - When the schema request fails, show the API's reason with a fix for the status (for example a rejected key, or a key from another workspace), say when NotCMS could not be reached, and ask for an update when a successful response is not a schema this version can read.
+  - `pull` now stops with an error when `notcms.config.json` exists but is not valid JSON or has no `schema` string. It used to ignore the file and write the schema to `src/notcms/schema.ts`.
+- 7bf15f6: Make the CLI help and the npm page easier to follow:
+  
+  - `npx notcms --help` describes what `init` and `pull` do, shows the `-e, --env` default as `.env,.env.local,.dev.vars` instead of a JSON array, names `NOTCMS_SECRET_KEY` and `NOTCMS_WORKSPACE_ID`, which let commands run without a browser login, and links to the CLI docs.
+  - `notcms init --help`, `notcms login --help` and `notcms pull --help` list `-e, --env` under "Global Options".
+  - The README on the npm page links to the migration checklist and the content recipes with absolute URLs, so the links work outside the repository.
+  - The npm package description matches the README ("NotCMS makes it easy to create a CMS, from Notion."), so npm search results say that the content comes from Notion. The keywords add "headless cms".
+- 070171d: `new Client()` now names the environment variable to set (`NOTCMS_SECRET_KEY` or `NOTCMS_WORKSPACE_ID`) when credentials are missing. The generated schema module creates the client when it is imported, so this error often appears in a deployment that lacks the variables.
+- 823ce0d: Fix the published type declarations. `list()`, `get()` and `getFirst()` now keep the choices of select, status and multi_select properties in their results. In the built package these values were typed as `any`, and projects with `skipLibCheck: false` failed with "Cannot find name 'O'". Code that compares these values with choices missing from the generated schema may now report type errors; run `npx notcms pull` if the choices changed in Notion. CommonJS projects now get the CommonJS declarations, so TypeScript projects that use `"moduleResolution": "node16"` can import the package instead of failing with TS1479.
+
 ## 1.1.0
 
 ### Minor Changes
